@@ -1,0 +1,292 @@
+#!/bin/bash
+
+#--------------------------------------------------------------------
+# Copyright 2020. Bioinformatic and Genomics Lab.
+# Hanyang University, Seoul, Korea
+# Coded by Jang-il Sohn (sohnjangil@gmail.com)
+#-------------------------------------------------------------------- 
+
+#############################
+#
+# Help message
+#
+
+USAGE="Usage: etching_filter [options] -i exam.conf [options]\n
+\n
+Required\n
+\t-i\tconfig file\n
+\n
+Options\n
+\t-p\tPrefix of output [filtered_read]\n
+\t-t\tNumber of threads [8]\n
+\t-c\tK-mer histogram cut-off for removing sequencing error [automatic]\n
+\t-d\t/path/to/etching [none]\n
+\t  \tUse this if you need to specify it.\n
+\t-T\tInput data type [W]\n
+\t  \tW for whole genome sequencing\n
+\t  \tT for targeted panel sequencing\n
+\n
+Contact:\n\tJang-il Sohn (sohnjangil@gmail.com)\n\tJin-Wu Nam (jwnam@hanyang.ac.kr)\n
+"
+
+#####################################
+
+if [ $# -lt 1 ]
+then
+    echo -e $USAGE
+    exit -1
+fi
+
+PREFIX=filtered_read
+THREADS=8
+DATATYPE="W"
+
+while [ "$1" != "" ]; do
+    case $1 in
+	-i | --config ) shift
+	    CONF=$1
+	    ;;
+        -p | --prefix ) shift
+            PREFIX=$1
+            ;;
+        -t | --threads ) shift
+	    THREADS=$1
+            ;;
+        -c | --cutoff ) shift
+	    CUTOFF=$1
+            ;;
+        -d | --directory ) shift
+	    DIR=$1
+            ;;
+        -T | --data-type ) shift
+	    DATATYPE=$1
+            ;;
+        -h | --help ) echo -e $USAGE
+            exit
+            ;;
+        #* )  echo -e $USAGE
+        #    exit 1
+    esac
+    shift
+done
+
+
+if [ ! ${DATATYPE} == "W" ] && [ ! ${DATATYPE} == "P" ]
+then
+    echo "ERROR!!! -T must be W or P."
+    echo "---------------------------"
+    exit -1
+fi
+
+
+#############################
+#
+# get arguments
+#
+
+if [ ${#CONF} == 0 ]
+then
+    echo "ERROR!!! Please input config file."
+    echo "-------------------------"
+    echo -e $USAGE
+    exit
+fi
+
+grep -v "#" $CONF | awk '{if($1=="sample") print $2}' > sample.list
+grep -v "#" $CONF | awk '{if($1=="filter_fq") print $2}' > filter_fq.list
+grep -v "#" $CONF | awk '{if($1=="filter_fa") print $2}' > filter_fa.list
+FILTER=$(grep -v "#" $CONF | awk '{if($1=="filter_db") print $2}' | head)
+
+
+LINE_NUMBER=$(wc -l sample.list | awk '{print $1}')
+if [ $LINE_NUMBER != 2 ]
+then
+    echo "ERROR!!! Sample file must be paired."
+    exit -1
+fi
+
+#############################
+#
+# Check executable files
+#
+
+if [ ${#DIR} == 0 ]
+then
+    KMER_FILTER=kmer_filter
+    READ_COLLECTOR=read_collector
+else
+    KMER_FILTER=${DIR}/kmer_filter
+    READ_COLLECTOR=${DIR}/read_collector
+fi
+
+CHECK=$(which ${KMER_FILTER} 2> err )
+rm err
+if [ ${#CHECK} == 0 ]
+then
+    echo "ERROR!!! kmer_filter was not installed"
+    exit -1
+fi
+
+CHECK=$(which ${READ_COLLECTOR} 2> err )
+rm err
+if [ ${#CHECK} == 0 ]
+then
+    echo "ERROR!!! read_collector was not install"
+    exit -1
+fi
+
+CHECK=$(which kmc 2> err )
+rm err
+if [ ${#CHECK} == 0 ]
+then
+    echo "ERROR!!! KMC3 was not install"
+    exit -1
+fi
+
+CHECK=$(which kmc_tools 2> err )
+rm err
+if [ ${#CHECK} == 0 ]
+then
+    echo "ERROR!!! KMC3 was not install"
+    exit -1
+fi
+
+CHECK=$(which kmc_dump 2> err )
+rm err
+if [ ${#CHECK} == 0 ]
+then
+    echo "ERROR!!! KMC3 was not install"
+    exit -1
+fi
+
+
+
+MAPPER=$(grep -v "#" ${CONF} | awk '{if($1=="mapper") print $2}' )
+SAMTOOLS=$(grep -v "#" ${CONF} | awk '{if($1=="samtools") print $2}' )
+
+if [ ${#MAPPER} == 0 ]
+then
+    MAPPER="bwa mem"
+else 
+    CHECK=$(grep -v "#" ${CONF} | awk '{$1=="mapper") print $2}' | grep bwa)
+    if [ ${#CHECK} != 0 ]
+    then
+	MAPPER="$CHECK mem"
+    else
+	CHECK=$(grep -v "#" ${CONF} | awk '{if($1=="mapper") print $2}' | grep minimap2)
+	if [ ${#CHECK} != 0 ]
+	then
+	    MAPPER="$CHECK -a"
+	else
+	    echo "ERROR!!! Mapper must be one of bwa or minimap2 in $CONF file."
+	    exit -1
+	fi
+    fi
+fi
+
+CHECK=$(which $MAPPER 2> err )
+rm err
+if [ ${#CHECK} == 0 ]
+then
+    echo "ERROR!!! bwa was not install"
+    exit -1
+fi
+
+
+
+if [ ${#SAMTOOLS} == 0 ]
+then
+    SAMTOOLS=samtools
+fi
+
+CHECK=$(which $SAMTOOLS 2> err )
+rm err
+if [ ${#CHECK} == 0 ]
+then
+    echo "ERROR!!! samtools was not installed"
+    exit -1
+fi
+
+
+GENOME=$(grep -v "#" ${CONF} | awk '{if($1=="genome") print $2}' )
+if [ ! -f ${GENOME} ]
+then
+    echo "ERROR!!!"
+    echo "There is no reference genome: $GENOME"
+    exit -1
+fi
+
+
+
+#############################
+#
+# get arguments
+#
+echo
+echo "[kmer_filter]"
+DATE="[$(date)]";echo ${DATE}
+
+if [ ${#CUTOFF} != 0 ]
+then
+    CUTOFF="-c $CUTOFF"
+fi
+
+#############################
+#
+# kmer_filter
+#
+cmd="${KMER_FILTER} -i sample.list -l filter_fq.list -r filter_fa.list -a $FILTER -o $PREFIX -t $THREADS $CUTOFF -T $DATATYPE > logs/kmer_filter.log 2> logs/kmer_filter.err"
+echo $cmd
+eval $cmd
+
+#############################
+#
+# read_collector
+#
+echo
+echo "[read_collector]"
+DATE="[$(date)]";echo ${DATE}
+
+FIRST_FRAG=$(head -n 1 sample.list)
+SECOND_FRAG=$(tail -n 1 sample.list)
+
+cmd="${READ_COLLECTOR} -f $PREFIX -1 $FIRST_FRAG -2 $SECOND_FRAG -o $PREFIX -t $THREADS > logs/read_collector.log 2> logs/read_collector.err"
+echo $cmd
+eval $cmd
+
+#############################
+#
+# Mapping
+#
+echo
+echo "[Mapping]"
+DATE="[$(date)]";echo ${DATE}
+
+FIRST_FRAG=${PREFIX}_1.fastq
+SECOND_FRAG=${PREFIX}_2.fastq
+
+
+cmd="${MAPPER} -t ${THREADS} ${GENOME} ${FIRST_FRAG} ${SECOND_FRAG} 2> logs/mapping.log | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.bam"
+echo $cmd
+eval $cmd
+
+CHECK=$($SAMTOOLS sort 2>&1 | grep "\-o" | grep "final output to stdout")
+
+if [ ${#CHECK} == 0 ]
+then
+    cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.bam -o ${PREFIX}.sort.bam"
+    echo $cmd
+    eval $cmd
+else
+    cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.bam ${PREFIX}.sort"
+    echo $cmd
+    eval $cmd
+fi
+
+cmd="${SAMTOOLS} index ${PREFIX}.sort.bam"
+echo $cmd
+eval $cmd
+
+echo
+echo "[END]"
+DATE="[$(date)]";echo ${DATE}
