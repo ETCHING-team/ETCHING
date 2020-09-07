@@ -9,7 +9,7 @@ default:
 	cd Caller && make
 	cd Sorter && make
 	cd FG_identifier && make
-	#bash decomp.sh
+	bash decomp.sh
 	if [[ ! -d "bin" ]]; then mkdir bin ; fi
 	cp ETCHING/etching bin/
 	cp ETCHING/etching_conf_parse bin/
