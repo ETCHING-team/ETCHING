@@ -31,7 +31,7 @@ If you are using v1.0 (initial buggy version), please replace with the version >
 
 * 64-bit LINUX with >=64GB RAM (at least >=16GB).
 
-* C++11 with g++>=4.7.1
+* C++11 with g++>=4.7.0
 
 * python2.7 with pickle, pandas, numpy, xgboost, and scikit-learn packages.
 
