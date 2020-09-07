@@ -32,12 +32,15 @@
 #include "Peak_memory_measure.hpp"
 #include "CPU_TIME_measure.hpp"
 
-const std::string version = "v20200822";
+const std::string version = "ETCHING_v1.0.1 (released 2020.09.05)";
 const std::string PROGRAM = "Program: etching_caller";
 const std::string VERSION = "Version: " + version;
 const std::string CONTACT = "Contact:\n\tJang-il Sohn (sohnjangil@gmail.com)\n\tJin-Wu Nam (jwnam@hanyang.ac.kr)";
 
 using Position = std::pair < int , int > ;
+
+void print_version();
+void caller_usage();
 
 template < class T >
 class Format{

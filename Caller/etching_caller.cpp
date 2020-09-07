@@ -12,8 +12,9 @@
 #include "CPU_TIME_measure.hpp"
 #include "Peak_memory_measure.hpp"
 
+/*
 void print_version(){
-  std::cout << "etching_caller_" << version << "\n";
+  std::cout << version << "\n";
 }
 
 void caller_usage(){
@@ -53,7 +54,7 @@ void caller_usage(){
     << CONTACT << "\n"
     << "\n";
 };
-
+*/
 int main(int argc, char ** argv){
 
   if(argc == 1 ){

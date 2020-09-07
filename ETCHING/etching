@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+VERSION="ETCHING_v1.0.1 (released 2020.09.05)"
 
 #--------------------------------------------------------------------
 # Copyright 2020. Bioinformatic and Genomics Lab.
@@ -6,7 +8,7 @@
 # Coded by Jang-il Sohn (sohnjangil@gmail.com)
 #--------------------------------------------------------------------  
 
-VERSION="ETCHING_r1.0 (released 2020.08.22)\n"
+VERSION="ETCHING_v1.0.1 (released 2020.09.05)\n"
 
 #############################
 #
@@ -278,9 +280,25 @@ do
 done
 
 
+
+for i in etching_caller etching_sorter etching_fg_identifier read_collector
+do
+    CHECK=$(${i} 2> err )
+    if [ ${#CHECK} == 0 ]
+    then
+        echo "ERROR!!!: Shared library was not installed."
+	echo "Please set LD_LIBRARY_PATH=/path/to/etching/lib:$LD_LIBRARY_PATH"
+	echo "----------------------------------------------------------------"
+        cat err
+	rm err
+        exit -1
+    fi
+done
+
+
 for i in kmc kmc_tools kmc_dump
 do
-    CHECK=$(which kmc 2> err )
+    CHECK=$(which ${i} 2> err )
     rm err
     if [ ${#CHECK} == 0 ]
     then

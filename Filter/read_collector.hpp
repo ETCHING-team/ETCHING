@@ -35,6 +35,7 @@ using namespace std;
 using spp::sparse_hash_set;
 
 
+/*
 #define TWO_BITS_MASK (3)
 #define BITS_PER_BYTE (8)
 #define BIG_ENOUGH (1024)
@@ -46,13 +47,14 @@ void encode_forw(uint64_t & value, const char & base, const size_t &kl);
 uint64_t revcom(unsigned char x);
 void encode_reve(uint64_t & value, const char & base, const size_t & kl);
 uint64_t select_canonical (uint64_t & value1,uint64_t & value2);
+*/
 
 uint64_t return_encode(string & kmer);
-bool search_kmer(string & read1, string & qual1, string & read2, string & qual2);
+bool search_kmer(string & read1, string & qual1, string & read2, string & qual2, size_t kmer_size);
 
 void read_fastq();
 void read_fastq_gz();
-void encoding();
+void encoding(size_t kmer_size, int num_threads);
 void write_fastq();
 void SWAP();
 

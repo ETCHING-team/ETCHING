@@ -334,7 +334,7 @@ int main ( int argc , char ** argv ){
       for ( size_t i = 1 ; i < depth.size() ; i ++ ){
 	if ( freq[0] > 10 * freq[i] ){
 	  // local_min = depth[i];
-	  if ( freq[i-1] - freq[0]/10 > freq[0]/10 - freq[i] ){
+	  if ( freq[i-1] - freq[0]/10 < freq[0]/10 - freq[i] ){
 	    local_min = depth[i-1];
 	  }
 	  else{

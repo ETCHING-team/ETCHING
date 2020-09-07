@@ -1,10 +1,15 @@
 ---
 # ETCHING
 
+### Version 1.0.1
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
 ETCHING takes 2-3 hours for WGS data with 30X normal and 50X tumor.
+
+### Note!!!
+
+If you are using v1.0 (initial buggy version), please replace with the version >=1.0.1.
 
 ---
 ## Table of contents
@@ -24,9 +29,9 @@ ETCHING takes 2-3 hours for WGS data with 30X normal and 50X tumor.
 
 ### System
 
-* 64-bit linux with >=64GB RAM (at least >=16GB).
+* 64-bit LINUX with >=64GB RAM (at least >=16GB).
 
-* g++ (>=4.8.5)
+* C++11 with g++>=4.7.1
 
 * python2.7 with pickle, pandas, numpy, xgboost, and scikit-learn packages.
 
@@ -52,11 +57,13 @@ make
 
 export PATH=/path/to/etching/bin:$PATH
 export LD_LIBRARY_PATH=/path/to/etching/lib:$LD_LIBRARY_PATH
+export ETCHING_ML_PATH=/path/to/etching/ETCHING_ML_model
 ```
 You can add this line in bashrc or bash_profile.
 ```
 echo "export PATH=/path/to/etching/bin:$PATH" >> ~/.bashrc
 echo "export LD_LIBRARY_PATH=/path/to/etching/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
+echo "export ETCHING_ML_PATH=/path/to/etching/ETCHING_ML_model" >>/.bashrc
 ```
 If you want to install ETCHING for all users, copy all files as follows.
 ```
@@ -64,16 +71,6 @@ sudo cp /path/to/etching/bin/* /usr/bin
 sudo cp /path/to/etching/lib/* /usr/lib
 ```
 or to /usr/local/bin, and /usr/local/lib.
-
-You should set ETCHING_ML_PATH with export command before using ETCHING.
-```
-export ETCHING_ML_PATH=/path/to/etching/ETCHING_ML_model
-```
-or add the last line in bashrc or bash_profile.
-```
-echo "export ETCHING_ML_PATH=/path/to/etching/ETCHING_ML_model" >> ~/.bashrc
-```
-ETCHING-Sorter will not be working without the machine learning models.
 
 ----------------------------------------------------------------------------------
 ## Usage

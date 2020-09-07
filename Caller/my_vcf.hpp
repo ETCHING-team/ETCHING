@@ -112,10 +112,8 @@ public:
   std::string to_string();
   std::string to_string_short();
 
-  void resize_tool_comp(int Size){
-    tool_comp.clear();
-    tool_comp.resize(Size);
-  }
+  void resize_tool_comp(int Size);
+
 };
 
 VCF return_mate(VCF input);
@@ -132,9 +130,11 @@ private:
   char GetNucl(const std::string & , const std::size_t &);
 
 public:
-  VCF_CLASS(){};
+  VCF_CLASS();
   VCF_CLASS(const std::string input_file);
-  ~VCF_CLASS(){clear();};
+  ~VCF_CLASS();
+
+  std::string etching_version;
   
   // Main container
   VCF_MAP vcf_map;

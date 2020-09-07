@@ -56,7 +56,7 @@ test:    test_gzip test_gunzip
 	gzip gz.tmp
 	./test_gunzip gz.tmp.gz gz.tmp
 	diff COPYING.LIB gz.tmp
-	rm gz.tmp.gz gz.tmp
+	rm -f gz.tmp.gz gz.tmp
 	# *** O.K. Test finished successfully. ***
 
 install: libgzstream.a test
@@ -66,13 +66,13 @@ install: libgzstream.a test
 	# *** O.K. Installation finished successfully. ***
 
 gzstream.o : gzstream.C gzstream.h
-	${CXX} ${CPPFLAGS} -c -o gzstream.o gzstream.C
+	${CXX} ${CPPFLAGS} -c -fPIC -o gzstream.o gzstream.C
 
 test_gzip.o : test_gzip.C gzstream.h
-	${CXX} ${CPPFLAGS} -c -o test_gzip.o test_gzip.C
+	${CXX} ${CPPFLAGS} -c -fPIC -o test_gzip.o test_gzip.C
 
 test_gunzip.o : test_gunzip.C gzstream.h
-	${CXX} ${CPPFLAGS} -c -o test_gunzip.o test_gunzip.C
+	${CXX} ${CPPFLAGS} -c -fPIC -o test_gunzip.o test_gunzip.C
 
 libgzstream.a : gzstream.o
 	${AR} libgzstream.a gzstream.o
@@ -84,10 +84,10 @@ test_gunzip : test_gunzip.o libgzstream.a
 	${CXX} -o test_gunzip test_gunzip.o ${LDFLAGS}
 
 clean :
-	rm *.o
+	rm -f *.o
 
 cleanall :
-	rm *.o libgzstream.a test_gzip test_gunzip
+	rm -f *.o libgzstream.a test_gzip test_gunzip
 
 uninstall:
 	rm /usr/include/gzstream.h /usr/lib/libgzstream.a

@@ -1,6 +1,18 @@
-all:
+default: ../lib/libetching_fg_identifier.so etching_fg_identifier sort_gtf
+
+all: default
+
+etching_fg_identifier:
+	g++ -Wall -g -std=c++11 etching_fg_identifier.cpp -L../lib -letching_fg_identifier -o etching_fg_identifier
+
+sort_gtf:
 	g++ -Wall -g -std=c++11 sort_gtf.cpp -o sort_gtf
-	g++ -Wall -g -std=c++11 etching_fg_identifier.cpp -L../lib -l fg_identifier -o etching_fg_identifier
+
 
 clean:
 	rm -f etching_fg_identifier sort_gtf
+
+cleanlibrary:
+	rm -f ../lib/libfg_identifier.so
+
+cleanall: clean cleanlibrary
