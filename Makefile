@@ -1,5 +1,3 @@
-GCC_VERSION=$(g++ --version | head -n 1 | awk '{print $3}')
-
 default:
 	bash libconf.sh
 	cd lib/zlib && make
