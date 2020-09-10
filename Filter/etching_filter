@@ -168,7 +168,7 @@ if [ ${#MAPPER} == 0 ]
 then
     MAPPER="bwa mem"
 else 
-    CHECK=$(grep -v "#" ${CONF} | awk '{$1=="mapper") print $2}' | grep bwa)
+    CHECK=$(grep -v "#" ${CONF} | awk '{if($1=="mapper") print $2}' | grep bwa)
     if [ ${#CHECK} != 0 ]
     then
 	MAPPER="$CHECK mem"
