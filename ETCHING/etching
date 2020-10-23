@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.0.2 (released 2020.09.10)"
+VERSION="ETCHING_v1.1.0 (released 2020.10.24)"
 
 #--------------------------------------------------------------------
 # Copyright 2020. Bioinformatic and Genomics Lab.
@@ -13,58 +13,68 @@ VERSION="ETCHING_v1.0.2 (released 2020.09.10)"
 # Help message
 #
 
-USAGE="
-$VERSION\n
-Usage: etching [options] -i exam.conf [options]\n
-\n
-Example)\n
-\$ etching -i exam.conf -p test_out -t 30 -w workdir -T P -L 150 -P 0.5 -A -R\n
-\n
-[Required]\n
--i (string)  \tConfig file\n
-\n
-[General options]\n
--p (string)  \tPrefix of output [etching]\n
--t (int)     \tNumber of threads [8]\n
--d (string)  \t/path/to/etching [none]\n
-           \t\tUse this if you need to specify it.\n
--w (string)  \tWorking directory [./working]\n
--h\t\tPrint this message\n
-\n
-[READ FILTER]\n
--T (stiring) \tW for WGS, P for Panel [W]\n
--K (int)     \tK-mer frequency cut-off for removing \n
-           \t\tsequencing error in etching_filter [automatic]\n
--L (int)     \tRead length [100]\n
-\n
-[SV CALLER]\n
--P (double)  \tTumor purity [0.75]\n
--I (int)     \tInsert-size [500]\n
--O (string)  \tRead-orientation FR or RF. [FR]\n
--A         \t\tUse all split-reads [None]\n
-           \t\tThis option increases recall. However,\n
-           \t\tlots of folse-positives also can be generated.\n
-\n
-[SV SORTER]\n
--R         \t\tRandom Forest in scoring [default]\n
--X         \t\tXGBoost in scoring\n
--C (double)  \tCut-off of false SVs [0.4]\n
--m (string)  \tPath to ETCHING machine learning model [None]\n
-           \t\tUse this if you want to specify the path to\n
-           \t\tmachine learning models.\n
-\n
-[About ETCHING]\n
--h         \t\tPrint this message\n
--v         \t\tPrint version\n
-\n
-Contact:\n\tJang-il Sohn (sohnjangil@gmail.com)\n\tJin-Wu Nam (jwnam@hanyang.ac.kr)\n
-"
+function USAGE {
+    echo -e "$VERSION"
+    echo -e "Usage: etching [options] -i exam.conf [options]"
+    echo -e 
+    echo -e "Example)"
+    echo -e "If you want to run ETCHING for panel data (-T P) of 150bp insert-size (-L 150)"
+    echo -e "and 0.5 tumor purity (-P 0.5) with 30 thread (-t 30) using Random Forest scorer (-R)"
+    echo -e "on working directory workdir (-w workdir),"
+    echo -e "run the following command after editing exam.conf."
+    echo -e "\$ etching -i exam.conf -p test_out -t 30 -w workdir -T P -L 150 -P 0.5 -A -R"
+    echo -e 
+    echo -e "[Required]"
+    echo -e "-i (string)\tConfig file"
+    echo -e 
+    echo -e "[General options]"
+    echo -e "-p (string)\tPrefix of output [etching]"
+    echo -e "-t (int)   \tNumber of threads [8]"
+    echo -e "-d (string)\t/path/to/etching [none]"
+    echo -e "           \tUse this if you need to specify it."
+    echo -e "-w (string)\tWorking directory [./working]"
+    echo -e 
+    echo -e "[READ FILTER]"
+    echo -e "-T (string)\tW for WGS, P for Panel [W]"
+    echo -e "-K (int)   \tK-mer frequency cut-off for removing "
+    echo -e "           \tsequencing error in etching_filter [automatic]"
+    echo -e "-L (int)   \tRead length [100]"
+    echo -e 
+    echo -e "[SV CALLER]"
+    echo -e "-P (double)\tTumor purity [0.75]"
+    echo -e "-I (int)   \tInsert-size [500]"
+    echo -e "-O (string)\tRead-orientation FR or RF. [FR]"
+    echo -e "-A         \tUse all split-reads [None]"
+    echo -e "           \tThis option increases recall. However,"
+    echo -e "           \tlots of folse-positives also can be generated."
+    echo -e "-D (int)   \tSequencing depth [automatic]"
+    echo -e "           \tIn case of WGS, sequencing depth is calculated automatically using k-mer histogram."
+    echo -e "           \tNote: In case of panel, sequencing data have ~500X or more depth. However, we set"
+    echo -e "           \tdefault to 50 for panel, and it works well in Sorter."
+    echo -e 
+    echo -e "[SV SORTER]"
+    echo -e "-R         \tRandom Forest in scoring [default]"
+    echo -e "-X         \tXGBoost in scoring"
+    echo -e "-C (double)\tCut-off of false SVs [0.4]"
+    echo -e "-m (string)\tPath to ETCHING machine learning model [None]"
+    echo -e "           \tUse this if you want to specify the path to"
+    echo -e "           \tmachine learning models."
+    echo -e 
+    echo -e "[About ETCHING]"
+    echo -e "-h         \tPrint this message"
+    echo -e "-v         \tPrint version"
+    echo -e 
+    echo -e "Contact:"
+    echo -e "\tJang-il Sohn (sohnjangil@gmail.com)"
+    echo -e "\tJin-Wu Nam (jwnam@hanyang.ac.kr)"
+    echo -e
+}
 
 #####################################
 
 if [ $# -lt 1 ]
 then
-    echo -e $USAGE
+    USAGE
     exit -1
 fi
 
@@ -84,6 +94,7 @@ ALLSPLIT=
 PURITY=0.75
 INSERTSIZE=500
 ORIENT=FR
+DEPTH=
 
 ALGOR=
 ALGOR_R=0
@@ -130,6 +141,9 @@ while [ "$1" != "" ]; do
         -O | --orientation ) shift
 	    ORIENT=$1
             ;;
+        -D | --sequencing_depth ) shift
+	    DEPTH="-D "$1
+            ;;
 
         -R | --random_forest )
 	    ALGOR_R=1
@@ -144,7 +158,7 @@ while [ "$1" != "" ]; do
 	    ML_PATH=$1
             ;;
 
-        -h | --help ) echo -e $USAGE
+        -h | --help ) USAGE
             exit
             ;;
 
@@ -174,7 +188,7 @@ if [ ${ALGOR_R} == 1 ] && [ ${ALGOR_X} == 1 ]
 then
     echo "ERROR!!! -R and -X can not used together."
     echo "-----------------------------------------"
-    echo -e $USAGE
+    USAGE
     exit -1
 fi
 
@@ -200,7 +214,7 @@ if [ ! ${DATATYPE} == "W" ] && [ ! ${DATATYPE} == "P" ]
 then
     echo "ERROR!!! -T must be used with W or P."
     echo "---------------------------"
-    echo -e $USAGE
+    USAGE
     exit -1
 fi
 
@@ -248,7 +262,7 @@ if [ ${#CONF} == 0 ]
 then
     echo "Please input config file."
     echo "-------------------------"
-    echo -e $USAGE
+    USAGE
     exit -1
 fi
 
@@ -267,8 +281,8 @@ fi
 
 for i in etching_conf_parse etching_filter estimate_coverage etching_caller etching_sorter etching_fg_identifier kmer_filter read_collector
 do
-    CHECK=$(which ${DIR}${i} 2> err )
-    rm err
+    CHECK=$(which ${DIR}${i})
+    
     if [ ${#CHECK} == 0 ]
     then
 	echo "ERROR!!!"
@@ -281,14 +295,14 @@ done
 
 for i in etching_caller etching_sorter etching_fg_identifier read_collector
 do
-    CHECK=$(${i} 2> err )
+    CHECK=$(${i})
     if [ ${#CHECK} == 0 ]
     then
         echo "ERROR!!!: Shared library was not installed."
 	echo "Please set LD_LIBRARY_PATH=/path/to/etching/lib:$LD_LIBRARY_PATH"
 	echo "----------------------------------------------------------------"
         cat err
-	rm err
+	
         exit -1
     fi
 done
@@ -296,8 +310,8 @@ done
 
 for i in kmc kmc_tools kmc_dump
 do
-    CHECK=$(which ${i} 2> err )
-    rm err
+    CHECK=$(which ${i})
+    
     if [ ${#CHECK} == 0 ]
     then
 	echo "ERROR!!!"
@@ -314,8 +328,8 @@ SAMTOOLS=$(grep -v "#" ${CONF} | awk '{if($1=="samtools") print $2}' )
 if [ ${#MAPPER} == 0 ]
 then
     MAPPER="bwa mem"
-    CHECK=$(which $MAPPER 2> err )
-    rm err
+    CHECK=$(which $MAPPER)
+    
     if [ ${#CHECK} == 0 ]
     then
 	echo "ERROR!!!"
@@ -327,8 +341,8 @@ else
     if [ ${#CHECK} != 0 ]
     then
 	MAPPER="${CHECK}"
-	CHECK=$(which $MAPPER 2> err )
-	rm err
+	CHECK=$(which $MAPPER)
+	
 	if [ ${#CHECK} == 0 ]
 	then
 	    echo "ERROR!!!"
@@ -340,8 +354,8 @@ else
 	if [ ${#CHECK} != 0 ]
 	then
             MAPPER=$CHECK
-	    CHECK=$(which $MAPPER 2> err )
-	    rm err
+	    CHECK=$(which $MAPPER)
+	    
 	    if [ ${#CHECK} == 0 ]
 	    then
 		echo "ERROR!!!"
@@ -364,8 +378,8 @@ then
     SAMTOOLS=samtools
 fi
 
-CHECK=$(which $SAMTOOLS 2> err )
-rm err
+CHECK=$(which $SAMTOOLS)
+
 if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!!"
@@ -443,7 +457,7 @@ then
 	    echo "ERROR!!! In config file"
 	    echo "There is no input file: ${i}"
 	    #echo "--------------------------------------------"
-	    #echo -e $USAGE
+	    #USAGE
 	    exit -1
 	fi
     done
@@ -461,7 +475,7 @@ then
 	    echo "ERROR!!! In config file"
 	    echo "There is no input file: ${i}"
 	    #echo "--------------------------------------------"
-	    #echo -e $USAGE
+	    #USAGE
 	    exit -1
 	fi
     done
@@ -477,7 +491,7 @@ then
 	echo "ERROR!!! In config file"
 	echo "There is no input file: ${FILTER}.kmc_pre"
 	#echo "--------------------------------------------"
-	#echo -e $USAGE
+	#USAGE
 	exit -1
     fi
     if [ ! -f ${FILTER}.kmc_suf ]
@@ -485,7 +499,7 @@ then
 	echo "ERROR!!! In config file"
 	echo "There is no input file: ${FILTER}.kmc_suf"
 	#echo "--------------------------------------------"
-	#echo -e $USAGE
+	#USAGE
 	exit -1
     fi
 fi
@@ -558,7 +572,7 @@ fi
 
 mkdir logs
 
-cmd="${DIR}etching_filter -i $CONF -t $THREADS $KMERCUTOFF -T ${DATATYPE} ${DIR_OPT} > logs/ETCHING_FILTER.log 2> logs/ETCHING_FILTER.err"
+cmd="${DIR}etching_filter -i $CONF -t $THREADS $KMERCUTOFF -T ${DATATYPE} ${DIR_OPT} > logs/ETCHING_FILTER.log"
 echo $cmd
 eval $cmd
 
@@ -571,18 +585,19 @@ echo
 echo "[CALLER]"
 DATE="[$(date)]";echo ${DATE}
 
-if [ $DATATYPE == "W" ]
-then 
-    cmd="${DIR}estimate_coverage sample $READLENGTH 31"
-    echo $cmd
-    DEPTH=$(eval $cmd 2> err)
-    rm err
-    DEPTH="-D $DEPTH"
-else
-    DEPTH=
+if [${#DEPTH} == 0 ]
+then
+    if [ $DATATYPE == "W" ]
+    then 
+	cmd="${DIR}estimate_coverage sample $READLENGTH 31"
+	echo $cmd
+	DEPTH=$(eval $cmd)
+	
+	DEPTH="-D $DEPTH"
+    fi
 fi
 
-cmd="${DIR}etching_caller -b filtered_read.sort.bam -g $GENOME -o $PREFIX $DEPTH -P $PURITY -O $ORIENT $ALLSPLIT > logs/ETCHING_CALLER.log 2> logs/ETCHING_CALLER.err"
+cmd="${DIR}etching_caller -b filtered_read.sort.bam -g $GENOME -o $PREFIX $DEPTH -P $PURITY -O $ORIENT $ALLSPLIT > logs/ETCHING_CALLER.log "
 echo $cmd
 eval $cmd
 
@@ -600,8 +615,7 @@ if [ ${#ML_PATH} != 0 ]
 then
     cmd="${cmd} -m ${ML_PATH}"
 fi
-cmd="$cmd > logs/ETCHING_SORTER.BND.log 2> logs/ETCHING_SORTER.BND.err"
-#cmd="${DIR}etching_sorter -i ${PREFIX}.BND.vcf -o ${PREFIX}.BND -c $CUTOFF $ALGOR > logs/ETCHING_SORTER.BND.log 2> logs/ETCHING_SORTER.BND.err"
+cmd="$cmd > logs/ETCHING_SORTER.BND.log "
 echo $cmd
 eval $cmd
 
@@ -610,8 +624,7 @@ if [ ${#ML_PATH} != 0 ]
 then
     cmd="${cmd} -m ${ML_PATH}"
 fi
-cmd="$cmd > logs/ETCHING_SORTER.SV.log 2> logs/ETCHING_SORTER.SV.err"
-#cmd="${DIR}etching_sorter -i ${PREFIX}.SV.vcf -o ${PREFIX}.SV -c $CUTOFF $ALGOR > logs/ETCHING_SORTER.SV.log 2> logs/ETCHING_SORTER.SV.err"
+cmd="$cmd > logs/ETCHING_SORTER.SV.log "
 echo $cmd
 eval $cmd
 

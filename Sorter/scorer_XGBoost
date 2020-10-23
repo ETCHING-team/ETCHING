@@ -18,12 +18,12 @@ def xgbooster(testfile,prefix,directory):
 	test_label = np.array(pd.DataFrame(test_file,columns=['ID']))
 	test_ref_file = test_file.drop(columns = ['ID','SVTYPE'])
 	test_ref_file_ar = np.array(test_ref_file)
-#	test_name = testfile[:-4]
-#	out = open(str(test_name) + '_Precision_recall.csv','wb')
-#	out.write('Recall' + ',' + 'Precision' + '\n')
-#	pout = open(str(test_name) + '_threshold.csv','wb')
-#	pout.write('Threshold' + '\n')
 	
+	for fnum in range (1,11) :
+                fname = directory + 'etching_xgb_' + str(fnum) + '.sav'
+                if os.path.exists ( fname ) != True :
+                        print ( "ERROR!!! Check model files in path: " + directory )
+                        sys.exit()
 	
 	model_1 = pickle.load(open(str(directory) + 'etching_xgb_1.sav','rb'))
 	model_2 = pickle.load(open(str(directory) +'etching_xgb_2.sav','rb'))
@@ -77,6 +77,6 @@ else:
         directory = sys.argv[3] + '/'
 
 result = xgbooster(args,prefix,directory)
-print result
+print ( result )
 	
 	

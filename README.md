@@ -1,15 +1,11 @@
 ---
 # ETCHING
 
-### Version 1.0.2
+### Version 1.1.0
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
 ETCHING takes 2-3 hours for WGS data with 30X normal and 50X tumor.
-
-### Note!!!
-
-If you are using v1.0 (initial buggy version), please replace with the version >=1.0.1.
 
 ---
 ## Table of contents
@@ -33,17 +29,15 @@ If you are using v1.0 (initial buggy version), please replace with the version >
 
 * C++11 with g++>=4.7.0
 
-* python2.7 with pickle, pandas, numpy, xgboost, and scikit-learn packages.
+* python3 with pickle, pandas, numpy, sklearn, skranger, and xgboost packages.
 
 * bwa mem (or Minimap2)
 
 * samtools
 
-(Python3 will be supported soon)
-
 You can install ETCHING even if you did not install the python packages, but ETCHING-Sorter is not working properly.
 
-##### We tested this version on CentOS 7.4.1708 with g++-4.8.5 and python 2.7.15.
+##### We tested this version on CentOS 7.4.1708 with g++ >4.7 and python-3.6.10.
 
 ----------------------------------------------------------------------------------
 ## Installation

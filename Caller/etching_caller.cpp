@@ -116,59 +116,59 @@ int main(int argc, char ** argv){
 
     case 'h': caller_usage(); return 0 ;
 
-    default: std::cerr << "\tInvalid option\n"; caller_usage(); return 1;
+    default: std::cout << "\tInvalid option\n"; caller_usage(); return 1;
 
     }
   }
 
   if ( input_bam.size() == 0 ){
-    std::cerr << "------------------------------------------------------------------------------\n";
-    std::cerr << "ERROR!!! In option -i : Input bam file is required.\n";
-    std::cerr << "------------------------------------------------------------------------------\n\n";
+    std::cout << "------------------------------------------------------------------------------\n";
+    std::cout << "ERROR!!! In option -i : Input bam file is required.\n";
+    std::cout << "------------------------------------------------------------------------------\n\n";
     caller_usage();
     return 0;
   }
   if ( prefix.size() == 0 ){
-    std::cerr << "------------------------------------------------------------------------------\n";
-    std::cerr << "ERROR!!! In option -o : Prefix of output file is required.\n";
-    std::cerr << "------------------------------------------------------------------------------\n\n";
+    std::cout << "------------------------------------------------------------------------------\n";
+    std::cout << "ERROR!!! In option -o : Prefix of output file is required.\n";
+    std::cout << "------------------------------------------------------------------------------\n\n";
     caller_usage();
     return 0;
   }
   if ( genome.size() == 0 ){
-    std::cerr << "------------------------------------------------------------------------------\n";
-    std::cerr << "ERROR!!! In option -g : Reference genome file is required.\n";
-    std::cerr << "------------------------------------------------------------------------------\n\n";
+    std::cout << "------------------------------------------------------------------------------\n";
+    std::cout << "ERROR!!! In option -g : Reference genome file is required.\n";
+    std::cout << "------------------------------------------------------------------------------\n\n";
     caller_usage();
     return 0;
   }
   if ( read_orientation != "FR" && read_orientation != "RF" ) {
-    std::cerr << "------------------------------------------------------------------------------\n";
-    std::cerr << "ERROR!!! In option -r : Read-orientation must be one of FR or RF.\n";
-    std::cerr << "------------------------------------------------------------------------------\n\n";
+    std::cout << "------------------------------------------------------------------------------\n";
+    std::cout << "ERROR!!! In option -r : Read-orientation must be one of FR or RF.\n";
+    std::cout << "------------------------------------------------------------------------------\n\n";
     caller_usage();
     return 0;
   }
   if ( purity <= 0 || purity > 1 ){
-    std::cerr << "------------------------------------------------------------------------------\n";
-    std::cerr << "ERROR!!! In option -P : Tumor purity must be from 0 to 1.\n";
-    std::cerr << "------------------------------------------------------------------------------\n\n";
+    std::cout << "------------------------------------------------------------------------------\n";
+    std::cout << "ERROR!!! In option -P : Tumor purity must be from 0 to 1.\n";
+    std::cout << "------------------------------------------------------------------------------\n\n";
     caller_usage();
     return 0;
   }
   if ( seqdep < 0 ){
-    std::cerr << "------------------------------------------------------------------------------\n";
-    std::cerr << "ERROR!!! In option -C : Sequencing coverage (or depth) must be greater then 0.\n";
-    std::cerr << "------------------------------------------------------------------------------\n\n";
+    std::cout << "------------------------------------------------------------------------------\n";
+    std::cout << "ERROR!!! In option -C : Sequencing coverage (or depth) must be greater then 0.\n";
+    std::cout << "------------------------------------------------------------------------------\n\n";
     caller_usage();
     return 0;
   }
   if ( data_type.size() > 0 ){
     if ( data_type != "WGS" &&  data_type != "WES" &&  data_type != "PANEL" &&  data_type != "wgs" &&
 	 data_type != "wes" &&  data_type != "panel" &&  data_type != "Panel" ){
-      std::cerr << "------------------------------------------------------------------------------\n";
-      std::cerr << "ERROR!!! In option -T : Data type must be one of WGS, WES, or PANEL.\n";
-      std::cerr << "------------------------------------------------------------------------------\n\n";
+      std::cout << "------------------------------------------------------------------------------\n";
+      std::cout << "ERROR!!! In option -T : Data type must be one of WGS, WES, or PANEL.\n";
+      std::cout << "------------------------------------------------------------------------------\n\n";
       caller_usage();
       return 0;
     }
@@ -176,9 +176,9 @@ int main(int argc, char ** argv){
   
   std::ifstream fin ( input_bam.c_str() );
   if ( !fin.good() ) {
-    std::cerr << "------------------------------------------------------------------------------\n";
-    std::cerr << "ERROR!!! In option -b : No input bam file : " << input_bam << "\n";
-    std::cerr << "------------------------------------------------------------------------------\n\n";
+    std::cout << "------------------------------------------------------------------------------\n";
+    std::cout << "ERROR!!! In option -b : No input bam file : " << input_bam << "\n";
+    std::cout << "------------------------------------------------------------------------------\n\n";
     caller_usage();
     return 0;
   }
@@ -186,9 +186,9 @@ int main(int argc, char ** argv){
 
   fin.open( genome.c_str() );
   if ( !fin.good() ) {
-    std::cerr << "------------------------------------------------------------------------------\n";
-    std::cerr << "ERROR!!! In option -g : No reference genome file : " << genome << "\n";
-    std::cerr << "------------------------------------------------------------------------------\n\n";
+    std::cout << "------------------------------------------------------------------------------\n";
+    std::cout << "ERROR!!! In option -g : No reference genome file : " << genome << "\n";
+    std::cout << "------------------------------------------------------------------------------\n\n";
     caller_usage();
     return 0;
   }

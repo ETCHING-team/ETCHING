@@ -32,6 +32,62 @@ void usage(){
     << "\t" << "           \t" << "FILTER field.\n"
     << "\n";
 }
+
+
+int python_version(std::string prefix){
+  std::string fname = prefix + "python_version";
+  std::string command = "python --version > " + fname;
+  system ( command.c_str() );
+  std::ifstream fin ( fname.c_str() );
+  std::string tmp;
+  fin >> tmp >> tmp;
+  tmp = tmp[0];
+  return atoi ( tmp.c_str() );
+}
+
+
+std::string python_module_check(std::string prefix, std::string method){
+  std::string output;
+
+  std::vector < std::string > pm;
+  std::vector < std::string > module;
+
+  pm.push_back("import pickle");
+  pm.push_back("import pandas");
+  pm.push_back("import numpy");
+  pm.push_back("from sklearn import metrics");
+  if ( method == "RandomForest")
+    pm.push_back("import skranger");
+  if ( method == "XGBoost")
+    pm.push_back("import xgboost");
+
+  module.push_back("pickle");
+  module.push_back("pandas");
+  module.push_back("numpy");
+  module.push_back("sklearn");
+  if ( method == "RandomForest")
+    module.push_back("skranger");
+  if ( method == "XGBoost")
+    module.push_back("xgboost");
+
+  for ( std::size_t i = 0 ; i < pm.size() ; i ++ ){
+    std::string fname = prefix + "python_module_check";
+    std::string command = "python -c '" + pm[i] + "' 2>&1 | wc -l > " + fname;
+    system ( command.c_str() );
+    std::ifstream fin ( fname.c_str() );
+    int count;
+    fin >> count;
+    fin.close();
+    if ( count > 0 ){
+      output = module[i];
+      break;
+    }
+  }
+
+  return output;
+}
+
+
   
 int main ( int argc , char ** argv ){
   if ( argc == 1 ){
@@ -60,14 +116,14 @@ int main ( int argc , char ** argv ){
     case 'R': method+="RandomForest"; break; // Random Forest
     case 'X': method+="XGBoost"; break; // XGBoost
     case 'T': tagging=1; break; // Tagging SVs instead of ramoving low quality SVs.
-    default: std::cerr << "ERROR!!! Check options!!!\n\n" ; usage(); return 0 ; 
+    default: std::cout << "ERROR!!! Check options!!!\n\n" ; usage(); return 0 ; 
     }
   }
   
   if ( infile.size() == 0 ){
-    std::cerr << "ERROR!!! -i (input file) is required\n"; 
-    std::cerr << "------------------------------------\n";
-    std::cerr << "\n";
+    std::cout << "ERROR!!! -i (input file) is required\n"; 
+    std::cout << "------------------------------------\n";
+    std::cout << "\n";
     usage();
     return 0;
   }
@@ -75,9 +131,9 @@ int main ( int argc , char ** argv ){
   std::ifstream fin ( infile.c_str() );
 
   if ( ! fin ){
-    std::cerr << "ERROR!!! There is no input file: " << infile << "\n";
-    std::cerr << "-------------------------------------------------\n";
-    std::cerr << "\n";
+    std::cout << "ERROR!!! There is no input file: " << infile << "\n";
+    std::cout << "-------------------------------------------------\n";
+    std::cout << "\n";
     usage();
     return 0;
   }
@@ -89,9 +145,9 @@ int main ( int argc , char ** argv ){
     //method = "XGBoost";
   }
   else if (method == "RandomForestXGBoost" || method == "XGBoostRandomForest") {
-    std::cerr << "ERROR!!! -R (Random Forest) and -X (XGBoost) can not be used at the same time\n";
-    std::cerr << "-----------------------------------------------------------------------------\n";
-    std::cerr << "\n";
+    std::cout << "ERROR!!! -R (Random Forest) and -X (XGBoost) can not be used at the same time\n";
+    std::cout << "-----------------------------------------------------------------------------\n";
+    std::cout << "\n";
     usage();
     return 0;
   }
@@ -101,6 +157,14 @@ int main ( int argc , char ** argv ){
   }
 
   if ( prefix.size() != 0 ) prefix += ".";
+
+  if ( python_version(prefix) != 3 ) {
+    std::cout << "ERROR!!! You need python3.\n";
+    return 0;
+  }
+  python_module_check(prefix,method);
+
+
 
   if ( path.size()== 0 ) {
     path = "${ETCHING_ML_PATH}";
@@ -118,19 +182,28 @@ int main ( int argc , char ** argv ){
   //std::cout << "Path-to-model\t" << path << "\n";
 
   std::string command;
-  std::random_device rd;
-  std::uniform_int_distribution<int> dis(0, 999999);
-  std::mt19937 gen(rd());
-  std::string tmperr = "tmperr" + std::to_string ( dis(gen) );
+
+  std::string err_fname = prefix + "score.err";
 
   std::cout << "Calculating features\n";
   calc_feature(infile,feature_file);
-  std::cout << "Scoring:\n";
-  command = "scorer_" + method + " " + feature_file + " " + score_file + " " + path + " 2> " + tmperr + " ; rm " + tmperr;
-  //std::cout << command << "\n";
-  echo="echo "+command;
+  std::cout << "Scoring_command:\t";
+  command = "scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
+  echo="echo \"" + command + "\"";
+
   system ( echo.c_str() );
   system ( command.c_str() );
+
+  std::string check_none;
+  fin.open(err_fname.c_str());
+  fin >> check_none;
+  fin.close();
+
+  if ( check_none != "None" ){
+    std::cout << "ERROR!!! Python module of etching_sorter did not run properly\n";
+    return 0;
+  }
+
   std::cout << "Removing false positives\n";
   razor ( infile, score_file, outfile, alpha, method, tagging);
 

@@ -81,7 +81,7 @@ int main ( int argc , char ** argv ){
     case 'c': cutoff = atoi ( optarg ); break;
     case 'k': kl = atoi (optarg ); break;
     case 'h': filter_usage() ; return 0;
-    default: std::cerr << "ERROR!!! Invalid option\n" ; return 0;
+    default: std::cout << "ERROR!!! Invalid option\n" ; return 0;
     }
   }
 
@@ -91,13 +91,13 @@ int main ( int argc , char ** argv ){
   //
 
   if ( data_type != "W" && data_type != "P"){
-    std::cerr << "ERROR!!! -T must be one of W, or P. Default is W.\n";
-    std::cerr << "\t" << "-T <string>\t" << "Sequencing data type. W for WGS, or P for Panel [W]" ;
+    std::cout << "ERROR!!! -T must be one of W, or P. Default is W.\n";
+    std::cout << "\t" << "-T <string>\t" << "Sequencing data type. W for WGS, or P for Panel [W]" ;
     return 0;
   }
 
   if ( infile_list.size() == 0 ){
-    std::cerr << "ERROR!!! -i is required.\n";
+    std::cout << "ERROR!!! -i is required.\n";
     return 0;
   }
   else {
@@ -108,8 +108,8 @@ int main ( int argc , char ** argv ){
 	   tmp.substr(tmp.size()-3) != ".fq" && 
 	   tmp.substr(tmp.size()-9) != ".fastq.gz" && 
 	   tmp.substr(tmp.size()-6) != ".fq.gz"){
-	std::cerr << "ERROR: Please check files in " << tmp <<"\n";
-	std::cerr << "This file must be fastq format.\n";
+	std::cout << "ERROR: Please check files in " << tmp <<"\n";
+	std::cout << "This file must be fastq format.\n";
       }
       file_list.push_back(tmp);
     }
@@ -124,8 +124,8 @@ int main ( int argc , char ** argv ){
 	   tmp.substr(tmp.size()-3) != ".fq" && 
 	   tmp.substr(tmp.size()-9) != ".fastq.gz" && 
 	   tmp.substr(tmp.size()-6) != ".fq.gz"){
-	std::cerr << "ERROR: Please check files in " << tmp <<"\n";
-	std::cerr << "This file must be fastq format.\n";
+	std::cout << "ERROR: Please check files in " << tmp <<"\n";
+	std::cout << "This file must be fastq format.\n";
       }
       file_list.push_back(tmp); 
       control_count ++ ;
@@ -144,8 +144,8 @@ int main ( int argc , char ** argv ){
 	   tmp.substr(tmp.size()-6) != ".fa.gz" && 
 	   tmp.substr(tmp.size()-7) != ".fna.gz" && 
 	   tmp.substr(tmp.size()-4) != ".fna" ){
-	std::cerr << "ERROR: Please check files in " << reference_list_file <<"\n";
-	std::cerr << "The files in this list must be fasta format.\n";
+	std::cout << "ERROR: Please check files in " << reference_list_file <<"\n";
+	std::cout << "The files in this list must be fasta format.\n";
 	return 0;
       }
       file_list.push_back(tmp);
@@ -162,7 +162,7 @@ int main ( int argc , char ** argv ){
   for ( auto & i : file_list ){
     std::ifstream fin (i);
     if ( ! fin ){
-      std::cerr << "ERROR!!! There is no " + i + ".\n";
+      std::cout << "ERROR!!! There is no " + i + ".\n";
       return 0;
     }
     fin.close();
@@ -173,21 +173,21 @@ int main ( int argc , char ** argv ){
     std::ifstream fin;
     fin.open( tmp.c_str() );
     if ( ! fin ){
-      std::cerr << "ERROR!!! There is no " + existing+ ".kmc_pre.\n";
+      std::cout << "ERROR!!! There is no " + existing+ ".kmc_pre.\n";
       return 0;
     }
     fin.close();
     tmp = existing + ".kmc_suf";
     fin.open( tmp.c_str() );
     if ( ! fin ){
-      std::cerr << "ERROR!!! There is no " + existing+ ".kmc_pre.\n";
+      std::cout << "ERROR!!! There is no " + existing+ ".kmc_pre.\n";
       return 0;
     }
   }
 
   if ( file_list.size() + existing.size() == 0){
-    std::cerr << "ERROR!!! You did not input any filters.\n";
-    std::cerr << "At least one of -l, -r, or -a is required.\n";
+    std::cout << "ERROR!!! You did not input any filters.\n";
+    std::cout << "At least one of -l, -r, or -a is required.\n";
     return 0;
   }
 
@@ -210,7 +210,7 @@ int main ( int argc , char ** argv ){
   //std::cout << "[Making filter]\n";
   if ( control_count !=0 ){
     //std::cout << "Making control filter\n";
-    command = "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) + " -ci2 -fq @" + control_list_file + " control_filter " + tmp_dir + " > control_filter.log 2> control_filter.err";
+    command = "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) + " -ci2 -fq @" + control_list_file + " control_filter " + tmp_dir + " > control_filter.log 2>&1";
     std::cout << command << "\n" ; 
     system(command.c_str());
   }
@@ -220,7 +220,7 @@ int main ( int argc , char ** argv ){
   //
   if ( reference_count != 0){
     //std::cout << "Making reference filter\n";
-    command = "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) + " -ci1 -fm @" + reference_list_file + " reference_filter " + tmp_dir + " > reference_filter.log 2> reference_filter.err";
+    command = "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) + " -ci1 -fm @" + reference_list_file + " reference_filter " + tmp_dir + " > reference_filter.log 2>&1";
     std::cout << command << "\n" ; 
     system(command.c_str());
   }
@@ -231,7 +231,7 @@ int main ( int argc , char ** argv ){
   if ( existing.size() != 0 ){
     //std::cout << "Merging filters\n"; 
     if ( control_count !=0 && reference_count == 0 ){
-      command = "kmc_tools simple control_filter " + existing + " union filter 2> merging.err";
+      command = "kmc_tools simple control_filter " + existing + " union filter 2>&1";
       std::cout << command << "\n";
       system(command.c_str() );
     }
@@ -241,10 +241,10 @@ int main ( int argc , char ** argv ){
       system(command.c_str() );
     }
     else if ( control_count !=0 && reference_count != 0 ){
-      command = "kmc_tools simple control_filter " + existing + " union filter_tmp 2> merging_tmp.err";
+      command = "kmc_tools simple control_filter " + existing + " union filter_tmp 2>&1";
       std::cout << command << "\n";
       system(command.c_str() );
-      command = "kmc_tools simple filter_tmp reference_filter union filter 2> merging.err";
+      command = "kmc_tools simple filter_tmp reference_filter union filter 2>&1";
       std::cout << command << "\n";
       system(command.c_str() );
     }
@@ -276,12 +276,12 @@ int main ( int argc , char ** argv ){
     }
     else if ( control_count !=0 && reference_count != 0 ){
       std::cout << "Merging filters\n"; 
-      command = "kmc_tools simple control_filter reference_filter union filter > merging.log 2> merging.err";
+      command = "kmc_tools simple control_filter reference_filter union filter > merging.log 2>&1";
       std::cout << command << "\n"; 
       system(command.c_str() );
     }
     else {
-      std::cerr <<"ERROR!!! No filter was input";
+      std::cout <<"ERROR!!! No filter was input";
       return 0;
     }
   }
@@ -295,7 +295,7 @@ int main ( int argc , char ** argv ){
   //
   //std::cout << "[ETCHING filter]\n";
   //std::cout << "Making Sample k-mer DB\n";
-  command = "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) + " -ci2 -fq @" + infile_list + " sample " + tmp_dir + " > sample_kmer_table.log 2> sample_kmer_table.err";
+  command = "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) + " -ci2 -fq @" + infile_list + " sample " + tmp_dir + " > sample_kmer_table.log 2>&1";
   std::cout << command << "\n" ; 
   system(command.c_str());
 
@@ -311,7 +311,7 @@ int main ( int argc , char ** argv ){
   
     std::string sample_hist = "sample.hist";
 
-    command = "kmc_tools transform sample histogram " + sample_hist + " 2> sample_kmer_hist.err";
+    command = "kmc_tools transform sample histogram " + sample_hist + " 2>&1";
     std::cout << command << "\n"; 
     system(command.c_str() );
 
@@ -355,7 +355,7 @@ int main ( int argc , char ** argv ){
   // Applying filter
   //
   //std::cout << "Appying filter\n";
-  command = "kmc_tools simple sample -ci" + std::to_string(cutoff) + " filter -ci1 kmers_subtract " + outfile + " 2> " + outfile + ".err";
+  command = "kmc_tools simple sample -ci" + std::to_string(cutoff) + " filter -ci1 kmers_subtract " + outfile + " 2>&1";
   std::cout << command << "\n" ;
   system(command.c_str() );
 

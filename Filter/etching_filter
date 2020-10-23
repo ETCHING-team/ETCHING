@@ -11,29 +11,33 @@
 # Help message
 #
 
-USAGE="Usage: etching_filter [options] -i exam.conf [options]\n
-\n
-Required\n
-\t-i\tconfig file\n
-\n
-Options\n
-\t-p\tPrefix of output [filtered_read]\n
-\t-t\tNumber of threads [8]\n
-\t-c\tK-mer histogram cut-off for removing sequencing error [automatic]\n
-\t-d\t/path/to/etching [none]\n
-\t  \tUse this if you need to specify it.\n
-\t-T\tInput data type [W]\n
-\t  \tW for whole genome sequencing\n
-\t  \tT for targeted panel sequencing\n
-\n
-Contact:\n\tJang-il Sohn (sohnjangil@gmail.com)\n\tJin-Wu Nam (jwnam@hanyang.ac.kr)\n
-"
+function USAGE {
+    echo -e "Usage: etching_filter [options] -i exam.conf [options]"
+    echo -e
+    echo -e "Required"
+    echo -e "\t-i\tconfig file"
+    echo -e
+    echo -e "Options"
+    echo -e "\t-p\tPrefix of output [filtered_read]"
+    echo -e "\t-t\tNumber of threads [8]"
+    echo -e "\t-c\tK-mer histogram cut-off for removing sequencing error [automatic]"
+    echo -e "\t-d\t/path/to/etching [none]"
+    echo -e "\t  \tUse this if you need to specify it."
+    echo -e "\t-T\tInput data type [W]"
+    echo -e "\t  \tW for whole genome sequencing"
+    echo -e "\t  \tT for targeted panel sequencing"
+    echo -e 
+    echo -e "Contact:"
+    echo -e "\tJang-il Sohn (sohnjangil@gmail.com)"
+    echo -e "\tJin-Wu Nam (jwnam@hanyang.ac.kr)"
+    echo -e
+}
 
 #####################################
 
 if [ $# -lt 1 ]
 then
-    echo -e $USAGE
+    USAGE
     exit -1
 fi
 
@@ -61,10 +65,10 @@ while [ "$1" != "" ]; do
         -T | --data-type ) shift
 	    DATATYPE=$1
             ;;
-        -h | --help ) echo -e $USAGE
+        -h | --help ) USAGE
             exit
             ;;
-        #* )  echo -e $USAGE
+        #* )  USAGE
         #    exit 1
     esac
     shift
@@ -88,7 +92,7 @@ if [ ${#CONF} == 0 ]
 then
     echo "ERROR!!! Please input config file."
     echo "-------------------------"
-    echo -e $USAGE
+    USAGE
     exit
 fi
 
@@ -119,40 +123,40 @@ else
     READ_COLLECTOR=${DIR}/read_collector
 fi
 
-CHECK=$(which ${KMER_FILTER} 2> err )
-rm err
+CHECK=$(which ${KMER_FILTER}  )
+
 if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!! kmer_filter was not installed"
     exit -1
 fi
 
-CHECK=$(which ${READ_COLLECTOR} 2> err )
-rm err
+CHECK=$(which ${READ_COLLECTOR}  )
+
 if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!! read_collector was not install"
     exit -1
 fi
 
-CHECK=$(which kmc 2> err )
-rm err
+CHECK=$(which kmc  )
+
 if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!! KMC3 was not install"
     exit -1
 fi
 
-CHECK=$(which kmc_tools 2> err )
-rm err
+CHECK=$(which kmc_tools  )
+
 if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!! KMC3 was not install"
     exit -1
 fi
 
-CHECK=$(which kmc_dump 2> err )
-rm err
+CHECK=$(which kmc_dump  )
+
 if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!! KMC3 was not install"
@@ -184,8 +188,8 @@ else
     fi
 fi
 
-CHECK=$(which $MAPPER 2> err )
-rm err
+CHECK=$(which $MAPPER  )
+
 if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!! bwa was not install"
@@ -199,8 +203,8 @@ then
     SAMTOOLS=samtools
 fi
 
-CHECK=$(which $SAMTOOLS 2> err )
-rm err
+CHECK=$(which $SAMTOOLS  )
+
 if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!! samtools was not installed"
@@ -235,7 +239,7 @@ fi
 #
 # kmer_filter
 #
-cmd="${KMER_FILTER} -i sample.list -l filter_fq.list -r filter_fa.list -a $FILTER -o $PREFIX -t $THREADS $CUTOFF -T $DATATYPE > logs/kmer_filter.log 2> logs/kmer_filter.err"
+cmd="${KMER_FILTER} -i sample.list -l filter_fq.list -r filter_fa.list -a $FILTER -o $PREFIX -t $THREADS $CUTOFF -T $DATATYPE > logs/kmer_filter.log"
 echo $cmd
 eval $cmd
 
@@ -250,7 +254,7 @@ DATE="[$(date)]";echo ${DATE}
 FIRST_FRAG=$(head -n 1 sample.list)
 SECOND_FRAG=$(tail -n 1 sample.list)
 
-cmd="${READ_COLLECTOR} -f $PREFIX -1 $FIRST_FRAG -2 $SECOND_FRAG -o $PREFIX -t $THREADS > logs/read_collector.log 2> logs/read_collector.err"
+cmd="${READ_COLLECTOR} -f $PREFIX -1 $FIRST_FRAG -2 $SECOND_FRAG -o $PREFIX -t $THREADS > logs/read_collector.log "
 echo $cmd
 eval $cmd
 

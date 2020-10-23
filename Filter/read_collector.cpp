@@ -46,20 +46,20 @@ int main (int argc , char ** argv){
     case 'o': prefix = optarg; break;
     case 't': num_threads = atoi(optarg); break;
     case 'h': read_collector_usage(); return 0 ;
-    default: std::cerr << "\tInvalid option: " << optarg << "\n" ; read_collector_usage(); return 1;
+    default: std::cout << "\tInvalid option: " << optarg << "\n" ; read_collector_usage(); return 1;
     }
   }
 
   if ( kmer_table.size() == 0 ){
-    std::cerr << "ERROR!!! -f is required.\n";
-    std::cerr << "\n";
+    std::cout << "ERROR!!! -f is required.\n";
+    std::cout << "\n";
     read_collector_usage();
     return 0;
   }
 
   if (input_1.size()==0 || input_2.size()==0){
-    std::cerr << "ERROR!!! -1 and -2 are required.\n";
-    std::cerr << "\n";
+    std::cout << "ERROR!!! -1 and -2 are required.\n";
+    std::cout << "\n";
     read_collector_usage();
     return 0;
   }
@@ -67,12 +67,12 @@ int main (int argc , char ** argv){
   int gz_check = 0 ;
   if ( input_1.substr(input_1.size()-3) == ".gz" && input_2.substr(input_2.size()-3) == ".gz" ) gz_check = 1;
   if ( input_1.substr(input_1.size()-3) == ".gz" && input_2.substr(input_2.size()-3) != ".gz" ) {
-    std::cerr << "ERROR!!! Check input file names.\n\n";
+    std::cout << "ERROR!!! Check input file names.\n\n";
     read_collector_usage();
     return 0;
   }
   if ( input_1.substr(input_1.size()-3) != ".gz" && input_2.substr(input_2.size()-3) == ".gz" ) {
-    std::cerr << "ERROR!!! Check input file names.\n\n";
+    std::cout << "ERROR!!! Check input file names.\n\n";
     read_collector_usage();
     return 0;
   }
