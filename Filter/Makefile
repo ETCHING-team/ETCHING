@@ -10,7 +10,7 @@ estimate_coverage: estimate_coverage.cpp
 	g++ -Wall -g -std=c++11 estimate_coverage.cpp -o estimate_coverage
 
 read_collector: read_collector.cpp ../lib/libetching_filter.so
-	g++ -Wall -g -std=c++11 -fopenmp -Isparsepp_spp64 -Igzstream read_collector.cpp -L../lib -letching_filter -lz -o read_collector
+	g++ -Wall -g -std=c++11 -fopenmp -I../lib/zlib -Isparsepp_spp64 -Igzstream read_collector.cpp -L../lib -letching_filter -lz -o read_collector
 
 clean:
 	rm -f read_collector kmer_filter estimate_coverage 
