@@ -29,7 +29,7 @@ ETCHING takes 2-3 hours for WGS data with 30X normal and 50X tumor.
 
 * C++11 with g++>=4.7.0
 
-* python3 with pickle, pandas, numpy, sklearn, skranger, and xgboost packages.
+* python3 with pickle, pandas, numpy, scikit-learn, skranger, and xgboost packages.
 
 * bwa mem (or Minimap2)
 
