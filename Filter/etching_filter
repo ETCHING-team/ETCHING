@@ -171,6 +171,14 @@ SAMTOOLS=$(grep -v "#" ${CONF} | awk '{if($1=="samtools") print $2}' )
 if [ ${#MAPPER} == 0 ]
 then
     MAPPER="bwa mem"
+
+    CHECK=$(which bwa)
+    if [ ${#CHECK} == 0 ]
+    then
+	echo "ERROR!!! bwa was not install"
+	exit -1
+    fi
+    
 else 
     CHECK=$(grep -v "#" ${CONF} | awk '{if($1=="mapper") print $2}' | grep bwa)
     if [ ${#CHECK} != 0 ]
@@ -186,14 +194,6 @@ else
 	    exit -1
 	fi
     fi
-fi
-
-CHECK=$(which $MAPPER  )
-
-if [ ${#CHECK} == 0 ]
-then
-    echo "ERROR!!! bwa was not install"
-    exit -1
 fi
 
 

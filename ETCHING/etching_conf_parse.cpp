@@ -48,7 +48,8 @@ int main ( int argc , char ** argv ){
 	}
       }
 
-      if ( key == "sample" || key == "filter_fq" || key == "filter_fa" || key == "annotation" ){
+      // if ( key == "sample" || key == "filter_fq" || key == "filter_fa" || key == "annotation" ){
+      if ( key == "sample" || key == "filter_fq" || key == "filter_fa" || key == "annotation" || key == "filter_db"){
 	if ( value[0] != '/' && value.substr(0,2) != "~/" && value[0] != '$' ){
 	  char cwd[PATH_MAX];
 	  getcwd(cwd, sizeof(cwd));
@@ -60,9 +61,9 @@ int main ( int argc , char ** argv ){
 	  std::cout << key << "\t" << value << "\n";
 	}
       }
-      else if ( key == "filter_db" ){
-	std::cout << key << "\t" << value << "\n";	
-      }
+      // else if ( key == "filter_db" ){
+      // 	std::cout << key << "\t" << value << "\n";	
+      // }
       else if ( key == "genome" ){
 	if ( value[0] != '/' && value.substr(0,2) != "~/" && value[0] != '$' ){
 	  char cwd[PATH_MAX];

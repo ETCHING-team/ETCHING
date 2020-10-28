@@ -76,7 +76,6 @@ wget https://github.com/ETCHING-team/ETCHING/releases/download/v1.1.1/ETCHING_v1
 tar zxvf ETCHING_v1.1.1_binary.tar.gz
 cd ETCHING_v1.1.1_binary
 echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
-echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
 echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 ```
 or
