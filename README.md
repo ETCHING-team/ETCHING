@@ -7,6 +7,10 @@
 
 ETCHING takes 2-3 hours for WGS data with 30X normal and 50X tumor with 20 threads.
 
+You can find codes, k-mer set, and DEMO files also on our website.
+
+http://big.hanyang.ac.kr/ETCHING/
+
 ---
 
 ## Table of contents
