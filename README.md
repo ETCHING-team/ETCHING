@@ -26,6 +26,7 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
     * [Pan-genome k-mer - PGK](#pan-genome-k-mer---pgk)
     * [Example execution](#example-execution)
     * [Step-by-step execution](#step-by-step-execution)
+	* [Docker](#docker)
   * [Contributors](#contributors)
   * [Contact](#contact)
 
@@ -60,7 +61,7 @@ You can install ETCHING even if you did not install the python packages, but ETC
 Download code from git
 
 ```
-git clone https://github.com/sohnjangil/etching.git
+git clone https://github.com/ETCHING-team/ETCHING.git
 cd etching
 make
 echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
@@ -71,9 +72,9 @@ echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 or from our web server
 
 ```
-wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.1.1.tar.gz
-tar zxvf ETCHING_v1.1.1.tar.gz
-cd ETCHING_v1.1.1
+wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.1.2.tar.gz
+tar zxvf ETCHING_v1.1.2.tar.gz
+cd ETCHING_v1.1.2
 make
 echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
 echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
@@ -85,9 +86,9 @@ echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 Alternatively, you can just use our pre-compiled version of ETCHING.
 
 ```
-wget https://github.com/ETCHING-team/ETCHING/releases/download/v1.1.1/ETCHING_v1.1.1_binary.tar.gz
-tar zxvf ETCHING_v1.1.1_binary.tar.gz
-cd ETCHING_v1.1.1_binary
+wget https://github.com/ETCHING-team/ETCHING/releases/download/v1.1.2/ETCHING_v1.1.2_binary.tar.gz
+tar zxvf ETCHING_v1.1.2_binary.tar.gz
+cd ETCHING_v1.1.2_binary
 echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
 echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 ```
@@ -95,13 +96,34 @@ echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 or
 
 ```
-wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.1.1_binary.tar.gz
-tar zxvf ETCHING_v1.1.1_binary.tar.gz
-cd ETCHING_v1.1.1_binary
+wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.1.2_binary.tar.gz
+tar zxvf ETCHING_v1.1.2_binary.tar.gz
+cd ETCHING_v1.1.2_binary
 echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
 echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
 echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 ```
+
+### From docker image
+
+Download the docker image from our web (http://big.hanyang.ac.kr/ETCHING/download.html)
+And load ETCHING docker image
+```
+wget http://big.hanyang.ac.kr/ETCHING/etching_docker_v1.1.2.tar
+docker load -i etching_v1.1.2.tar
+```
+
+Check if the docker image is loaded properly
+
+```
+docker images
+```
+
+Output should be like below
+
+|REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
+|:---|:---|:---|:---|:---|
+|etching|1.1.2|16647cac9a99|40 hours ago|3.5GB|
 
 
 ### Pan-Genome k-mer set
@@ -114,7 +136,8 @@ wget http://big.hanyang.ac.kr/ETCHING/PGK.tar.gz
 tar zxvf PGK.tar.gz
 ```
 
-Then, you will see the files ```PGK_20200103.kmc_pre``` and ```PGK_20200103.kmc_suf``` in the directory ```PGK```:
+Then, you will see the files ```PGK_20200103.kmc_pre``` and ```PGK_20200103.kmc_suf``` 
+in the directory ```PGK```:
 
 ```
 ls PGK/
@@ -130,7 +153,7 @@ Alternatively, you can make your own k-mer set as follows:
 kmc -k31 -v -ci1 -fa @genome_list.txt your_kmer_db ./
 ```
 
-Keep the order and ```-k31```, ```-ci1```, and ```-fa``` options. The ```genome_list.txt``` is a file of 
+Keep the order and ```-k31```, ```-ci1```, and ```-fa``` options. The ```genome_list.txt``` is a file of
 reference genomes' list, which must be separated line-by-line. Use any name you prefer for ```your_kmer_db```. 
 If you use the same same, you will see ```your_kmer_db.pre``` and ```your_kmer_db.suf``` in the directory.
 
@@ -154,8 +177,8 @@ etching -h
 
 ### Example of a config file
 
-You can write a config file as follows, if you want to predict SVs from tumor samples (tumor_1/2) with matched
-normal samples (normal_a/b_1/2), and ready-made k-mer database (PGK).
+You can write a config file as follows, if you want to predict SVs from tumor samples (tumor_1/2) with 
+matched normal samples (normal_a/b_1/2), and ready-made k-mer database (PGK).
 
 ```
 #####################################################################
@@ -222,8 +245,8 @@ If you have no matched normal data, PGK must be helpful to select tumor specific
 
 #### WGS data
 
-If you want to run ETCHING with 30 threads (```-t 30```) for sequencing data of length 150 bp (```-L 150```), 
-run the following command:
+If you want to run ETCHING with 30 threads (```-t 30```) for sequencing data of length 150 bp 
+(```-L 150```), run the following command:
 
 ```
 etching -i example.conf -t 30 -L 150 -p OUTPUT
@@ -258,6 +281,7 @@ make two more files of fusion-genes:
 OUTPUT.BND.fusion_gene.txt
 OUTPUT.SV.fusion_gene.txt
 ```
+
 
 ### Step-by-step execution
 
@@ -300,6 +324,30 @@ etching_sorter -i OUTPUT.SV.vcf -o OUTPUT.SV
 etching_fg_identifier output.BND.etching_sorter.vcf hg19.annot.gtf > output.BND.FG.txt
 etching_fg_identifier output.SV.etching_sorter.vcf hg19.annot.gtf > output.SV.FG.txt
 ```
+
+### Docker
+
+In case of using ETCHING docker image,
+
+```
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.1.2 etching -i demo.conf
+```
+Mount your directory containing all required files, such as PGK, reference fasta, sample and normal 
+fastq  to '/work/' directory in the docker container. The mount point on docker '/work/' should not be
+changed. Note that file paths in a configure file should point the mounted files in the docker container. 
+So path should be either relative path starting from your mount point or absolute path starting from 
+'/work/' directory. To say, if you have the data path '/path/to/mounted/directory/sample.fq', and mounted
+'/path/to/mounted/directory' to '/work/' on docker container, then the file path on configure file should
+be either 'sample.fq' or '/work/sample.fq'.
+
+Alternatively, you can run ETCHING inside docker container
+```
+docker run -i -t --rm -v /local/path/to/example/directory/:/work/ etching:1.1.2 /bin/bash
+etching -i example.conf
+```
+The ETCHING binary and ML models are located on '/etching/'
+
+
 
 ----------------------------------------------------------------------------------
 ## Contributors
