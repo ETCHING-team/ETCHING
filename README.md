@@ -1,7 +1,7 @@
 ---
 # ETCHING
 
-### Version 1.1.1
+### Version 1.1.2
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
@@ -93,10 +93,9 @@ echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 ```
 
 
-
 ### Pan-Genome k-mer set
 
-After installation of ETCHING, you may need pan-genome k-mer set (PGK) especially when you have no matched normal of tumor samples.
+After installation of ETCHING, you need pan-genome k-mer set (PGK) especially when you have no matched normal of tumor samples.
 ```
 cd /path/to/etching
 wget http://big.hanyang.ac.kr/ETCHING/PGK.tar.gz
@@ -118,10 +117,20 @@ Keep the order and ```-k31```, ```-ci1```, and ```-fa``` options. The ```genome_
 
 ## Usage
 
-You can run ETCHING with a config file
+After installation, you can download and run demo
+
+ ```
+wget http://big.hanyang.ac.kr/ETCHING/DEMO.tar.gz
+tar zxvf DEMO.tar.gz
+cd DEMO
+etching -i demo.conf
+ ```
+
+If you want the list of options, check with this command
 ```
-etching -i exmple.conf
+etching -h
 ```
+
 
 ### Example of a config file
 
