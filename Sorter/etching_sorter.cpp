@@ -36,7 +36,7 @@ void usage(){
 
 int python_version(std::string prefix){
   std::string fname = prefix + "python_version";
-  std::string command = "python --version > " + fname + " 2>&1";
+  std::string command = "python3 --version > " + fname + " 2>&1";
   system ( command.c_str() );
   std::ifstream fin ( fname.c_str() );
   std::string tmp;

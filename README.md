@@ -5,11 +5,12 @@
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
-ETCHING takes 2-3 hours for WGS data with 30X normal and 50X tumor with 20 threads.
-
+ETCHING takes 2-3 hours for WGS data with 30X normal and 50X tumor with 20 threads on DELL 930 server.
 You can also find codes, k-mer set, and DEMO files in our website.
 
 http://big.hanyang.ac.kr/ETCHING/
+
+The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Processor).
 
 ---
 
@@ -157,6 +158,22 @@ You can write a config file as follows, if you want to predict SVs from tumor sa
 normal samples (normal_a/b_1/2), and ready-made k-mer database (PGK).
 
 ```
+#####################################################################
+#                                                                           
+# sample     : (tumor) sample in fastq                                      
+# filter_fq  : (matched normal) control sample as filter in fastq 
+# filter_fa  : Assembly, genome, or normal samples as filter in fasta
+# filter_db  : Pre-made k-mer set (prefix of database), such as PGK
+# genome     : Reference genome for mapping 
+# mapper     : bwa or minimap2 
+# annotation : for fusion-gene identifying in gtf format 
+# 
+# NOTE!!!       
+# Keep the type names.              
+# Use filter_db only once, if you needed it.
+#####################################################################
+
+
 # sample (or tumor) sequencing files
 # ETCHING supports gzip (fq.gz) files, 
 # but it will slow down 3-5 times in the Filter module.
@@ -181,7 +198,7 @@ filter_fa       Ash1.7.fa
 filter_fa       ../../T2T.fasta
 filter_fa       /path/to/CHM1.fa
 
-# BWA indexed reference genome
+# BWA (or Minimap2) indexed reference genome
 genome          /path/to/hg19.fa
 
 # Set one of these if you need to specify mapper.
@@ -195,6 +212,7 @@ genome          /path/to/hg19.fa
 
 # An annotation file in gtf format for FG-identifier
 # Use this option to predic FGs.
+# Note: only gtf is supported yet.
 annotation      hg19.gtf
 ```
 
