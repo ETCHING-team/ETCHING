@@ -101,7 +101,7 @@ cd /path/to/etching
 wget http://big.hanyang.ac.kr/ETCHING/PGK.tar.gz
 tar zxvf PGK.tar.gz
 ```
-Then, you will see the files ```PGK_20200103.kmc_pre``` and ```PGK_20200103.kmc_pref``` in the directory ```PGK```:
+Then, you will see the files ```PGK_20200103.kmc_pre``` and ```PGK_20200103.kmc_suf``` in the directory ```PGK```:
 ```
 ls PGK/
 PGK_20200103.kmc_pre
