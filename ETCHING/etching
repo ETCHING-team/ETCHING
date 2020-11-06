@@ -586,7 +586,7 @@ echo
 echo "[CALLER]"
 DATE="[$(date)]";echo ${DATE}
 
-if [${#DEPTH} == 0 ]
+if [ ${#DEPTH} == 0 ]
 then
     if [ $DATATYPE == "W" ]
     then 
