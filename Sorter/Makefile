@@ -12,4 +12,6 @@ clean:
 cleanlibrary: 
 	rm -f ../lib/libetching_sorter.so
 
-cleanall: clean cleanlibrary
+cleanall:
+	rm -f *.lo *.o
+	rm -f ../lib/libetching_sorter.so

@@ -17,4 +17,6 @@ clean:
 cleanlibrary: 
 	rm -f ../lib/libetching_caller.so
 
-cleanall: clean cleanlibrary
+cleanall: 
+	rm -f *.lo *.o
+	rm -f ../lib/libetching_caller.so

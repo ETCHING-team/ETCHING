@@ -15,4 +15,6 @@ clean:
 cleanlibrary:
 	rm -f ../lib/libfg_identifier.so
 
-cleanall: clean cleanlibrary
+cleanall: 
+	rm -f ../lib/libfg_identifier.so
+	rm -f *.lo *.o

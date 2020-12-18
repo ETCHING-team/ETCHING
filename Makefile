@@ -36,6 +36,7 @@ clean:
 	cd Caller && make clean
 	cd Sorter && make clean
 	cd FG_identifier && make clean
+	cd lib/bamtools && make clean
 
 cleanlibrary:
 	rm -f lib/*so
