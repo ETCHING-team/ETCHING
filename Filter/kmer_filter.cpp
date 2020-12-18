@@ -21,21 +21,26 @@ void filter_usage(){
   std::cout << "Usage: kmer_filter [options]\n"
 	    << "\n"
 	    << "Required:\n"
-	    << "\t" << "-i <string>\t" << "List of sample (tumor) fastq (required; gz supported).\n"
+	    << "\t" << "-i <string>\t" << "List of sample (tumor) in fastq(.gz) or bam.\n"
+	    << "\t" << "           \t" << "If the file format is fastq, you must have a pair of fastq files of paired-end reads.\n"
+	    << "\t" << "           \t" << "If the file format is bam, use only one mapped bam file of paired-end reads\n"
+	    << "\t" << "           \t" << "Do not use fastq and bam files at the same time.\n"
 	    << "\n"
 	    << "Filters:\n"
-	    << "\t" << "-l <string>\t" << "List of control (matched normal) fastq as (normal) filters (gz supported).\n"
-	    << "\t" << "-r <string>\t" << "List of reference genome files to be used as (reference) filters (gz supported).\n"
-	    << "\t" << "-a <string>\t" << "Existing filter to add.\n"
-	    << "\t" << "           \t" << "If you input PGK, then there must be PGK.kmc_pre and PGK.kmc_suf.\n"
+	    << "\t" << "-c <string>\t" << "List of control (matched normal) in fastq(.gz) or bam (mapped or unmapped).\n"
+	    << "\t" << "-r <string>\t" << "List of control (reference genome) files in fasta(.gz).\n"
+	    << "\t" << "-a <string>\t" << "Existing filter to add. If you input PGK, you must have PGK.kmc_pre and PGK.kmc_suf.\n"
 	    << "\n"
-	    << "Optional:\n"
-	    << "\t" << "-o <string>\t" << "Output file name [filtered_kmer]\n"
-	    << "\t" << "-c <int>   \t" << "k-mer histogram cut-off for remove sequencing error [automatically calculated].\n"
+	    << "Options:\n"
+	    << "\t" << "-p <string>\t" << "Output file name [filtered_kmer]\n"
+	    << "\t" << "-l <string>\t" << "k-mer size [31]\n"
+	    << "\t" << "-K <int>   \t" << "k-mer histogram cut-off for remove sequencing error [automatically calculated].\n"
+	    << "\t" << "-M <int>   \t" << "Maximum k-mer frequency to be counted [10000].\n"
 	    << "\t" << "-T <string>\t" << "Sequencing data type. W for WGS, or P for Panel [W]\n"
 	    << "\t" << "           \t" << "If PANEL, must be specified.\n"
 	    << "\t" << "-m <int>   \t" << "Maximum RAM memory in GB [12].\n"
 	    << "\t" << "-t <int>   \t" << "Number of thread [8].\n"
+	    << "\t" << "-D <int>   \t" << "Directory of KMC-3 [null].\n"
 	    << "\n"
 	    << "Contact:\n\tJang-il Sohn (sohnjangil@gmail.com)\n\tJin-Wu Nam (jwnam@hanyang.ac.kr)\n";
 }
@@ -50,7 +55,7 @@ int main ( int argc , char ** argv ){
 
   std::string control_list_file;
   std::string reference_list_file;
-  std::string outfile="filtered_kmer";
+  std::string prefix="filtered_kmer";
 
   int control_count = 0;
   int reference_count = 0;
@@ -63,25 +68,30 @@ int main ( int argc , char ** argv ){
   int num_threads = 8 ;
 
   int cutoff = 0 ;
+  int maxkfreq = 10000;
   int kl = 31;
 
   std::string data_type="W";
 
-  int opt;
-  while ((opt = getopt ( argc , argv , "i:o:l:r:a:m:t:T:c:k:h") ) != -1 ){
+  std::string DIR;
+
+  int opt = 0;
+  while ((opt = getopt ( argc , argv , "i:p:c:r:a:m:t:T:K:M:l:D:h") ) != -1 ){
     switch(opt){
     case 'i': infile_list = optarg; break;
-    case 'o': outfile = optarg; break;
-    case 'l': control_list_file = optarg; break;
+    case 'p': prefix = optarg; break;
+    case 'c': control_list_file = optarg; break;
     case 'r': reference_list_file = optarg; break;
     case 'a': existing = optarg; break;
     case 'T': data_type = optarg; break;
     case 'm': maxRAM = atoi ( optarg ); break;
     case 't': num_threads = atoi ( optarg ); break;
-    case 'c': cutoff = atoi ( optarg ); break;
-    case 'k': kl = atoi (optarg ); break;
+    case 'K': cutoff = atoi ( optarg ); break;
+    case 'M': maxkfreq = atoi ( optarg ); break;
+    case 'l': kl = atoi (optarg ); break;
+    case 'D': DIR = optarg ; break;
     case 'h': filter_usage() ; return 0;
-    default: std::cout << "ERROR!!! Invalid option\n" ; return 0;
+    default: std::cout << "ERROR!!! Invalid option: " << optarg << "\n" ; return -1;
     }
   }
 
@@ -90,29 +100,40 @@ int main ( int argc , char ** argv ){
   // Option check
   //
 
+  // pop_back if DIR has "/" charactor at the tail
+  if ( DIR.size() != 0 ){
+    if ( DIR[DIR.size()-1] != '/' ){
+      DIR += '/';
+    }
+  }
+
   if ( data_type != "W" && data_type != "P"){
     std::cout << "ERROR!!! -T must be one of W, or P. Default is W.\n";
     std::cout << "\t" << "-T <string>\t" << "Sequencing data type. W for WGS, or P for Panel [W]" ;
-    return 0;
+    return -1;
   }
 
   if ( infile_list.size() == 0 ){
     std::cout << "ERROR!!! -i is required.\n";
-    return 0;
+    return -1;
   }
   else {
     std::string tmp;
     std::ifstream fin ( infile_list );
+
     while ( fin >> tmp ){
       if ( tmp.substr(tmp.size()-6) != ".fastq" && 
 	   tmp.substr(tmp.size()-3) != ".fq" && 
 	   tmp.substr(tmp.size()-9) != ".fastq.gz" && 
-	   tmp.substr(tmp.size()-6) != ".fq.gz"){
-	std::cout << "ERROR: Please check files in " << tmp <<"\n";
-	std::cout << "This file must be fastq format.\n";
+	   tmp.substr(tmp.size()-6) != ".fq.gz" &&
+	   tmp.substr(tmp.size()-4) != ".bam" ){
+	std::cout << "ERROR!!! Please check files in " << tmp <<".\n";
+	std::cout << "This file must be fastq(.gz) or bam format.\n";
       }
+      //count ++;
       file_list.push_back(tmp);
     }
+
     fin.close();
   }
   
@@ -123,9 +144,10 @@ int main ( int argc , char ** argv ){
       if ( tmp.substr(tmp.size()-6) != ".fastq" && 
 	   tmp.substr(tmp.size()-3) != ".fq" && 
 	   tmp.substr(tmp.size()-9) != ".fastq.gz" && 
-	   tmp.substr(tmp.size()-6) != ".fq.gz"){
-	std::cout << "ERROR: Please check files in " << tmp <<"\n";
-	std::cout << "This file must be fastq format.\n";
+	   tmp.substr(tmp.size()-6) != ".fq.gz" &&
+	   tmp.substr(tmp.size()-4) != ".bam" ){
+	std::cout << "ERROR: Please check files in " << tmp <<".\n";
+	std::cout << "This file must be fastq(.gz) or bam format.\n";
       }
       file_list.push_back(tmp); 
       control_count ++ ;
@@ -144,9 +166,9 @@ int main ( int argc , char ** argv ){
 	   tmp.substr(tmp.size()-6) != ".fa.gz" && 
 	   tmp.substr(tmp.size()-7) != ".fna.gz" && 
 	   tmp.substr(tmp.size()-4) != ".fna" ){
-	std::cout << "ERROR: Please check files in " << reference_list_file <<"\n";
-	std::cout << "The files in this list must be fasta format.\n";
-	return 0;
+	std::cout << "ERROR: Please check files in " << reference_list_file <<".\n";
+	std::cout << "The files in this list must be fasta(.gz) format.\n";
+	return -1;
       }
       file_list.push_back(tmp);
       reference_count ++ ;
@@ -163,7 +185,7 @@ int main ( int argc , char ** argv ){
     std::ifstream fin (i);
     if ( ! fin ){
       std::cout << "ERROR!!! There is no " + i + ".\n";
-      return 0;
+      return -1;
     }
     fin.close();
   }
@@ -174,21 +196,21 @@ int main ( int argc , char ** argv ){
     fin.open( tmp.c_str() );
     if ( ! fin ){
       std::cout << "ERROR!!! There is no " + existing+ ".kmc_pre.\n";
-      return 0;
+      return -1;
     }
     fin.close();
     tmp = existing + ".kmc_suf";
     fin.open( tmp.c_str() );
     if ( ! fin ){
       std::cout << "ERROR!!! There is no " + existing+ ".kmc_pre.\n";
-      return 0;
+      return -1;
     }
   }
 
   if ( file_list.size() + existing.size() == 0){
     std::cout << "ERROR!!! You did not input any filters.\n";
     std::cout << "At least one of -l, -r, or -a is required.\n";
-    return 0;
+    return -1;
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -208,11 +230,100 @@ int main ( int argc , char ** argv ){
   // Making normal filter
   //
   //std::cout << "[Making filter]\n";
+
+  std::vector < std::string > bam_files ;
+  std::vector < std::string > fastq_files ;
+  std::string file_format;
+
+  int bam_count = 0;
+
   if ( control_count !=0 ){
+
+    
+
+    if ( control_list_file.size() != 0 ){
+      std::string tmp;
+      std::ifstream fin ( control_list_file.c_str() );
+      
+      int fastq_count = 0;
+      
+      while ( fin >> tmp){
+	std::cout << "[Filter as control : " << tmp << "]\n";
+	if ( tmp.substr(tmp.size()-4) == ".bam" ){
+	  bam_count ++;
+	  bam_files.push_back(tmp);
+	}
+	else{
+	  fastq_count ++;
+	  fastq_files.push_back(tmp);
+	}
+      }
+      fin.close();
+
+      if ( bam_count == 0 && fastq_count != 0 ){
+	file_format = "q";
+	command 
+	  = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
+	  + " -ci2 -f" + file_format + " @" + control_list_file + " control_filter " + tmp_dir + " 2>&1";
+	std::cout << command << "\n" ; 
+	std::cout << "[Logs]";
+	system(command.c_str());
+	std::cout << "\n";
+      }
+      else if ( bam_count != 0 && fastq_count == 0 ){
+	file_format = "bam";
+	command 
+	  = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
+	  + " -ci2 -f" + file_format + " @" + control_list_file + " control_filter " + tmp_dir + " 2>&1";
+	std::cout << command << "\n" ; 
+	std::cout << "[Logs]";
+	system(command.c_str());
+	std::cout << "\n";
+      }
+      else if ( fastq_count != 0 && bam_count != 0){
+
+	std::ofstream fout;
+	fout.open("control_filter_fastq_file_list.txt");
+	for ( auto i : fastq_files ){
+	  fout << i << "\n";
+	}
+	fout.close();
+	fastq_files.clear();
+
+	fout.open("control_filter_bam_file_list.txt");
+	for ( auto i : bam_files ){
+	  fout << i << "\n";
+	}
+	fout.close();
+	bam_files.clear();
+
+	file_format = "q";
+	command 
+	  = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
+	  + " -ci2 -f" + file_format + " @control_filter_fastq_file_list.txt control_filter_fastq " + tmp_dir + " 2>&1";
+	std::cout << command << "\n" ; 
+	std::cout << "[Logs]";
+	system(command.c_str());
+	std::cout << "\n";
+	
+	file_format = "bam";
+	command 
+	  = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
+	  + " -ci2 -f" + file_format + " @control_filter_bam_file_list.txt control_filter_bam " + tmp_dir + " 2>&1";
+	std::cout << command << "\n" ; 
+	std::cout << "[Logs]";
+	system(command.c_str());
+	std::cout << "\n";
+
+	command = DIR + "kmc_tools simple control_filter_fastq control_filter_bam union control_filter 2>&1";
+	std::cout << command << "\n" ; 
+	std::cout << "[Logs]";
+	system(command.c_str());
+	std::cout << "\n";
+      }
+    }
+
     //std::cout << "Making control filter\n";
-    command = "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) + " -ci2 -fq @" + control_list_file + " control_filter " + tmp_dir + " > control_filter.log 2>&1";
-    std::cout << command << "\n" ; 
-    system(command.c_str());
   }
   ///////////////////////////////////////////////////////////////////////////////////////
   //
@@ -220,9 +331,13 @@ int main ( int argc , char ** argv ){
   //
   if ( reference_count != 0){
     //std::cout << "Making reference filter\n";
-    command = "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) + " -ci1 -fm @" + reference_list_file + " reference_filter " + tmp_dir + " > reference_filter.log 2>&1";
+    command 
+      = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
+      + " -ci1 -fm @" + reference_list_file + " reference_filter " + tmp_dir + " 2>&1";
     std::cout << command << "\n" ; 
+    std::cout << "[Logs]";
     system(command.c_str());
+    std::cout << "\n";
   }
   ///////////////////////////////////////////////////////////////////////////////////////
   //
@@ -231,22 +346,31 @@ int main ( int argc , char ** argv ){
   if ( existing.size() != 0 ){
     //std::cout << "Merging filters\n"; 
     if ( control_count !=0 && reference_count == 0 ){
-      command = "kmc_tools simple control_filter " + existing + " union filter 2>&1";
+      command = DIR + "kmc_tools simple control_filter " + existing + " union filter 2>&1";
       std::cout << command << "\n";
+      std::cout << "[Logs]";
       system(command.c_str() );
+      std::cout << "\n";
     }
     else if ( control_count ==0 && reference_count != 0 ){
-      command = "kmc_tools simple reference_filter " + existing + " union filter";
+      command = DIR + "kmc_tools simple reference_filter " + existing + " union filter 2>&1";
       std::cout << command << "\n" ;
+      std::cout << "[Logs]";
       system(command.c_str() );
+      std::cout << "\n";
     }
     else if ( control_count !=0 && reference_count != 0 ){
-      command = "kmc_tools simple control_filter " + existing + " union filter_tmp 2>&1";
+      command = DIR + "kmc_tools simple control_filter " + existing + " union filter_tmp 2>&1";
       std::cout << command << "\n";
+      std::cout << "[Logs]";
       system(command.c_str() );
-      command = "kmc_tools simple filter_tmp reference_filter union filter 2>&1";
+      std::cout << "\n";
+
+      command = DIR + "kmc_tools simple filter_tmp reference_filter union filter 2>&1";
       std::cout << command << "\n";
+      std::cout << "[Logs]";
       system(command.c_str() );
+      std::cout << "\n";
     }
     else {
       command = "ln -sf " + existing + ".kmc_pre filter.kmc_pre";
@@ -276,13 +400,15 @@ int main ( int argc , char ** argv ){
     }
     else if ( control_count !=0 && reference_count != 0 ){
       std::cout << "Merging filters\n"; 
-      command = "kmc_tools simple control_filter reference_filter union filter > merging.log 2>&1";
+      command = DIR + "kmc_tools simple control_filter reference_filter union filter 2>&1";
       std::cout << command << "\n"; 
+      std::cout << "[Logs]";
       system(command.c_str() );
+      std::cout << "\n";
     }
     else {
       std::cout <<"ERROR!!! No filter was input";
-      return 0;
+      return -1;
     }
   }
   // const double walltime1(get_wall_time());
@@ -295,10 +421,90 @@ int main ( int argc , char ** argv ){
   //
   //std::cout << "[ETCHING filter]\n";
   //std::cout << "Making Sample k-mer DB\n";
-  command = "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) + " -ci2 -fq @" + infile_list + " sample " + tmp_dir + " > sample_kmer_table.log 2>&1";
-  std::cout << command << "\n" ; 
-  system(command.c_str());
+  
+  file_format.clear();
+  
+  std::string tmp;
+  std::ifstream fin ( infile_list );
+  
+  int fastq_count = 0 ;
+  
+  while ( fin >> tmp){
+    if ( tmp.substr(tmp.size()-4) == ".bam" ){
+      bam_count ++;
+      bam_files.push_back(tmp);
+    }
+    else{
+      fastq_count ++;
+      fastq_files.push_back(tmp);
+    }
+  }
+  fin.close();
 
+
+  if ( bam_count == 0 && fastq_count != 0 ){
+    file_format = "q";
+    command 
+      = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
+      + " -ci2 " + "-cx" + std::to_string(maxkfreq) + " -f" + file_format + " @" + infile_list + " sample " + tmp_dir + " 2>&1";
+    std::cout << command << "\n" ; 
+    std::cout << "[Logs]";
+    system(command.c_str());
+    std::cout << "\n";
+  }
+  else if ( bam_count != 0 && fastq_count == 0 ){
+    file_format = "bam";
+    command 
+      = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
+      + " -ci2 " + "-cx" + std::to_string(maxkfreq) + " -f" + file_format + " @" + infile_list + " sample " + tmp_dir + " 2>&1";
+    std::cout << command << "\n" ; 
+    std::cout << "[Logs]";
+    system(command.c_str());
+    std::cout << "\n";
+  }
+  else if ( fastq_count != 0 && bam_count != 0){
+
+    std::ofstream fout;
+    fout.open("sample_fastq_file_list.txt");
+    for ( auto i : fastq_files ){
+      fout << i << "\n";
+    }
+    fout.close();
+    fastq_files.clear();
+
+    fout.open("sample_bam_file_list.txt");
+    for ( auto i : bam_files ){
+      fout << i << "\n";
+    }
+    fout.close();
+    bam_files.clear();
+
+    file_format = "q";
+    command 
+      = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
+      + " -ci2 -f" + file_format + " @sample_fastq_file_list.txt sample_fastq " + tmp_dir + " 2>&1";
+    std::cout << command << "\n" ; 
+    std::cout << "[Logs]";
+    system(command.c_str());
+    std::cout << "\n";
+	
+    file_format = "bam";
+    command 
+      = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
+      + " -ci2 -f" + file_format + " @sample_bam_file_list.txt sample_bam " + tmp_dir + " 2>&1";
+    std::cout << command << "\n" ; 
+    std::cout << "[Logs]";
+    system(command.c_str());
+    std::cout << "\n";
+
+    command = DIR + "kmc_tools simple sample_fastq sample_bam union sample 2>&1";
+    std::cout << command << "\n" ; 
+    std::cout << "[Logs]";
+    system(command.c_str());
+    std::cout << "\n";
+  }
+  
+  
   ///////////////////////////////////////////////////////////////////////////////////////
   //
   // Calculating cut-off
@@ -311,9 +517,11 @@ int main ( int argc , char ** argv ){
   
     std::string sample_hist = "sample.hist";
 
-    command = "kmc_tools transform sample histogram " + sample_hist + " 2>&1";
+    command = DIR + "kmc_tools transform sample histogram " + sample_hist + " 2>&1";
     std::cout << command << "\n"; 
+    std::cout << "[Logs]";
     system(command.c_str() );
+    std::cout << "\n";
 
     std::ifstream fin(sample_hist.c_str());
     while ( fin >> d >> f ){
@@ -347,7 +555,7 @@ int main ( int argc , char ** argv ){
     if ( local_min < 2 ) local_min = 2 ;
     cutoff = local_min;
   }
-  //std::cout << "k-mer cutoff: " << cutoff << "\n";
+  std::cout << "k-mer cutoff: " << cutoff << "\n";
 
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -355,19 +563,22 @@ int main ( int argc , char ** argv ){
   // Applying filter
   //
   //std::cout << "Appying filter\n";
-  command = "kmc_tools simple sample -ci" + std::to_string(cutoff) + " filter -ci1 kmers_subtract " + outfile + " 2>&1";
+  command = DIR + "kmc_tools simple sample -ci" + std::to_string(cutoff) + " filter -ci1 kmers_subtract " + prefix + " 2>&1";
   std::cout << command << "\n" ;
+  std::cout << "[Logs]";
   system(command.c_str() );
+  std::cout << "\n";
 
   ///////////////////////////////////////////////////////////////////////////////////////
   //
   // Print filter
   //
   //std::cout << "Writing sample-specific k-mers\n";
-  command = "kmc_dump " + outfile + " " + outfile ;
+  command = DIR + "kmc_dump " + prefix + " " + prefix + ".txt" ;
   std::cout << command << "\n"; 
+  std::cout << "[Logs]";
   system(command.c_str() );
-
+  std::cout << "\n";
 
   ///////////////////////////////////////////////////////////////////////////////////////
   //

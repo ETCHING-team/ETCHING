@@ -1,7 +1,3 @@
-#!/usr/bin/env bash
-
-VERSION="ETCHING_v1.1.3 (released 2020.12.12)"
-
 #--------------------------------------------------------------------
 # Copyright 2020. Bioinformatic and Genomics Lab.
 # Hanyang University, Seoul, Korea
@@ -28,46 +24,60 @@ function USAGE {
     echo -e "[[Required]]"
     echo -e "[Sample (tumor in somatic call)]"
     echo -e "-1  (string)\tFirst fastq file of paired-end"
-    echo -e "-2  (string)\tSecond fastq file of paired-end. -1 and -2 must be used together."
-    echo -e "-b  (string)\tAligned bam file of paired-end. Note! Do not use -b along with -1 or -2."
+    echo -e "-2  (string)\tSecond fastq file of paired-end"
+    echo -e "           \t-1 and -2 must be used together."
+    echo -e "-b  (string)\tAligned bam file of paired-end"
+    echo -e "           \tDo not use -b along with -1 or -2."
     echo -e
     echo -e "[Reference genome]"
     echo -e "-g  (string)\tBWA indexed reference genome."
+    echo -e
     echo -e
     echo -e "[[Options]]"
     echo -e "-p  (string)\tPrefix of output [etching]"
     echo -e "-t  (int)   \tNumber of threads [8]"
     echo -e "-l  (int)   \tk-mer size (<=32) [31]"
     echo -e "            \tPlease check k-mer size before using -f option."
-    echo -e "-w  (string)\tWorking directory [same with -p]"
-    echo -e "-a  (string)\tAnnotation file in gtf [null]. Only if you use this option, Fusion-genes will be predicted in a genome level."
+    echo -e "            \tOur default k-mer size of PGK is 31."
+    echo -e "-w  (string)\tWorking directory [./working]"
+    echo -e "-a  (string)\tAnnotation file in gtf [null]"
+    echo -e "            \tUse this option, if you want to predict fusion-gene in a genome level."
     echo -e
     echo -e "[Sample options]"
     echo -e "-T  (string)\tW for WGS, P for Panel [W]"
-    echo -e "-P  (double)\tTumor purity in somatic call (0-1) [0.75]. Note: Set 1 for germline call."
-    echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from sample sequencing reads [automatic]"
-    echo -e "            \tif you want to specify it, we recommand 3-7 for WGS data, and 5-10 for targeted panel sequencing data."
+    echo -e "-P  (double)\tTumor purity in somatic call (0-1) [0.75]"
+    echo -e "            \tNote: Set 1 for germline call."
+    echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from"
+    echo -e "            \tsample sequencing reads [automatic]"
+    #echo -e "            \tThough ETCHING can calculate optimal cut-off automatically,"
+    echo -e "            \tif you want to specify it, we recommand 3-7 for WGS data, and"
+    echo -e "            \t5-10 for targeted panel sequencing data."
     echo -e "            \tThe lesser, the more sensitive, and the more, the more specific."
     echo -e "-M  (int)   \tExclude the k-mers counted more than this [10000]."
     echo -e "-I  (int)   \tInsert-size [500]"
     echo -e "-L  (int)   \tRead-length [automatic]"
     echo -e "-O  (string)\tRead-orientation FR or RF. [FR]"
     echo -e "-D  (int)   \tSequencing depth [automatic]"
-    echo -e "            \tNote: In case of panel, sequencing data have ~500X or more depth. However, we set to 50 for panel."
+    echo -e "            \tIn case of WGS, sequencing depth is calculated automatically using k-mer histogram."
+    echo -e "            \tNote: In case of panel, sequencing data have ~500X or more depth. However, we set"
+    echo -e "            \tdefault to 50 for panel, because it works well"
     echo -e
     echo -e "[Control options]"
     echo -e "Control sample (matched normal in somatic call)"
     echo -e "-1c (string)\tFirst fastq file of paried-end [null]"
-    echo -e "-2c (string)\tSecond fastq file of paried-end [null]. -1c and -2c must be used together."
+    echo -e "-2c (string)\tSecond fastq file of paried-end [null]"
+    echo -e "            \t-1c and -2c must be used together."
     echo -e "-bc (string)\tAligned bam file of paried-end [null]"
     echo -e 
     echo -e "[K-mer database]"
     echo -e "-f  (string)\tPrefix of KMC3 k-mer database [null]"
-    echo -e "            \tIf you have /path/to/PGK.kmc_pre and /path/to/PGK.kmc_suf, use \"-f /path/to/PGK\""
+    echo -e "            \tIf you have /path/to/PGK.kmc_pre and /path/to/PGK.kmc_suf,"
+    echo -e "            \tyou can use \"-f /path/to/PGK\""
     echo -e 
     echo -e "[Initial SV call]"
     echo -e "-A          \tUse all split-reads [Null]"
-    echo -e "            \tThis option increases recall. However, lots of false-positives also can be generated."
+    echo -e "            \tThis option increases recall. However,"
+    echo -e "            \tlots of folse-positives also can be generated."
     echo -e 
     echo -e "[FP SV removing]"
     echo -e "-R          \tRandom Forest in scoring [default]"
@@ -75,13 +85,10 @@ function USAGE {
     echo -e "-C  (double)\tCut-off of false SVs [0.4]"
     echo -e "-m  (string)\tPath to ETCHING machine learning model [\$ETCHING_ML_PATH]"
     echo -e 
-    echo -e "[Others]"
-    echo -e "-S  (string)\t/path/to/samtools [null]"
-    echo -e "-B  (string)\t/path/to/bwa [null]"
-    echo -e 
     echo -e "[About ETCHING]"
     echo -e "-h          \tPrint this message"
     echo -e "-v          \tPrint version"
+    echo -e 
     echo -e 
     echo -e "[[Contact]]"
     echo -e "Please report bugs to"
@@ -106,7 +113,7 @@ GENOME=
 PREFIX=etching
 THREADS=8
 KL=31
-WORKDIR=
+WORKDIR=working
 
 ANNOTATION=
 
@@ -130,9 +137,6 @@ ALGOR=
 ALGOR_R=0
 ALGOR_X=0
 CUTOFF=0.4
-
-MAPPER=
-SAMTOOLS=
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -228,19 +232,12 @@ while [ "$1" != "" ]; do
             ;;
 
 
-        -S | --samtools ) shift
-	    SAMTOOLS=$1
-            ;;
-        -B | --bwa ) shift
-	    MAPPER=$1
-            ;;
-
         -h | --help ) USAGE
             exit
             ;;
 
 
-        -v | --version ) echo -e $VERSION
+        -v | --help ) echo -e $VERSION
             exit
             ;;
 
@@ -253,7 +250,6 @@ while [ "$1" != "" ]; do
     esac
     shift
 done
-
 
 
 #############################
@@ -537,25 +533,27 @@ done
 
 if [ ${#MAPPER} == 0 ]
 then
-    CHECK=$(which bwa)
-else
-    CHECK=$(which ${MAPPER})
+    MAPPER="bwa"
+    CHECK=$(which $MAPPER)
+    
+    if [ ${#CHECK} == 0 ]
+    then
+	echo "ERROR!!!"
+	echo "bwa was not found"
+	exit -1
+    fi
+    MAPPER="bwa mem"
 fi
 
-if [ ${#CHECK} == 0 ]
-then
-    echo "ERROR!!!"
-    echo "bwa was not found"
-    exit -1
-fi
+
 
 
 if [ ${#SAMTOOLS} == 0 ]
 then
-    CHECK=$(which samtools)
-else
-    CHECK=$(which $SAMTOOLS)
+    SAMTOOLS=samtools
 fi
+
+CHECK=$(which $SAMTOOLS)
 
 if [ ${#CHECK} == 0 ]
 then
@@ -564,16 +562,11 @@ then
     exit -1
 fi
 
+
 #######################################################################################
 #
 # check working directory
 #
-
-if [ ${#WORKDIR} == 0 ]
-then
-    WORKDIR=$PREFIX
-fi
-
 if [ ! -d $WORKDIR ]
 then
     echo "mkdir $WORKDIR"
@@ -836,26 +829,6 @@ then
 	OPTIONS="${OPTIONS} -f ${FILTER}"
     else
 	OPTIONS="-f ${FILTER}"
-    fi
-fi
-
-if [ ${#SAMTOOLS} != 0 ]
-then
-    if [ ${#OPTIONS} != 0 ]
-    then
-	OPTIONS="${OPTIONS} -S ${SAMTOOLS}"
-    else
-	OPTIONS="-S ${SAMTOOLS}"
-    fi
-fi
-
-if [ ${#MAPPER} != 0 ]
-then
-    if [ ${#OPTIONS} != 0 ]
-    then
-	OPTIONS="${OPTIONS} -B ${MAPPER}"
-    else
-	OPTIONS="-B ${MAPPER}"
     fi
 fi
 

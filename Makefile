@@ -1,6 +1,7 @@
 default:
 	bash libconf.sh
 	cd lib/zlib && make
+	cd lib/bamtools && make
 	cd lib && ln -sf zlib/libz.so libz.so
 	cd ETCHING && make
 	cd Filter && make
@@ -10,12 +11,13 @@ default:
 	bash decomp.sh
 	if [[ ! -d "bin" ]]; then mkdir bin ; fi
 	cp ETCHING/etching bin/
-	cp ETCHING/etching_conf_parse bin/
-	cp Filter/estimate_coverage bin/
 	cp Filter/etching_filter bin/
 	cp Filter/kmer_filter bin/
 	cp Filter/read_collector bin/
+	cp Filter/read_length_calc bin/
 	cp Filter/KMC3/kmc* bin/
+	cp Filter/fastq_check bin/
+	cp Caller/estimate_coverage bin/
 	cp Caller/etching_caller bin/
 	cp Caller/etching_typer bin/
 	cp Sorter/etching_sorter bin/
@@ -24,6 +26,7 @@ default:
 	cp FG_identifier/etching_fg_identifier bin/
 
 all: library default
+
 
 	cd lib/zlib && make
 clean:

@@ -12,22 +12,58 @@
 #
 
 function USAGE {
-    echo -e "Usage: etching_filter [options] -i exam.conf [options]"
+    echo -e "Usage: etching_filter [options]"
     echo -e
-    echo -e "Required"
-    echo -e "\t-i\tconfig file"
+    echo -e "[[Required]]"
+    echo -e "[Sample (tumor in somatic call)]"
+    echo -e "-1  (string)\tFirst fastq file of paired-end"
+    echo -e "-2  (string)\tSecond fastq file of paired-end"
+    echo -e "            \t-1 and -2 must be used together."
+    echo -e "-b  (string)\tAligned bam file of paired-end. No need to be sorted."
+    echo -e "            \tDo not use along with -1 or -2."
     echo -e
-    echo -e "Options"
-    echo -e "\t-p\tPrefix of output [filtered_read]"
-    echo -e "\t-t\tNumber of threads [8]"
-    echo -e "\t-c\tK-mer histogram cut-off for removing sequencing error [automatic]"
-    echo -e "\t-d\t/path/to/etching [none]"
-    echo -e "\t  \tUse this if you need to specify it."
-    echo -e "\t-T\tInput data type [W]"
-    echo -e "\t  \tW for whole genome sequencing"
-    echo -e "\t  \tT for targeted panel sequencing"
+    echo -e "[Reference genome]"
+    echo -e "-g  (string)\tBWA indexed reference genome."
+    echo -e
+    echo -e
+    echo -e "[[Options]]"
+    echo -e "-p  (string)\tPrefix of output [etching]"
+    echo -e "-t  (int)   \tNumber of threads [8]"
+    echo -e "-l  (int)   \tk-mer size (<=32) [31]"
+    echo -e "            \tPlease check k-mer size before using -f option."
+    echo -e "            \tOur default k-mer size of PGK is 31."
+    #echo -e "-D  (int)   \tSequencing depth [automatic for WGS]"
+    #echo -e "            \tTargeted sequencing data have >=500X depth. However, we set"
+    #echo -e "            \tdefault to 50 for panel, because it works well"
+    echo -e
+    echo -e "[Sample options]"
+    echo -e "-T  (string)\tW for WGS, P for Panel [W]"
+    echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from"
+    echo -e "            \tsample sequencing reads [automatic]"
+    echo -e "            \tThough ETCHING can calculate optimal cut-off automatically,"
+    echo -e "            \tif you want to specify it, we recommand 3-7 for WGS data, and"
+    echo -e "            \t5-10 for targeted panel sequencing data."
+    echo -e "            \tThe lesser, the more sensitive, and the more, the more specific."
+    echo -e "-M  (int)   \tExclude the k-mers counted more than this [10000]"
+    echo -e
+    echo -e "[Control sample (matched normal in somatic call)]"
+    echo -e "-1c (string)\tFirst fastq file of paried-end [null]"
+    echo -e "-2c (string)\tSecond fastq file of paried-end [null]"
+    echo -e "-bc (string)\tAligned bam file of paried-end [null]"
+    echo -e
+    echo -e "[K-mer database]"
+    echo -e "-f  (string)\tPrefix of KMC3 k-mer database [null]"
+    echo -e "            \tIf you have /path/to/PGK.kmc_pre and /path/to/PGK.kmc_suf,"
+    echo -e "            \tyou can use \"-f /path/to/PGK\""
+    echo -e
+    echo -e "-h          \tHelp message"
+    echo -e
+    echo -e "[Others]"
+    echo -e "-S  (string)\t/path/to/samtools [null]"
+    echo -e "-B  (string)\t/path/to/bwa [null]"
     echo -e 
-    echo -e "Contact:"
+    echo -e "[[Contact]]"
+    echo -e "Please report bugs to"
     echo -e "\tJang-il Sohn (sohnjangil@gmail.com)"
     echo -e "\tJin-Wu Nam (jwnam@hanyang.ac.kr)"
     echo -e
@@ -43,33 +79,94 @@ fi
 
 PREFIX=filtered_read
 THREADS=8
+
 DATATYPE="W"
+CUTOFF=
+MAXK=10000
+
+KMER_SIZE=31
+
+FIRST=
+SECOND=
+BAM=
+
+GENOME=
+
+FIRST_CONT=
+SECOND_CONT=
+BAM_CONT=
+
+FILTER=
+
+SAMTOOLS=
+MAPPER=
 
 while [ "$1" != "" ]; do
     case $1 in
-	-i | --config ) shift
-	    CONF=$1
+	-1 | --first ) shift
+	    FIRST=$1
 	    ;;
+	-2 | --second ) shift
+	    SECOND=$1
+	    ;;
+	-b | --bam ) shift
+	    BAM=$1
+	    ;;
+
+	-g | --reference-genome ) shift
+	    GENOME=$1
+	    ;;
+
         -p | --prefix ) shift
             PREFIX=$1
             ;;
         -t | --threads ) shift
 	    THREADS=$1
-            ;;
-        -c | --cutoff ) shift
-	    CUTOFF=$1
-            ;;
-        -d | --directory ) shift
-	    DIR=$1
-            ;;
+	    ;;
+        -l | --k-mer-size ) shift
+	    KMER_SIZE=$1
+	    ;;
+
         -T | --data-type ) shift
 	    DATATYPE=$1
             ;;
-        -h | --help ) USAGE
-            exit
+        -K | --k-mer-freq-cutoff ) shift
+	    CUTOFF=$1
             ;;
-        #* )  USAGE
-        #    exit 1
+        -M | --max-k-mer-freq ) shift
+	    MAXK=$1
+            ;;
+
+	-1c | --first-control ) shift
+	    FIRST_CONT=$1
+	    ;;
+	-2c | --second-control ) shift
+	    SECOND_CONT=$1
+	    ;;
+	-bc | --bam-control ) shift
+	    BAM_CONT=$1
+	    ;;
+
+	-f | --k-mer-filter ) shift
+	    FILTER=$1
+	    ;;
+
+        -h | --help ) USAGE
+            exit 0
+            ;;
+
+	-S | --samtools ) shift
+	    SAMTOOLS=$1
+	    ;;
+	-B | --bwa ) shift
+	    MAPPER=$1
+	    ;;
+
+	* ) 
+	    echo "ERROR!!! Unavailable option: $1"
+	    echo "-------------------------------"
+	    USAGE
+	    exit -1
     esac
     shift
 done
@@ -79,6 +176,7 @@ if [ ! ${DATATYPE} == "W" ] && [ ! ${DATATYPE} == "P" ]
 then
     echo "ERROR!!! -T must be W or P."
     echo "---------------------------"
+    USAGE
     exit -1
 fi
 
@@ -88,138 +186,190 @@ fi
 # get arguments
 #
 
-if [ ${#CONF} == 0 ]
+FILE_FORMAT="fq"
+if [ ${#FIRST} != 0 ] && [ ${#SECOND} != 0 ]
 then
-    echo "ERROR!!! Please input config file."
-    echo "-------------------------"
-    USAGE
-    exit
+    if [ ! -f ${FIRST} ]
+    then
+	echo "ERROR!!! Ther is no ${FIRST}".
+	exit -1
+    fi
+
+    if [ ! -f ${SECOND} ]
+    then
+	echo "ERROR!!! Ther is no ${SECOND}".
+	exit -1
+    fi
+
+    echo $FIRST > sample.list
+    echo $SECOND >> sample.list
+
+    if [ ${#BAM} != 0 ]
+    then
+	echo "WARNING!!! Input bam file will be ignored: ${BAMx}"
+    fi
+else
+    if [ ${#BAM} != 0 ]
+    then
+	FILE_FORMAT="bam"
+	if [ ! -f ${BAM} ]
+	then
+	    echo "ERROR!!! Ther is no ${BAM}".
+	    exit -1
+	fi
+	echo $BAM > sample.list
+    else
+	echo "ERROR!!! Please check required option"
+	echo "-------------------------------------"
+	USAGE
+	exit -1
+    fi
 fi
 
-grep -v "#" $CONF | awk '{if($1=="sample") print $2}' > sample.list
-grep -v "#" $CONF | awk '{if($1=="filter_fq") print $2}' > filter_fq.list
-grep -v "#" $CONF | awk '{if($1=="filter_fa") print $2}' > filter_fa.list
-FILTER=$(grep -v "#" $CONF | awk '{if($1=="filter_db") print $2}' | head)
 
 
-LINE_NUMBER=$(wc -l sample.list | awk '{print $1}')
-if [ $LINE_NUMBER != 2 ]
+if [ ${#FIRST_CONT} != 0 ]
 then
-    echo "ERROR!!! Sample file must be paired."
+    if [ ! -f ${FIRST_CONT} ]
+    then
+        echo "ERROR!!! Ther is no ${FIRST_CONT}".
+        exit -1
+    fi
+fi
+
+if [ ${#SECOND_CONT} != 0 ]
+then
+    if [ ! -f ${SECOND_CONT} ]
+    then
+        echo "ERROR!!! Ther is no ${SECOND_CONT}".
+        exit -1
+    fi
+fi
+
+
+if [ ${#BAM_CONT} != 0 ]
+then
+    if [ ! -f ${BAM_CONT} ]
+    then
+        echo "ERROR!!! Ther is no ${BAM_CONT}".
+        exit -1
+    fi
+fi
+
+echo $FIRST_CONT > filter_fq.list
+echo $SECOND_CONT >> filter_fq.list
+echo $BAM_CONT > filter_bam.list
+
+if [ ${#GENOME} == 0 ]
+then
+    echo "ERROR!!! -g (reference_genome) is required"
+    echo "------------------------------------------"
+    USAGE
     exit -1
 fi
+
+echo $GENOME > filter_fa.list
+if [ ! -f ${GENOME} ]
+then
+    echo "ERROR!!! There is no reference genome: $GENOME"
+    echo "----------------------------------------------"
+    USAGE
+    exit -1
+fi
+
+
+for i in amb ann bwt pac sa
+do
+    CHECK_INDEX=${GENOME}.${i}
+    if [ ! -f ${CHECK_INDEX} ]
+    then
+	echo "ERROR!!! ${GENOME} looks not indexed yet. We cannot find ${CHECK_INDEX}"
+	echo "-----------------------------------------------------------------------"
+	USAGE
+	exit -1
+    fi
+done
+
 
 #############################
 #
 # Check executable files
 #
 
-if [ ${#DIR} == 0 ]
-then
-    KMER_FILTER=kmer_filter
-    READ_COLLECTOR=read_collector
-else
-    KMER_FILTER=${DIR}/kmer_filter
-    READ_COLLECTOR=${DIR}/read_collector
-fi
+DIR=$(echo $0 | sed 's/etching_filter//g')
+
+
+
+KMER_FILTER=${DIR}kmer_filter
+READ_COLLECTOR=${DIR}read_collector
 
 CHECK=$(which ${KMER_FILTER}  )
 
 if [ ${#CHECK} == 0 ]
 then
-    echo "ERROR!!! kmer_filter was not installed"
+    echo "ERROR!!! kmer_filter was not found."
     exit -1
 fi
 
-CHECK=$(which ${READ_COLLECTOR}  )
+CHECK=$(which ${READ_COLLECTOR} )
+if [ ${#CHECK} == 0 ]
+then
+    echo "ERROR!!! read_collector was not found."
+    exit -1
+fi
+
+KMC=${DIR}kmc
+CHECK=$(which $KMC)
 
 if [ ${#CHECK} == 0 ]
 then
-    echo "ERROR!!! read_collector was not install"
+    echo "ERROR!!! KMC3 was not found."
     exit -1
 fi
 
-CHECK=$(which kmc  )
+KMC_TOOLS=${DIR}kmc_tools
+CHECK=$(which $KMC_TOOLS  )
 
 if [ ${#CHECK} == 0 ]
 then
-    echo "ERROR!!! KMC3 was not install"
+    echo "ERROR!!! KMC3 was not found"
     exit -1
 fi
 
-CHECK=$(which kmc_tools  )
+KMC_DUMP=${DIR}kmc_dump
+CHECK=$(which $KMC_DUMP  )
 
 if [ ${#CHECK} == 0 ]
 then
-    echo "ERROR!!! KMC3 was not install"
+    echo "ERROR!!! KMC3 was not found."
     exit -1
 fi
 
-CHECK=$(which kmc_dump  )
-
-if [ ${#CHECK} == 0 ]
-then
-    echo "ERROR!!! KMC3 was not install"
-    exit -1
-fi
-
-
-
-MAPPER=$(grep -v "#" ${CONF} | awk '{if($1=="mapper") print $2}' )
-SAMTOOLS=$(grep -v "#" ${CONF} | awk '{if($1=="samtools") print $2}' )
 
 if [ ${#MAPPER} == 0 ]
 then
-    MAPPER="bwa mem"
-
-    CHECK=$(which bwa)
-    if [ ${#CHECK} == 0 ]
-    then
-	echo "ERROR!!! bwa was not install"
-	exit -1
-    fi
-    
-else 
-    CHECK=$(grep -v "#" ${CONF} | awk '{if($1=="mapper") print $2}' | grep bwa)
-    if [ ${#CHECK} != 0 ]
-    then
-	MAPPER="$CHECK mem"
-    else
-	CHECK=$(grep -v "#" ${CONF} | awk '{if($1=="mapper") print $2}' | grep minimap2)
-	if [ ${#CHECK} != 0 ]
-	then
-	    MAPPER="$CHECK -a"
-	else
-	    echo "ERROR!!! Mapper must be one of bwa or minimap2 in $CONF file."
-	    exit -1
-	fi
-    fi
+    MAPPER="bwa"
 fi
 
-
+CHECK=$(which $MAPPER)
+if [ ${#CHECK} == 0 ]
+then
+    echo "ERROR!!! bwa was not found"
+    exit -1
+fi
+MAPPER=$MAPPER" mem"
 
 if [ ${#SAMTOOLS} == 0 ]
 then
-    SAMTOOLS=samtools
+    SAMTOOLS="samtools"
 fi
 
-CHECK=$(which $SAMTOOLS  )
-
+CHECK=$(which $SAMTOOLS )
 if [ ${#CHECK} == 0 ]
 then
-    echo "ERROR!!! samtools was not installed"
+    echo "ERROR!!! samtools was not found"
     exit -1
 fi
-
-
-GENOME=$(grep -v "#" ${CONF} | awk '{if($1=="genome") print $2}' )
-if [ ! -f ${GENOME} ]
-then
-    echo "ERROR!!!"
-    echo "There is no reference genome: $GENOME"
-    exit -1
-fi
-
 
 
 #############################
@@ -232,48 +382,85 @@ DATE="[$(date)]";echo ${DATE}
 
 if [ ${#CUTOFF} != 0 ]
 then
-    CUTOFF="-c $CUTOFF"
+    CUTOFF="-k $CUTOFF"
 fi
 
 #############################
 #
 # kmer_filter
 #
-cmd="${KMER_FILTER} -i sample.list -l filter_fq.list -r filter_fa.list -a $FILTER -o $PREFIX -t $THREADS $CUTOFF -T $DATATYPE > logs/kmer_filter.log"
+echo "[Merging filter_fq and filter_bam]"
+cmd="cat filter_fq.list filter_bam.list > filter_seq.list"
 echo $cmd
 eval $cmd
 
-#############################
-#
-# read_collector
-#
-echo
-echo "[read_collector]"
-DATE="[$(date)]";echo ${DATE}
-
-FIRST_FRAG=$(head -n 1 sample.list)
-SECOND_FRAG=$(tail -n 1 sample.list)
-
-cmd="${READ_COLLECTOR} -f $PREFIX -1 $FIRST_FRAG -2 $SECOND_FRAG -o $PREFIX -t $THREADS > logs/read_collector.log "
+cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -r filter_fa.list -a $FILTER -p $PREFIX -t $THREADS -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${DIR}"
 echo $cmd
 eval $cmd
 
-#############################
-#
-# Mapping
-#
-echo
-echo "[Mapping]"
-DATE="[$(date)]";echo ${DATE}
+if [ ! ${FILE_FORMAT} == "bam" ]
+then 
+    #############################
+    #
+    # read_collector for fastq
+    #
+    echo
+    echo "[read_collector]"
+    DATE="[$(date)]";echo ${DATE}
+    
+    cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -1 ${FIRST} -2 ${SECOND} -p ${PREFIX} -t ${THREADS} -l ${KMER_SIZE} 2> err"
+    echo $cmd
+    eval $cmd
+    rm -f err
 
-FIRST_FRAG=${PREFIX}_1.fastq
-SECOND_FRAG=${PREFIX}_2.fastq
+    #############################
+    #
+    # Mapping
+    #
+    echo
+    echo "[Mapping]"
+    DATE="[$(date)]";echo ${DATE}
 
+    cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq > ${PREFIX}.sam"
+    echo $cmd
+    eval $cmd
 
-cmd="${MAPPER} -t ${THREADS} ${GENOME} ${FIRST_FRAG} ${SECOND_FRAG} 2> logs/mapping.log | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.bam"
-echo $cmd
-eval $cmd
+    let HALF=${THREADS/2}+1
+    cmd="${SAMTOOLS} view -S -H ${PREFIX}.sam > ${PREFIX}.header"
+    echo $cmd
+    eval $cmd
+    cmd="${SAMTOOLS} view -S -@ ${HALF} ${PREFIX}.sam | grep \"SA:Z:\" > ${PREFIX}.SA.sam"
+    echo $cmd
+    eval $cmd &
+    cmd="${SAMTOOLS} view -S -@ ${HALF} ${PREFIX}.sam | grep -v \"SA:Z:\" | grep -v \"NM:i:0\" > ${PREFIX}.NM.sam"
+    echo $cmd
+    eval $cmd &
+    wait
+    cmd="cat ${PREFIX}.header ${PREFIX}.SA.sam ${PREFIX}.NM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.bam"
+    echo $cmd
+    eval $cmd
+    cmd="rm -f ${PREFIX}.sam ${PREFIX}.header ${PREFIX}.SA.sam ${PREFIX}.NM.sam"
+    echo $cmd
+    eval $cmd
 
+else
+    #############################
+    #
+    # read_collector for bam
+    #
+    echo
+    echo "[read_collector (bam mode)]"
+    DATE="[$(date)]";echo ${DATE}
+    
+    BAM_INPUT=$(head -n 1 sample.list)
+    
+    cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -b $BAM_INPUT -p $PREFIX -t $THREADS -l ${KMER_SIZE} 2> err"
+    echo $cmd
+    eval $cmd
+    rm -f err
+fi    
+
+# checking samtools sorting method
 CHECK=$($SAMTOOLS sort 2>&1 | grep "\-o" | grep "final output to stdout")
 
 if [ ${#CHECK} == 0 ]
@@ -294,3 +481,5 @@ eval $cmd
 echo
 echo "[END]"
 DATE="[$(date)]";echo ${DATE}
+
+exit 0

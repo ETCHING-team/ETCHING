@@ -22,43 +22,25 @@
 #include <utility>
 #include <thread>
 #include <bitset>
+// #include <algorithm>
+
+// #include <api/BamAlignment.h>
+// #include <api/BamReader.h>
+// #include <api/BamWriter.h>
 
 #include "spp.h"
+// #include "encode.hpp"
 
 #include "Peak_memory_measure.hpp"
 #include "CPU_TIME_measure.hpp"
+
 #include <gzstream.h>
-
-
 
 using namespace std;
 using spp::sparse_hash_set;
 
-
-/*
-#define TWO_BITS_MASK (3)
-#define BITS_PER_BYTE (8)
-#define BIG_ENOUGH (1024)
-
-
-string decode(uint64_t encoded, bool rna_flag, size_t kmer_size);
-uint64_t encode(const char *seq);
-void encode_forw(uint64_t & value, const char & base, const size_t &kl);
-uint64_t revcom(unsigned char x);
-void encode_reve(uint64_t & value, const char & base, const size_t & kl);
-uint64_t select_canonical (uint64_t & value1,uint64_t & value2);
-*/
-
-uint64_t return_encode(string & kmer);
-bool search_kmer(string & read1, string & qual1, string & read2, string & qual2, size_t kmer_size);
-
-void read_fastq();
-void read_fastq_gz();
-void encoding(size_t kmer_size, int num_threads);
-void write_fastq();
-void SWAP();
-
 int collector (string kmer_table, int kmer_size, string out_prefix, string read_file_1, string read_file_2, int gz_check, int NT);
+int collector_bam (string kmer_table, int kmer_size, string out_prefix, string read_file_b, int NT);
    
 #endif
 
