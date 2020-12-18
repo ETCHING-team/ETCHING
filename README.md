@@ -19,7 +19,7 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
   * [Requirement](#requirement)
   * [Installation](#installation)
     * [From source code](#from-source-code)
-    * [From executable file](#from-executable-file)
+    <!-- * [From executable file](#from-executable-file) -->
     * [Pan-Genome k-mer set](#pan-genome-k-mer-set)
   * [Usage](#usage)
     * [Example of a config file](#example-of-a-config-file)
@@ -68,27 +68,27 @@ echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
 echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
 echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 ```
-
+<!--
 or from our web server
 
 ```
-wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.1.2.tar.gz
-tar zxvf ETCHING_v1.1.2.tar.gz
-cd ETCHING_v1.1.2
+wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.1.3.tar.gz
+tar zxvf ETCHING_v1.1.3.tar.gz
+cd ETCHING_v1.1.3
 make
 echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
 echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
 echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 ```
-
+<!--
 ### From executable file
 
 Alternatively, you can just use our pre-compiled version of ETCHING.
 
 ```
-wget https://github.com/ETCHING-team/ETCHING/releases/download/v1.1.2/ETCHING_v1.1.2_binary.tar.gz
-tar zxvf ETCHING_v1.1.2_binary.tar.gz
-cd ETCHING_v1.1.2_binary
+wget https://github.com/ETCHING-team/ETCHING/releases/download/v1.1.3/ETCHING_v1.1.3_binary.tar.gz
+tar zxvf ETCHING_v1.1.3_binary.tar.gz
+cd ETCHING_v1.1.3_binary
 echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
 echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 ```
@@ -96,21 +96,21 @@ echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 or
 
 ```
-wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.1.2_binary.tar.gz
-tar zxvf ETCHING_v1.1.2_binary.tar.gz
-cd ETCHING_v1.1.2_binary
+wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.1.3_binary.tar.gz
+tar zxvf ETCHING_v1.1.3_binary.tar.gz
+cd ETCHING_v1.1.3_binary
 echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
 echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
 echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 ```
-
+-->
 ### From docker image
 
 Download the docker image from our web (http://big.hanyang.ac.kr/ETCHING/download.html)
 And load ETCHING docker image
 ```
-wget http://big.hanyang.ac.kr/ETCHING/etching_docker_v1.1.2.tar
-docker load -i etching_v1.1.2.tar
+wget http://big.hanyang.ac.kr/ETCHING/etching_docker_v1.1.3.tar
+docker load -i etching_v1.1.3.tar
 ```
 
 Check if the docker image is loaded properly
@@ -123,7 +123,7 @@ Output should be like below
 
 |REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
 |:---|:---|:---|:---|:---|
-|etching|1.1.2|16647cac9a99|40 hours ago|3.5GB|
+|etching|1.1.3|16647cac9a99|40 hours ago|3.5GB|
 
 
 ### Pan-Genome k-mer set
@@ -146,6 +146,8 @@ PGK_20200103.kmc_suf
 ```
 
 Here, ```PGK_20200103``` is the name of k-mer set to be used for ETCHING.
+If you have no matched normal data, PGK must be helpful to select tumor specific reads.
+./ㅐㅔ;.,
 
 Alternatively, you can make your own k-mer set as follows:
 
@@ -165,7 +167,13 @@ After installation, you can download and run demo
 wget http://big.hanyang.ac.kr/ETCHING/DEMO.tar.gz
 tar zxvf DEMO.tar.gz
 cd DEMO
-etching -i demo.conf
+etching -1 tumor_data/tumor1.fq -2 tumor_data/tumor2.fq \
+-1c normal_data/normal1.fastq -2c normal_data/normal2.fastq \
+-g small_genome/small_genome.fa \
+-a small_genome/small_genome.gtf \
+-p OUTPUT \
+-f kmer_set/demo \
+-m /path/to/ETCHING_ML_model
 ```
 
 If you want the list of options, check with this command
@@ -174,7 +182,7 @@ If you want the list of options, check with this command
 etching -h
 ```
 
-
+<!--
 ### Example of a config file
 
 You can write a config file as follows, if you want to predict SVs from tumor samples (tumor_1/2) with 
@@ -239,7 +247,6 @@ genome          /path/to/hg19.fa
 annotation      hg19.gtf
 ```
 
-If you have no matched normal data, PGK must be helpful to select tumor specific reads.
 
 ### Example execution 
 
@@ -259,7 +266,7 @@ In the case of targeted panel data (```-T P```), we recommend to use all split-r
 ```
 etching -i example.conf -t 30 -L 150 -T P -A -p OUTPUT
 ```
-
+-->
 #### Output
 
 The above command will give you two vcf files:
@@ -274,7 +281,7 @@ In OUTPUT.SV.etching_sorter.vcf, you will see SV typs, such as DEL, DUP, INV, or
 
 #### Fusion-gene
 
-If you use a line of annotation file in config file, ETCHING will
+If you use `-a annotation.gtf` option, ETCHING will
 make two more files of fusion-genes:
 
 ```
@@ -292,21 +299,36 @@ If you want to run ETCHING step-by-step, follow the steps.
 For WGS,
 
 ```
-etching_filter -i example.conf -t 30
+etching_filter -1 tumor_1.fq -2 tumor_2.fq \
+-1c normal_1.fastq -2c normal_2.fastq \
+-p OUTPUT \
+-t 30 \
+-g genome.fa \
+-p OUTPUT \
+-f PGK \
+-m /path/to/ETCHING_ML_model
+
 ```
 
-For panel,
+For panel, us `-T P` option
 
 ```
-etching_filter -i example.conf -t 30 -T P -A
+etching_filter -1 tumor_1.fq -2 tumor_2.fq \
+-1c normal_1.fastq -2c normal_2.fastq \
+-p OUTPUT \
+-t 30 \
+-g genome.fa \
+-p OUTPUT \
+-f PGK \
+-m /path/to/ETCHING_ML_model \
+ P -A
 ```
 
-Note: The configure file (```example.conf```) and ```-T P``` option are available only here.
 
 2. Caller
 
 ```
-etching_caller -b filtered_read.sort.bam -g /path/to/hg19.fa -o OUTPUT
+etching_caller -b filtered_read.sort.bam -g genome.fa -o OUTPUT
 ```
 
 This command returns two output, ```OUTPUT.BND.vcf``` and ```OUTPUT.SV.vcf```.
@@ -330,7 +352,7 @@ etching_fg_identifier output.SV.etching_sorter.vcf hg19.annot.gtf > output.SV.FG
 In case of using ETCHING docker image,
 
 ```
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.1.2 etching -i demo.conf
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.1.3 etching -i demo.conf
 ```
 Mount your directory containing all required files, such as PGK, reference fasta, sample and normal 
 fastq  to '/work/' directory in the docker container. The mount point on docker '/work/' should not be
@@ -342,7 +364,7 @@ be either 'sample.fq' or '/work/sample.fq'.
 
 Alternatively, you can run ETCHING inside docker container
 ```
-docker run -i -t --rm -v /local/path/to/example/directory/:/work/ etching:1.1.2 /bin/bash
+docker run -i -t --rm -v /local/path/to/example/directory/:/work/ etching:1.1.3 /bin/bash
 etching -i example.conf
 ```
 The ETCHING binary and ML models are located on '/etching/'
