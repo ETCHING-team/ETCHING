@@ -492,7 +492,7 @@ done
 #
 # CHECKING REQUIRED PROGRAMS
 #
-DIR=$(echo $0 | sed 's/etching//g')
+DIR=$(echo $0 | sed 's/etching$//g')
 echo $DIR
 for i in etching_filter estimate_coverage etching_caller etching_sorter etching_fg_identifier kmer_filter read_collector read_length_calc fastq_check
 do
