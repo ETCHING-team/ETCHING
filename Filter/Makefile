@@ -10,7 +10,7 @@ fastq_check: fastq_check.cpp ../lib/libetching_filter.so
 	g++ -Wall -g -std=c++11 -pthread -Igzstream fastq_check.cpp -L../lib -letching_filter -lz -o fastq_check
 
 read_length_calc: read_length_calc.cpp ../lib/libetching_filter.so
-	g++ -Wall -g -std=c++11 -pthread -Igzstream -L../lib -lz -letching_filter ../lib/bamtools/api/internal/*/*o ../lib/bamtools/api/*o read_length_calc.cpp -o read_length_calc
+	g++ -Wall -g -std=c++11 -pthread -Igzstream -I../lib/bamtools -L../lib -lz -letching_filter ../lib/bamtools/api/internal/*/*o ../lib/bamtools/api/*o read_length_calc.cpp -o read_length_calc
 
 read_collector: read_collector.cpp ../lib/libetching_filter.so
 	g++ -Wall -g -std=c++11 -fPIC -c read_collector.cpp -o read_collector.lo -L../lib -letching_filter -I sparsepp_spp64 -I gzstream -pthread
