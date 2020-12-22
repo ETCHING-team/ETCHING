@@ -429,17 +429,22 @@ then
     cmd="${SAMTOOLS} view -S -H ${PREFIX}.sam > ${PREFIX}.header"
     echo $cmd
     eval $cmd
-    cmd="${SAMTOOLS} view -S -@ ${HALF} ${PREFIX}.sam | grep \"SA:Z:\" > ${PREFIX}.SA.sam"
-    echo $cmd
-    eval $cmd &
-    cmd="${SAMTOOLS} view -S -@ ${HALF} ${PREFIX}.sam | grep -v \"SA:Z:\" | grep -v \"NM:i:0\" > ${PREFIX}.NM.sam"
-    echo $cmd
-    eval $cmd &
-    wait
-    cmd="cat ${PREFIX}.header ${PREFIX}.SA.sam ${PREFIX}.NM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.bam"
+    #cmd="${SAMTOOLS} view -S -@ ${HALF} ${PREFIX}.sam | grep \"SA:Z:\" > ${PREFIX}.SA.sam"
+    #echo $cmd
+    #eval $cmd &
+    #cmd="${SAMTOOLS} view -S -@ ${HALF} ${PREFIX}.sam | grep -v \"SA:Z:\" | grep -v \"NM:i:0\" > ${PREFIX}.NM.sam"
+    #echo $cmd
+    #eval $cmd &
+    #wait
+    cmd="samtools view -S -@ ${HALF} ${PREFIX}.sam | awk '$6 ~ /H|S/ || $0 !~ \"NM:i:0\" {print}' > ${PREFIX}.SHNM.sam"
     echo $cmd
     eval $cmd
-    cmd="rm -f ${PREFIX}.sam ${PREFIX}.header ${PREFIX}.SA.sam ${PREFIX}.NM.sam"
+    #cmd="cat ${PREFIX}.header ${PREFIX}.SA.sam ${PREFIX}.NM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.bam"
+    cmd="cat ${PREFIX}.header ${PREFIX}.SHNM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.bam"
+    echo $cmd
+    eval $cmd
+    #cmd="rm -f ${PREFIX}.sam ${PREFIX}.header ${PREFIX}.SA.sam ${PREFIX}.NM.sam"
+    cmd="rm -f ${PREFIX}.sam ${PREFIX}.header ${PREFIX}.SHNM.sam ${PREFIX}.sam"
     echo $cmd
     eval $cmd
 
