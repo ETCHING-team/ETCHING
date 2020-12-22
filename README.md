@@ -1,7 +1,7 @@
 ---
 # ETCHING
 
-### Version 1.1.3
+### Version 1.1.4
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
@@ -19,10 +19,8 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
   * [Requirement](#requirement)
   * [Installation](#installation)
     * [From source code](#from-source-code)
-    <!-- * [From executable file](#from-executable-file) -->
     * [Pan-Genome k-mer set](#pan-genome-k-mer-set)
   * [Usage](#usage)
-    * [Example of a config file](#example-of-a-config-file)
     * [Pan-genome k-mer - PGK](#pan-genome-k-mer---pgk)
     * [Example execution](#example-execution)
     * [Step-by-step execution](#step-by-step-execution)
@@ -68,42 +66,7 @@ echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
 echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
 echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 ```
-<!--
-or from our web server
 
-```
-wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.1.3.tar.gz
-tar zxvf ETCHING_v1.1.3.tar.gz
-cd ETCHING_v1.1.3
-make
-echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
-echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
-echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
-```
-<!--
-### From executable file
-
-Alternatively, you can just use our pre-compiled version of ETCHING.
-
-```
-wget https://github.com/ETCHING-team/ETCHING/releases/download/v1.1.3/ETCHING_v1.1.3_binary.tar.gz
-tar zxvf ETCHING_v1.1.3_binary.tar.gz
-cd ETCHING_v1.1.3_binary
-echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
-echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
-```
-
-or
-
-```
-wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.1.3_binary.tar.gz
-tar zxvf ETCHING_v1.1.3_binary.tar.gz
-cd ETCHING_v1.1.3_binary
-echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
-echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
-echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
-```
--->
 ### From docker image
 
 Download the docker image from our web (http://big.hanyang.ac.kr/ETCHING/download.html)
@@ -182,91 +145,6 @@ If you want the list of options, check with this command
 etching -h
 ```
 
-<!--
-### Example of a config file
-
-You can write a config file as follows, if you want to predict SVs from tumor samples (tumor_1/2) with 
-matched normal samples (normal_a/b_1/2), and ready-made k-mer database (PGK).
-
-```
-#####################################################################
-#                                                                           
-# sample     : (tumor) sample in fastq                                      
-# filter_fq  : (matched normal) control sample as filter in fastq 
-# filter_fa  : Assembly, genome, or normal samples as filter in fasta
-# filter_db  : Pre-made k-mer set (prefix of database), such as PGK
-# genome     : Reference genome for mapping 
-# mapper     : bwa or minimap2 
-# annotation : for fusion-gene identifying in gtf format 
-# 
-# NOTE!!!       
-# Keep the type names.              
-# Use filter_db only once, if you needed it.
-#####################################################################
-
-
-# sample (or tumor) sequencing files
-# ETCHING supports gzip (fq.gz) files, 
-# but it will slow down 3-5 times in the Filter module.
-sample  tumor_1.fastq
-sample  tumor_2.fastq
-
-# filter (or normal) samples
-filter_fq       normal_a_1.fastq
-filter_fq       normal_a_2.fastq
-
-# Additional fastq files can be added
-filter_fq       /path/to/normal_b_1.fastq
-filter_fq       /path/to/normal_b_2.fastq
-
-# Ready-made k-mer database made with KMC3
-filter_db       /path/to/PGK_20200103
-
-# If you want to add more k-mers from 
-# assemblies (or genomes) to k-mer set, 
-# use these options
-filter_fa       Ash1.7.fa
-filter_fa       ../../T2T.fasta
-filter_fa       /path/to/CHM1.fa
-
-# BWA (or Minimap2) indexed reference genome
-genome          /path/to/hg19.fa
-
-# Set one of these if you need to specify mapper.
-# default is bwa
-#mapper         /path/to/bwa
-#mapper         /path/to/minimap2
-
-# samtools
-# set this if you need to specify it
-#samtools       /path/to/samtools
-
-# An annotation file in gtf format for FG-identifier
-# Use this option to predic FGs.
-# Note: only gtf is supported yet.
-annotation      hg19.gtf
-```
-
-
-### Example execution 
-
-#### WGS data
-
-If you want to run ETCHING with 30 threads (```-t 30```) for sequencing data of length 150 bp 
-(```-L 150```), run the following command:
-
-```
-etching -i example.conf -t 30 -L 150 -p OUTPUT
-```
-
-#### Panel data
-
-In the case of targeted panel data (```-T P```), we recommend to use all split-reads with ```-A``` option:
-
-```
-etching -i example.conf -t 30 -L 150 -T P -A -p OUTPUT
-```
--->
 #### Output
 
 The above command will give you two vcf files:
