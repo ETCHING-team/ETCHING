@@ -34,4 +34,4 @@ SamSequenceDictionary.cpp.o: SamSequenceDictionary.cpp
 	g++ -Wall -std=c++11 -g -I .. -fPIC -c SamSequenceDictionary.cpp -o SamSequenceDictionary.cpp.o
 
 clean:
-	rm -f *.o
+	rm -f *.o internal/*/*.o

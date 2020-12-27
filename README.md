@@ -1,7 +1,7 @@
 ---
 # ETCHING
 
-### Version 1.1.4
+### Version 1.1.4a
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
@@ -21,6 +21,7 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
     * [From source code](#from-source-code)
     * [Pan-Genome k-mer set](#pan-genome-k-mer-set)
   * [Usage](#usage)
+    * [Example of a config file](#example-of-a-config-file)
     * [Pan-genome k-mer - PGK](#pan-genome-k-mer---pgk)
     * [Example execution](#example-execution)
     * [Step-by-step execution](#step-by-step-execution)
@@ -66,7 +67,6 @@ echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
 echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
 echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 ```
-
 ### From docker image
 
 Download the docker image from our web (http://big.hanyang.ac.kr/ETCHING/download.html)

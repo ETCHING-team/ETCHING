@@ -45,7 +45,8 @@ cleanlibrary:
 	cd Sorter && make cleanlibrary
 	cd FG_identifier && make cleanlibrary
 	cd lib/zlib && make clean
+	cd lib/bamtools && make clean
 
-cleanall: clean cleanlibrary
+cleanall: clean
 	rm -rf bin
 	rm -f ETCHING_ML_model/*sav
