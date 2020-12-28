@@ -36,7 +36,6 @@ clean:
 	cd Caller && make clean
 	cd Sorter && make clean
 	cd FG_identifier && make clean
-	cd lib/bamtools && make clean
 
 cleanlibrary:
 	rm -f lib/*so
@@ -46,7 +45,16 @@ cleanlibrary:
 	cd FG_identifier && make cleanlibrary
 	cd lib/zlib && make clean
 	cd lib/bamtools && make clean
+	rm -f lib/lib*
 
 cleanall: clean
+	cd ETCHING && make cleanall
+	cd Filter && make cleanall
+	cd Caller && make cleanall
+	cd Sorter && make cleanall
+	cd FG_identifier && make cleanall
 	rm -rf bin
 	rm -f ETCHING_ML_model/*sav
+	cd lib/zlib && make clean
+	cd lib/bamtools && make clean
+	rm -f lib/lib*

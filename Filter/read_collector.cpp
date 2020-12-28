@@ -115,10 +115,18 @@ int main (int argc , char ** argv){
       read_collector_usage();
       return -1;
     }
-    collector (kmer_table, kl, prefix, input_1, input_2, gz_check, num_threads);
+    int check_collector = collector (kmer_table, kl, prefix, input_1, input_2, gz_check, num_threads);
+    if ( check_collector != 0 ){
+      std::cout << "ETCHING-Filter was abnormally finished at the collector function in read_collector\n";
+      return check_collector;
+    }
   }
   else if ( input_b.size() != 0 ){
-    collector_bam (kmer_table, kl, prefix, input_b, num_threads);
+    int check_collector = collector_bam (kmer_table, kl, prefix, input_b, num_threads);
+    if ( check_collector != 0 ){
+      std::cout << "ETCHING-Filter was abnormally finished at the collector_bam function in read_collector\n";
+      return check_collector;
+    }
   }
   else {
     std::cout << "ERROR!!! You missed input files.\n";

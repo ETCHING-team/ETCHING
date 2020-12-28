@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.1.4 (released 2020.12.22)"
+VERSION="ETCHING_v1.1.4b (released 2020.12.29)"
 
 #--------------------------------------------------------------------
 # Copyright 2020. Bioinformatic and Genomics Lab.
@@ -76,8 +76,9 @@ function USAGE {
     echo -e "-m  (string)\tPath to ETCHING machine learning model [\$ETCHING_ML_PATH]"
     echo -e 
     echo -e "[Others]"
-    echo -e "-S  (string)\t/path/to/samtools [null]"
-    echo -e "-B  (string)\t/path/to/bwa [null]"
+    echo -e "-S  (string)\t/path/to/samtools [system]"
+    echo -e "-B  (string)\t/path/to/bwa [system]"
+    echo -e "-E          \tStore k-mer database files [remove the files]"
     echo -e 
     echo -e "[About ETCHING]"
     echo -e "-h          \tPrint this message"
@@ -133,6 +134,7 @@ CUTOFF=0.4
 
 MAPPER=
 SAMTOOLS=
+STORE_KMC=
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -233,6 +235,9 @@ while [ "$1" != "" ]; do
             ;;
         -B | --bwa ) shift
 	    MAPPER=$1
+            ;;
+        -E ) shift
+	    STORE_KMC="-E"
             ;;
 
         -h | --help ) USAGE
@@ -492,8 +497,8 @@ done
 #
 # CHECKING REQUIRED PROGRAMS
 #
-DIR=$(echo $0 | sed 's/etching//g')
-echo $DIR
+DIR=$(echo $0 | sed 's/etching$//g')
+#echo $DIR
 for i in etching_filter estimate_coverage etching_caller etching_sorter etching_fg_identifier kmer_filter read_collector read_length_calc fastq_check
 do
     CHECK=$(which ${DIR}${i})
@@ -725,13 +730,13 @@ DATE="[$(date)]";echo ${DATE}
 mkdir logs
 
 REQUIRED=
-echo $FIRST
-echo $SECOND
+#echo $FIRST
+#echo $SECOND
 
 if [ ${#FIRST} != 0 ] && [ ${#SECOND} != 0 ]
 then
     REQUIRED="-1 $FIRST -2 $SECOND -g ${GENOME}"
-    echo $REQUIRED
+    #echo $REQUIRED
 else
     REQUIRED="-b $BAM -g ${GENOME}"
 fi
@@ -859,9 +864,21 @@ then
     fi
 fi
 
-cmd="${DIR}etching_filter ${REQUIRED} ${OPTIONS} > logs/ETCHING_FILTER.log"
+if [ ${#STORE_KMC} != 0 ]
+then
+    if [ ${#OPTIONS} != 0 ]
+    then
+	OPTIONS="${OPTIONS} -E"
+    else
+	OPTIONS="-E"
+    fi
+fi
+
+cmd="${DIR}etching_filter ${REQUIRED} ${OPTIONS} > logs/ETCHING_FILTER.log 2> logs/ETCHING_FILTER.err"
 echo $cmd
 eval $cmd
+
+rm -f logs/ETCHING_FILTER.err
 
 #######################################################################################################################
 
@@ -897,7 +914,7 @@ if [ ${#DEPTH} == 0 ]
 then
     if [ $DATATYPE == "W" ]
     then 
-	cmd="${DIR}estimate_coverage sample $READLENGTH $KL"
+	cmd="${DIR}estimate_coverage sample.hist $READLENGTH $KL"
 	echo $cmd
 	DEPTH=$(eval $cmd)
 	

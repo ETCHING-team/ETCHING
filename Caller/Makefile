@@ -9,7 +9,6 @@ estimate_coverage: estimate_coverage.cpp
 
 etching_typer: ../lib/libetching_caller.so etching_typer.cpp
 	g++ -Wall -g -std=c++11 etching_typer.cpp -L../lib -letching_caller -lz -o etching_typer -I../lib/bamtools
-	g++ -Wall -g -std=c++11 estimate_coverage.cpp -o estimate_coverage
 
 clean:
 	rm -f etching_caller etching_typer

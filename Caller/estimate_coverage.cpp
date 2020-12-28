@@ -14,11 +14,11 @@
 
 int main ( int argc , char ** argv ){
   if ( argc != 4 ){
-    std::cout << "estimate_coverage  TUMOR_DB_name  read_length  k-mer_length\n";
+    std::cout << "estimate_coverage  sample_kmer_histogram  read_length  k-mer_length\n";
     return 0;
   }
 
-  std::string tumor = argv[1];
+  std::string tumor_hist = argv[1];
   double read_length = (double) atoi ( argv[2] );
   double kl = (double) atoi ( argv[3] );
 
@@ -31,10 +31,10 @@ int main ( int argc , char ** argv ){
 
   double coverage;
 
-  std::string command = "kmc_tools transform " + tumor + " histogram " + tumor + ".hist";
-  system(command.c_str());
+  // std::string command = "kmc_tools transform " + tumor + " histogram " + tumor + ".hist";
+  // system(command.c_str());
 
-  std::string tumor_hist = tumor + ".hist";
+  // std::string tumor_hist = tumor + ".hist";
 
   std::ifstream fin(tumor_hist.c_str());
   while ( fin >> d >> f ){

@@ -27,6 +27,7 @@ function USAGE {
     echo -e
     echo -e
     echo -e "[[Options]]"
+    echo -e "[General]"
     echo -e "-p  (string)\tPrefix of output [etching]"
     echo -e "-t  (int)   \tNumber of threads [8]"
     echo -e "-l  (int)   \tk-mer size (<=32) [31]"
@@ -36,7 +37,7 @@ function USAGE {
     #echo -e "            \tTargeted sequencing data have >=500X depth. However, we set"
     #echo -e "            \tdefault to 50 for panel, because it works well"
     echo -e
-    echo -e "[Sample options]"
+    echo -e "[Sample]"
     echo -e "-T  (string)\tW for WGS, P for Panel [W]"
     echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from"
     echo -e "            \tsample sequencing reads [automatic]"
@@ -46,7 +47,7 @@ function USAGE {
     echo -e "            \tThe lesser, the more sensitive, and the more, the more specific."
     echo -e "-M  (int)   \tExclude the k-mers counted more than this [10000]"
     echo -e
-    echo -e "[Control sample (matched normal in somatic call)]"
+    echo -e "[Control (matched normal in somatic call)]"
     echo -e "-1c (string)\tFirst fastq file of paried-end [null]"
     echo -e "-2c (string)\tSecond fastq file of paried-end [null]"
     echo -e "-bc (string)\tAligned bam file of paried-end [null]"
@@ -59,8 +60,9 @@ function USAGE {
     echo -e "-h          \tHelp message"
     echo -e
     echo -e "[Others]"
-    echo -e "-S  (string)\t/path/to/samtools [null]"
-    echo -e "-B  (string)\t/path/to/bwa [null]"
+    echo -e "-S  (string)\t/path/to/samtools [system]"
+    echo -e "-B  (string)\t/path/to/bwa [system]"
+    echo -e "-E          \tStore k-mer database files [remove the files]"
     echo -e 
     echo -e "[[Contact]]"
     echo -e "Please report bugs to"
@@ -100,7 +102,7 @@ FILTER=
 
 SAMTOOLS=
 MAPPER=
-
+STORE_KMC=
 while [ "$1" != "" ]; do
     case $1 in
 	-1 | --first ) shift
@@ -160,6 +162,10 @@ while [ "$1" != "" ]; do
 	    ;;
 	-B | --bwa ) shift
 	    MAPPER=$1
+	    ;;
+
+	-E ) shift
+	    STORE_KMC="-E"
 	    ;;
 
 	* ) 
@@ -296,53 +302,81 @@ done
 # Check executable files
 #
 
-DIR=$(echo $0 | sed 's/etching_filter//g')
+DIR=$(echo $0 | sed 's/etching_filter$//g')
 
-
-
-KMER_FILTER=${DIR}kmer_filter
-READ_COLLECTOR=${DIR}read_collector
-
+KMER_FILTER=kmer_filter
 CHECK=$(which ${KMER_FILTER}  )
 
 if [ ${#CHECK} == 0 ]
 then
-    echo "ERROR!!! kmer_filter was not found."
-    exit -1
+    KMER_FILTER=${DIR}kmer_filter
+    CHECK=$(which ${KMER_FILTER}  )
+    
+    if [ ${#CHECK} == 0 ]
+    then
+	echo "ERROR!!! kmer_filter was not found."
+	exit -1
+    fi
 fi
 
+READ_COLLECTOR=read_collector
 CHECK=$(which ${READ_COLLECTOR} )
 if [ ${#CHECK} == 0 ]
 then
-    echo "ERROR!!! read_collector was not found."
-    exit -1
+    READ_COLLECTOR=${DIR}read_collector
+    CHECK=$(which ${READ_COLLECTOR} )
+    if [ ${#CHECK} == 0 ]
+    then
+	echo "ERROR!!! read_collector was not found."
+	exit -1
+    fi
 fi
 
-KMC=${DIR}kmc
+KMC=kmc
 CHECK=$(which $KMC)
-
 if [ ${#CHECK} == 0 ]
 then
-    echo "ERROR!!! KMC3 was not found."
+    KMC=${DIR}kmc
+    CHECK=$(which $KMC)
+    if [ ${#CHECK} == 0 ]
+    then
+	echo "ERROR!!! KMC3 was not found."
+	exit -1
+    fi
+fi
+
+CHECK=$($KMC | grep "K-Mer Counter (KMC) ver. 3")
+if [ ${#CHECK} == 0 ]
+then
+    echo "KMC version must be >=3"
+    echo $CHECK
     exit -1
 fi
 
-KMC_TOOLS=${DIR}kmc_tools
+KMC_TOOLS=kmc_tools
 CHECK=$(which $KMC_TOOLS  )
-
 if [ ${#CHECK} == 0 ]
 then
-    echo "ERROR!!! KMC3 was not found"
-    exit -1
+    KMC_TOOLS=${DIR}kmc_tools
+    CHECK=$(which $KMC_TOOLS  )
+    if [ ${#CHECK} == 0 ]
+    then
+	echo "ERROR!!! KMC3 was not found"
+	exit -1
+    fi
 fi
 
-KMC_DUMP=${DIR}kmc_dump
+KMC_DUMP=kmc_dump
 CHECK=$(which $KMC_DUMP  )
-
 if [ ${#CHECK} == 0 ]
 then
-    echo "ERROR!!! KMC3 was not found."
-    exit -1
+    KMC_DUMP=${DIR}kmc_dump
+    CHECK=$(which $KMC_DUMP  )
+    if [ ${#CHECK} == 0 ]
+    then
+	echo "ERROR!!! KMC3 was not found."
+	exit -1
+    fi
 fi
 
 
@@ -394,7 +428,13 @@ cmd="cat filter_fq.list filter_bam.list > filter_seq.list"
 echo $cmd
 eval $cmd
 
-cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -r filter_fa.list -a $FILTER -p $PREFIX -t $THREADS -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${DIR}"
+KMC_DIR=$(which ${KMC} | sed 's/\/kmc$//g')
+if [ ${#FILTER} == 0 ]
+then
+    cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -r filter_fa.list -p $PREFIX -t $THREADS -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${KMC_DIR} ${STORE_KMC}"
+else
+    cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -r filter_fa.list -a $FILTER -p $PREFIX -t $THREADS -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${KMC_DIR} ${STORE_KMC}"
+fi
 echo $cmd
 eval $cmd
 
@@ -408,10 +448,9 @@ then
     echo "[read_collector]"
     DATE="[$(date)]";echo ${DATE}
     
-    cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -1 ${FIRST} -2 ${SECOND} -p ${PREFIX} -t ${THREADS} -l ${KMER_SIZE} 2> err"
+    cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -1 ${FIRST} -2 ${SECOND} -p ${PREFIX} -t ${THREADS} -l ${KMER_SIZE}"
     echo $cmd
     eval $cmd
-    rm -f err
 
     #############################
     #
@@ -421,29 +460,20 @@ then
     echo "[Mapping]"
     DATE="[$(date)]";echo ${DATE}
 
-    cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq > ${PREFIX}.sam"
+    cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq > ${PREFIX}.sam 2> logs/bwa_mem.log"
     echo $cmd
     eval $cmd
 
-    let HALF=${THREADS/2}+1
+    #let HALF=${THREADS/2}+1
     cmd="${SAMTOOLS} view -S -H ${PREFIX}.sam > ${PREFIX}.header"
     echo $cmd
     eval $cmd
-    #cmd="${SAMTOOLS} view -S -@ ${HALF} ${PREFIX}.sam | grep \"SA:Z:\" > ${PREFIX}.SA.sam"
-    #echo $cmd
-    #eval $cmd &
-    #cmd="${SAMTOOLS} view -S -@ ${HALF} ${PREFIX}.sam | grep -v \"SA:Z:\" | grep -v \"NM:i:0\" > ${PREFIX}.NM.sam"
-    #echo $cmd
-    #eval $cmd &
-    #wait
-    cmd="samtools view -S -@ ${HALF} ${PREFIX}.sam | awk '$6 ~ /H|S/ || $0 !~ \"NM:i:0\" {print}' > ${PREFIX}.SHNM.sam"
+    cmd="${SAMTOOLS} view -S -@ ${THREADS} ${PREFIX}.sam | awk '\$6 ~ /H|S|*/ || \$0 !~ \"NM:i:0\" {print}' > ${PREFIX}.SHNM.sam"
     echo $cmd
     eval $cmd
-    #cmd="cat ${PREFIX}.header ${PREFIX}.SA.sam ${PREFIX}.NM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.bam"
     cmd="cat ${PREFIX}.header ${PREFIX}.SHNM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.bam"
     echo $cmd
     eval $cmd
-    #cmd="rm -f ${PREFIX}.sam ${PREFIX}.header ${PREFIX}.SA.sam ${PREFIX}.NM.sam"
     cmd="rm -f ${PREFIX}.sam ${PREFIX}.header ${PREFIX}.SHNM.sam ${PREFIX}.sam"
     echo $cmd
     eval $cmd
@@ -458,11 +488,9 @@ else
     DATE="[$(date)]";echo ${DATE}
     
     BAM_INPUT=$(head -n 1 sample.list)
-    
-    cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -b $BAM_INPUT -p $PREFIX -t $THREADS -l ${KMER_SIZE} 2> err"
+    cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -b $BAM_INPUT -p $PREFIX -t $THREADS -l ${KMER_SIZE} "
     echo $cmd
     eval $cmd
-    rm -f err
 fi    
 
 # checking samtools sorting method
@@ -478,6 +506,10 @@ else
     echo $cmd
     eval $cmd
 fi
+
+cmd="rm -rf ${PREFIX}.bam"
+echo $cmd
+eval $cmd
 
 cmd="${SAMTOOLS} index ${PREFIX}.sort.bam"
 echo $cmd
