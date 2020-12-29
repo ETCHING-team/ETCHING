@@ -14,7 +14,7 @@ read_length_calc: read_length_calc.cpp ../lib/libetching_filter.so
 
 read_collector: read_collector.cpp ../lib/libetching_filter.so
 	g++ -Wall -g -std=c++11 -fPIC -c read_collector.cpp -o read_collector.lo -L../lib -letching_filter -I gzstream -pthread
-	g++ -Wall -g -std=c++11 -pthread -L../lib -letching_filter ../lib/bamtools/api/internal/*/*o ../lib/bamtools/api/*o read_collector.lo -lz -o read_collector
+	g++ -Wall -g -std=c++11 ../lib/bamtools/api/internal/*/*o ../lib/bamtools/api/*o read_collector.lo -L../lib -letching_filter -lz -pthread -o read_collector
 
 
 clean:
