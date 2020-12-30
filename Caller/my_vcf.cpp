@@ -633,11 +633,11 @@ void VCF_CLASS::make_header_short(){
 
 
 VCF_CLASS::VCF_CLASS(){
-  etching_version="ETCHING_v1.1.4b (released 2020.12.29)";
+  etching_version="ETCHING_v1.1.4c (released 2020.12.30)";
 }
 
 VCF_CLASS::VCF_CLASS(const std::string infile){
-  etching_version="ETCHING_v1.1.4b (released 2020.12.29)";
+  etching_version="ETCHING_v1.1.4c (released 2020.12.30)";
   read_vcf_file(infile);
 }
 
@@ -1244,22 +1244,24 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int read_length
     
     /////////////////////////////////////////////////////
     // Scanning clipped read map and mapping quality map
-    if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
-      Pos1.first = al.RefID;
-      Pos1.second = al.Position;
-      if ( Pos1.first >= 0 && Pos1.second >= 0 ){
-	cr_map [ Pos1 ] ++;
-	mq_map [ Pos1 ] += al.MapQuality ;
-	tcb_map [ Pos1 ]+= al.CigarData[0].Length ; 
+    if ( al.CigarData.size() > 0 ){
+      if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
+	Pos1.first = al.RefID;
+	Pos1.second = al.Position;
+	if ( Pos1.first >= 0 && Pos1.second >= 0 ){
+	  cr_map [ Pos1 ] ++;
+	  mq_map [ Pos1 ] += al.MapQuality ;
+	  tcb_map [ Pos1 ]+= al.CigarData[0].Length ; 
+	}
       }
-    }
-    if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
-      Pos1.first = al.RefID;
-      Pos1.second = al.GetEndPosition() - 1;
-      if ( Pos1.first >= 0 && Pos1.second >= 0 ){
-	cr_map [ Pos1 ] ++ ;
-	mq_map [ Pos1 ] += al.MapQuality ;
-	tcb_map [ Pos1 ]+= al.CigarData[al.CigarData.size()-1].Length ; 
+      if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
+	Pos1.first = al.RefID;
+	Pos1.second = al.GetEndPosition() - 1;
+	if ( Pos1.first >= 0 && Pos1.second >= 0 ){
+	  cr_map [ Pos1 ] ++ ;
+	  mq_map [ Pos1 ] += al.MapQuality ;
+	  tcb_map [ Pos1 ]+= al.CigarData[al.CigarData.size()-1].Length ; 
+	}
       }
     }
 
@@ -1689,25 +1691,26 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int rea
     
     /////////////////////////////////////////////////////
     // Scanning clipped read map and mapping quality map
-    if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
-      Pos1.first = al.RefID;
-      Pos1.second = al.Position;
-      if ( Pos1.first >= 0 && Pos1.second >= 0 ){
-	cr_map [ Pos1 ] ++;
-	mq_map [ Pos1 ] += al.MapQuality ;
-	tcb_map [ Pos1 ]+= al.CigarData[0].Length ; 
+    if ( al.CigarData.size() > 0 ){
+      if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
+	Pos1.first = al.RefID;
+	Pos1.second = al.Position;
+	if ( Pos1.first >= 0 && Pos1.second >= 0 ){
+	  cr_map [ Pos1 ] ++;
+	  mq_map [ Pos1 ] += al.MapQuality ;
+	  tcb_map [ Pos1 ]+= al.CigarData[0].Length ; 
+	}
+      }
+      if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
+	Pos1.first = al.RefID;
+	Pos1.second = al.GetEndPosition() - 1;
+	if ( Pos1.first >= 0 && Pos1.second >= 0 ){
+	  cr_map [ Pos1 ] ++ ;
+	  mq_map [ Pos1 ] += al.MapQuality ;
+	  tcb_map [ Pos1 ]+= al.CigarData[al.CigarData.size()-1].Length ; 
+	}
       }
     }
-    if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
-      Pos1.first = al.RefID;
-      Pos1.second = al.GetEndPosition() - 1;
-      if ( Pos1.first >= 0 && Pos1.second >= 0 ){
-	cr_map [ Pos1 ] ++ ;
-	mq_map [ Pos1 ] += al.MapQuality ;
-	tcb_map [ Pos1 ]+= al.CigarData[al.CigarData.size()-1].Length ; 
-      }
-    }
-
 
     /////////////////////////////////////////////////////
     // Scanning split read map
@@ -1719,38 +1722,41 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int rea
 	tag_vec.push_back( tmp );
       }
       for ( auto tag : tag_vec){
-	if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
-	  Pos1.first = al.RefID ;
-	  Pos1.second = al.GetEndPosition()-1;
-	  Pos2 = find_split(tag,id_ref_map);
-	  if ( Pos2.second > -1 ){
-	    sr_map[Pos1][Pos2]++;
+	if ( al.CigarData.size() > 0 ){
+	  if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
+	    Pos1.first = al.RefID ;
+	    Pos1.second = al.GetEndPosition()-1;
+	    Pos2 = find_split(tag,id_ref_map);
+	    if ( Pos2.second > -1 ){
+	      sr_map[Pos1][Pos2]++;
+	    }
 	  }
-	}
-	if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
-	  Pos1.first = al.RefID ;
-	  Pos1.second = al.Position;
-	  Pos2 = find_split(tag,id_ref_map);
-	  if ( Pos2.second > -1 ){
-	    sr_map[Pos1][Pos2]++;
+	  if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
+	    Pos1.first = al.RefID ;
+	    Pos1.second = al.Position;
+	    Pos2 = find_split(tag,id_ref_map);
+	    if ( Pos2.second > -1 ){
+	      sr_map[Pos1][Pos2]++;
+	    }
 	  }
 	}
       }
     }
     // SND
     if ( ! al.IsMateMapped () ){
-      if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
-	Pos1.first = al.RefID ;
-	Pos1.second = al.GetEndPosition()-1;
-	un_map[Pos1] ++;
-      }
-      if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
-	Pos1.first = al.RefID ;
-	Pos1.second = al.Position;
-	un_map[Pos1] ++;
+      if ( al.CigarData.size() > 0 ){
+	if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
+	  Pos1.first = al.RefID ;
+	  Pos1.second = al.GetEndPosition()-1;
+	  un_map[Pos1] ++;
+	}
+	if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
+	  Pos1.first = al.RefID ;
+	  Pos1.second = al.Position;
+	  un_map[Pos1] ++;
+	}
       }
     }
-
 
     /////////////////////////////////////////////////////
     // Scanning discordant map
@@ -2132,25 +2138,26 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
     
     /////////////////////////////////////////////////////
     // Scanning clipped read map and mapping quality map
-    if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
-      Pos1.first = al.RefID;
-      Pos1.second = al.Position;
-      if ( Pos1.first >= 0 && Pos1.second >= 0 ){
-	cr_map [ Pos1 ] ++;
-	mq_map [ Pos1 ] += al.MapQuality ;
-	tcb_map [ Pos1 ]+= al.CigarData[0].Length ; 
+    if ( al.CigarData.size() > 0 ){
+      if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
+	Pos1.first = al.RefID;
+	Pos1.second = al.Position;
+	if ( Pos1.first >= 0 && Pos1.second >= 0 ){
+	  cr_map [ Pos1 ] ++;
+	  mq_map [ Pos1 ] += al.MapQuality ;
+	  tcb_map [ Pos1 ]+= al.CigarData[0].Length ; 
+	}
+      }
+      if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
+	Pos1.first = al.RefID;
+	Pos1.second = al.GetEndPosition() - 1;
+	if ( Pos1.first >= 0 && Pos1.second >= 0 ){
+	  cr_map [ Pos1 ] ++ ;
+	  mq_map [ Pos1 ] += al.MapQuality ;
+	  tcb_map [ Pos1 ]+= al.CigarData[al.CigarData.size()-1].Length ; 
+	}
       }
     }
-    if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
-      Pos1.first = al.RefID;
-      Pos1.second = al.GetEndPosition() - 1;
-      if ( Pos1.first >= 0 && Pos1.second >= 0 ){
-	cr_map [ Pos1 ] ++ ;
-	mq_map [ Pos1 ] += al.MapQuality ;
-	tcb_map [ Pos1 ]+= al.CigarData[al.CigarData.size()-1].Length ; 
-      }
-    }
-
 
     /////////////////////////////////////////////////////
     // Scanning split read map
@@ -2162,39 +2169,41 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
 	tag_vec.push_back( tmp );
       }
       for ( auto tag : tag_vec){
+	if ( al.CigarData.size() > 0 ){
+	  if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
+	    Pos1.first = al.RefID ;
+	    Pos1.second = al.GetEndPosition()-1;
+	    Pos2 = find_split(tag,id_ref_map);
+	    if ( Pos2.second > -1 ){
+	      sr_map[Pos1][Pos2]++;
+	    }
+	  }
+	  if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
+	    Pos1.first = al.RefID ;
+	    Pos1.second = al.Position;
+	    Pos2 = find_split(tag,id_ref_map);
+	    if ( Pos2.second > -1 ){
+	      sr_map[Pos1][Pos2]++;
+	    }
+	  }
+	}
+      }
+    }    
+    // SND
+    if ( ! al.IsMateMapped () ){
+      if ( al.CigarData.size() > 0 ){
 	if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
 	  Pos1.first = al.RefID ;
 	  Pos1.second = al.GetEndPosition()-1;
-	  Pos2 = find_split(tag,id_ref_map);
-	  if ( Pos2.second > -1 ){
-	    sr_map[Pos1][Pos2]++;
-	  }
+	  un_map[Pos1] ++;
 	}
 	if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
 	  Pos1.first = al.RefID ;
 	  Pos1.second = al.Position;
-	  Pos2 = find_split(tag,id_ref_map);
-	  if ( Pos2.second > -1 ){
-	    sr_map[Pos1][Pos2]++;
-	  }
+	  un_map[Pos1] ++;
 	}
       }
     }
-    
-    // SND
-    if ( ! al.IsMateMapped () ){
-      if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
-	Pos1.first = al.RefID ;
-	Pos1.second = al.GetEndPosition()-1;
-	un_map[Pos1] ++;
-      }
-      if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
-	Pos1.first = al.RefID ;
-	Pos1.second = al.Position;
-	un_map[Pos1] ++;
-      }
-    }
-
 
     /////////////////////////////////////////////////////
     // Scanning discordant map

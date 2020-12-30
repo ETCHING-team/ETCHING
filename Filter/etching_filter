@@ -423,7 +423,7 @@ fi
 #
 # kmer_filter
 #
-echo "[Merging filter_fq and filter_bam]"
+echo "[k-mer filtration]"
 cmd="cat filter_fq.list filter_bam.list > filter_seq.list"
 echo $cmd
 eval $cmd

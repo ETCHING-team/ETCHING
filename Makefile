@@ -2,7 +2,6 @@ default:
 	bash libconf.sh
 	cd lib/zlib && make
 	cd lib/bamtools && make
-	cd lib && ln -sf zlib/libz.so libz.so
 	cd ETCHING && make
 	cd Filter && make
 	cd Caller && make

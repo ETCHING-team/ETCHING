@@ -46,6 +46,16 @@ void filter_usage(){
 	    << "Contact:\n\tJang-il Sohn (sohnjangil@gmail.com)\n\tJin-Wu Nam (jwnam@hanyang.ac.kr)\n";
 }
 
+void print_file ( std::string infile ){
+  std::ifstream fin(infile.c_str());
+  std::string tmp;
+  std::cout << infile << "\n";
+  while ( fin >> tmp ){
+    std::cout << "\t" << tmp << "\n";
+  }
+}
+
+
 int main ( int argc , char ** argv ){
   if ( argc == 1 ){
     filter_usage();
@@ -243,8 +253,6 @@ int main ( int argc , char ** argv ){
 
   if ( control_count !=0 ){
 
-    
-
     if ( control_list_file.size() != 0 ){
       std::string tmp;
       std::ifstream fin ( control_list_file.c_str() );
@@ -270,7 +278,7 @@ int main ( int argc , char ** argv ){
 	  = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
 	  + " -ci2 -f" + file_format + " @" + control_list_file + " control_filter " + tmp_dir + " 2>&1";
 	std::cout << command << "\n" ; 
-	
+	print_file(control_list_file);
 	system(command.c_str());
 	
       }
@@ -280,7 +288,7 @@ int main ( int argc , char ** argv ){
 	  = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
 	  + " -ci2 -f" + file_format + " @" + control_list_file + " control_filter " + tmp_dir + " 2>&1";
 	std::cout << command << "\n" ; 
-	
+	print_file(control_list_file);
 	system(command.c_str());
 	
       }
@@ -299,20 +307,22 @@ int main ( int argc , char ** argv ){
 	  fout << i << "\n";
 	}
 	fout.close();
-	bam_files.clear();
 
 	file_format = "q";
 	command 
 	  = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
 	  + " -ci2 -f" + file_format + " @control_filter_fastq_file_list.txt control_filter_fastq " + tmp_dir + " 2>&1";
 	std::cout << command << "\n" ; 
+	print_file("control_filter_fastq_file_list.txt");
 	system(command.c_str());
+
 	
 	file_format = "bam";
 	command 
 	  = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
 	  + " -ci2 -f" + file_format + " @control_filter_bam_file_list.txt control_filter_bam " + tmp_dir + " 2>&1";
 	std::cout << command << "\n" ; 
+	print_file("control_filter_bam_file_list.txt");
 	system(command.c_str());
 	
 
@@ -344,7 +354,7 @@ int main ( int argc , char ** argv ){
       = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
       + " -ci1 -fm @" + reference_list_file + " reference_filter " + tmp_dir + " 2>&1";
     std::cout << command << "\n" ; 
-    
+    print_file(reference_list_file);
     system(command.c_str());
     
   }
@@ -488,7 +498,8 @@ int main ( int argc , char ** argv ){
   std::ifstream fin ( infile_list );
   
   int fastq_count = 0 ;
-  
+  bam_count = 0 ;
+  bam_files.clear();
   while ( fin >> tmp){
     if ( tmp.substr(tmp.size()-4) == ".bam" ){
       bam_count ++;
@@ -508,7 +519,7 @@ int main ( int argc , char ** argv ){
       = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
       + " -ci2 " + "-cx" + std::to_string(maxkfreq) + " -f" + file_format + " @" + infile_list + " sample " + tmp_dir + " 2>&1";
     std::cout << command << "\n" ; 
-    
+    print_file ( infile_list );
     system(command.c_str());
     
   }
@@ -518,7 +529,7 @@ int main ( int argc , char ** argv ){
       = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
       + " -ci2 " + "-cx" + std::to_string(maxkfreq) + " -f" + file_format + " @" + infile_list + " sample " + tmp_dir + " 2>&1";
     std::cout << command << "\n" ; 
-    
+    print_file ( infile_list );
     system(command.c_str());
     
   }
@@ -537,14 +548,13 @@ int main ( int argc , char ** argv ){
       fout << i << "\n";
     }
     fout.close();
-    bam_files.clear();
 
     file_format = "q";
     command 
       = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
       + " -ci2 -f" + file_format + " @sample_fastq_file_list.txt sample_fastq " + tmp_dir + " 2>&1";
     std::cout << command << "\n" ; 
-    
+    print_file ( "sample_fastq_file_list.txt" );
     system(command.c_str());
     
 	
@@ -553,7 +563,7 @@ int main ( int argc , char ** argv ){
       = DIR + "kmc -v -k" + std::to_string(kl) + " -t"+ std::to_string ( num_threads ) + " -m" + std::to_string ( maxRAM ) 
       + " -ci2 -f" + file_format + " @sample_bam_file_list.txt sample_bam " + tmp_dir + " 2>&1";
     std::cout << command << "\n" ; 
-    
+    print_file ( "sample_bam_file_list.txt" );
     system(command.c_str());
     
 
