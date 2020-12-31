@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.1.4c (released 2020.12.30)"
+VERSION="ETCHING_v1.1.5 (released 2021.1.1)"
 
 #--------------------------------------------------------------------
 # Copyright 2020. Bioinformatic and Genomics Lab.
@@ -98,6 +98,8 @@ then
     USAGE
     exit -1
 fi
+
+PREDIR=$PWD
 
 FIRST=
 SECOND=
@@ -940,7 +942,7 @@ if [ ${#ML_PATH} != 0 ]
 then
     cmd="${cmd} -m ${ML_PATH}"
 fi
-cmd="$cmd > logs/ETCHING_SORTER.BND.log "
+cmd="$cmd > logs/ETCHING_SORTER.BND.log & "
 echo $cmd
 eval $cmd
 
@@ -949,9 +951,11 @@ if [ ${#ML_PATH} != 0 ]
 then
     cmd="${cmd} -m ${ML_PATH}"
 fi
-cmd="$cmd > logs/ETCHING_SORTER.SV.log "
+cmd="$cmd > logs/ETCHING_SORTER.SV.log & "
 echo $cmd
 eval $cmd
+
+wait
 
 #######################################################################################################################
 #############################
@@ -965,13 +969,15 @@ then
     echo "[FG_IDENTIFIER]"
     DATE="[$(date)]";echo ${DATE}
     
-    cmd="${DIR}etching_fg_identifier ${PREFIX}.BND.etching_sorter.vcf $ANNOTATION > ${PREFIX}.BND.fusion_gene.txt"
+    cmd="${DIR}etching_fg_identifier ${PREFIX}.BND.etching_sorter.vcf $ANNOTATION > ${PREFIX}.BND.fusion_gene.txt &"
     echo $cmd
     eval $cmd
 
-    cmd="${DIR}etching_fg_identifier ${PREFIX}.SV.etching_sorter.vcf $ANNOTATION > ${PREFIX}.SV.fusion_gene.txt"
+    cmd="${DIR}etching_fg_identifier ${PREFIX}.SV.etching_sorter.vcf $ANNOTATION > ${PREFIX}.SV.fusion_gene.txt &"
     echo $cmd
     eval $cmd
+    
+    wait
 fi
 
 cmd="cd -"
@@ -986,26 +992,40 @@ eval $cmd
 
 echo
 echo "[RESULTS]"
-#ln -s  ${WORKDIR}/${PREFIX}.BND.etching_sorter.vcf ${WORKDIR}/${PREFIX}.SV.etching_sorter.vcf ./
-#cp  ${WORKDIR}/${PREFIX}.BND.etching_sorter.vcf ${WORKDIR}/${PREFIX}.SV.etching_sorter.vcf ./
-#echo ${PREFIX}.BND.etching_sorter.vcf
-#echo ${PREFIX}.SV.etching_sorter.vcf
-cp ${WORKDIR}/${PREFIX}*etching_sorter.vcf ./
-ls -1 ${PREFIX}*etching_sorter.vcf
 
+cmd="cp ${WORKDIR}/${PREFIX}.BND.etching_sorter.vcf ${WORKDIR}/${PREFIX}.SV.etching_sorter.vcf ./"
+echo $cmd
+echo $eval
 if [ -f ${WORKDIR}/${PREFIX}.BND.fusion_gene.txt ]
 then
-    #ln -s ${WORKDIR}/${PREFIX}.BND.fusion_gene.txt 
-    cp ${WORKDIR}/${PREFIX}.BND.fusion_gene.txt ./
-    ls ${PREFIX}.BND.fusion_gene.txt
+    cmd="cp ${WORKDIR}/${PREFIX}.BND.fusion_gene.txt ./"
+    echo $cmd
+    eval $cmd
 fi
 
 if [ -f ${WORKDIR}/${PREFIX}.SV.fusion_gene.txt ]
 then
-    #ln -s ${WORKDIR}/${PREFIX}.SV.fusion_gene.txt 
-    cp ${WORKDIR}/${PREFIX}.SV.fusion_gene.txt ./
-    ls ${PREFIX}.SV.fusion_gene.txt
+    cmd="cp ${WORKDIR}/${PREFIX}.SV.fusion_gene.txt ./"
+    echo $cmd
+    eval $cmd
 fi
 echo
+
+
+echo "[Final results]"
+echo "${PREFIX}.BND.etching_sorter.vcf"
+echo "${PREFIX}.SV.etching_sorter.vcf"
+
+if [ -f ${PREFIX}.BND.fusion_gene.txt ]
+then
+    echo "${PREFIX}.BND.fusion_gene.txt"
+fi
+
+if [ -f ${PREFIX}.SV.fusion_gene.txt ]
+then
+    echo "${PREFIX}.SV.fusion_gene.txt"
+fi
+echo
+
 echo "[Finished]"
 DATE="[$(date)]";echo ${DATE}

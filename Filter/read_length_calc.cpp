@@ -88,17 +88,30 @@ int main ( int argc , char ** argv ){
 
   std::vector < std::string > (*fcnPtr)(std::string, int);
   std::vector < std::string > seq_vec;
-  
+
   int Size = infile.size();
-  if ( infile.substr(Size-6) == ".fastq" ||
-       infile.substr(Size-3) == ".fq" ){
+
+  int size9 = Size - 9;
+  if (size9 < 0 ) size9=0;
+
+  int size6 = Size - 6;
+  if (size6 < 0 ) size6=0;
+
+  int size4 = Size - 4;
+  if (size4 < 0 ) size4=0;
+
+  int size3 = Size - 3;
+  if (size3 < 0 ) size3=0;
+
+  if ( infile.substr(size6) == ".fastq" ||
+       infile.substr(size3) == ".fq" ){
     fcnPtr = fastq_count;
   }
-  else if ( infile.substr(Size-9) == ".fastq.gz" ||
-	    infile.substr(Size-6) == ".fq.gz" ){
+  else if ( infile.substr(size9) == ".fastq.gz" ||
+	    infile.substr(size6) == ".fq.gz" ){
     fcnPtr = fastq_gz_count;
   }
-  else if ( infile.substr(Size-4) == ".bam" ){
+  else if ( infile.substr(size4) == ".bam" ){
     fcnPtr = bam_count;
   }
 
@@ -107,7 +120,6 @@ int main ( int argc , char ** argv ){
 
   for ( auto i : seq_vec ) {
     read_length_sum += i.size();
-    //std::cout << i.size() << "\n";
   }
 
   read_length_average = read_length_sum / count ;

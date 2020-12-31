@@ -21,8 +21,8 @@ function USAGE {
     echo -e "            \t-1 and -2 must be used together."
     echo -e "-b  (string)\tAligned bam file of paired-end. No need to be sorted."
     echo -e "            \tDo not use along with -1 or -2."
-    echo -e
-    echo -e "[Reference genome]"
+    #echo -e
+    #echo -e "[Reference genome]"
     echo -e "-g  (string)\tBWA indexed reference genome."
     echo -e
     echo -e
@@ -41,19 +41,22 @@ function USAGE {
     echo -e "-T  (string)\tW for WGS, P for Panel [W]"
     echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from"
     echo -e "            \tsample sequencing reads [automatic]"
-    echo -e "            \tThough ETCHING can calculate optimal cut-off automatically,"
-    echo -e "            \tif you want to specify it, we recommand 3-7 for WGS data, and"
+    #echo -e "            \tThough ETCHING can calculate optimal cut-off automatically,"
+    echo -e "            \tIf you want to specify it, we recommand 3-7 for WGS data, and"
     echo -e "            \t5-10 for targeted panel sequencing data."
     echo -e "            \tThe lesser, the more sensitive, and the more, the more specific."
     echo -e "-M  (int)   \tExclude the k-mers counted more than this [10000]"
+    echo -e "-F          \tFast-bam mode for -b option. This option keeps original alignement."
+    echo -e "            \tNote: If you use this option, the kept alignment result can be"
+    echo -e "            \tdifferent to the alignment result of filtered reads."
     echo -e
     echo -e "[Control (matched normal in somatic call)]"
-    echo -e "-1c (string)\tFirst fastq file of paried-end [null]"
-    echo -e "-2c (string)\tSecond fastq file of paried-end [null]"
-    echo -e "-bc (string)\tAligned bam file of paried-end [null]"
+    echo -e "-1c (string)\tFirst fastq file of paried-end"
+    echo -e "-2c (string)\tSecond fastq file of paried-end"
+    echo -e "-bc (string)\tAligned bam file of paried-end"
     echo -e
     echo -e "[K-mer database]"
-    echo -e "-f  (string)\tPrefix of KMC3 k-mer database [null]"
+    echo -e "-f  (string)\tPrefix of KMC3 k-mer database"
     echo -e "            \tIf you have /path/to/PGK.kmc_pre and /path/to/PGK.kmc_suf,"
     echo -e "            \tyou can use \"-f /path/to/PGK\""
     echo -e
@@ -103,6 +106,9 @@ FILTER=
 SAMTOOLS=
 MAPPER=
 STORE_KMC=
+
+KEEP_ALIGNMENT=0
+
 while [ "$1" != "" ]; do
     case $1 in
 	-1 | --first ) shift
@@ -137,6 +143,9 @@ while [ "$1" != "" ]; do
             ;;
         -M | --max-k-mer-freq ) shift
 	    MAXK=$1
+            ;;
+        -F | --keep-alignment ) shift
+	    KEEP_ALIGNMENT=1
             ;;
 
 	-1c | --first-control ) shift
@@ -454,6 +463,40 @@ then
 
     #############################
     #
+    # Sort
+    #
+
+    TAG_CHECK1=$(head -n 1 ${PREFIX}_1.fastq | grep "/1")
+    TAG_CHECK2=$(head -n 1 ${PREFIX}_1.fastq | grep "/2")
+    TAG_CHECK=${TAG_CHECK1}${TAG_CHECK2}
+
+    if [ ${#TAG_CHECK} != 0 ]
+    then
+	cmd="remove_tag_from_fastq ${PREFIX}_1.fastq > ${PREFIX}_1.fastq_ ; mv ${PREFIX}_1.fastq_ ${PREFIX}_1.fastq &"
+	echo $cmd
+	eval $cmd
+	cmd="remove_tag_from_fastq ${PREFIX}_2.fastq > ${PREFIX}_2.fastq_ ; mv ${PREFIX}_2.fastq_ ${PREFIX}_2.fastq &"
+	echo $cmd
+	eval $cmd
+	wait
+    fi
+    echo
+    echo "[Sort by ID]"
+    mkdir sort_tmp_1 sort_tmp_2
+    awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_1.fastq | sort -T sort_tmp_1 > ${PREFIX}_1.fastq_line &
+    awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_2.fastq | sort -T sort_tmp_2 > ${PREFIX}_2.fastq_line &
+    wait
+    
+    rm -rf sort_tmp_1 sort_tmp_2
+    
+    awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_1.fastq_line > ${PREFIX}_1.fastq &
+    awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_2.fastq_line > ${PREFIX}_2.fastq &
+    wait
+
+    rm -f ${PREFIX}_1.fastq_line ${PREFIX}_2.fastq_line
+
+    #############################
+    #
     # Mapping
     #
     echo
@@ -483,14 +526,99 @@ else
     #
     # read_collector for bam
     #
-    echo
-    echo "[read_collector (bam mode)]"
-    DATE="[$(date)]";echo ${DATE}
-    
-    BAM_INPUT=$(head -n 1 sample.list)
-    cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -b $BAM_INPUT -p $PREFIX -t $THREADS -l ${KMER_SIZE} "
-    echo $cmd
-    eval $cmd
+    if [ ${KEEP_ALIGNMENT} -eq 1 ]
+    then
+	echo
+	echo "[Read_collector (fast-bam mode)]"
+	DATE="[$(date)]";echo ${DATE}
+	
+	BAM_INPUT=$(head -n 1 sample.list)
+	cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -b $BAM_INPUT -p $PREFIX -t $THREADS -l ${KMER_SIZE} "
+	echo $cmd
+	eval $cmd
+    else
+	echo
+	echo "[Read_collector (bam mode)]"
+	DATE="[$(date)]";echo ${DATE}
+	
+	BAM_INPUT=$(grep "\.bam$" sample.list | head -n 1 )
+	BAM_PREFIX=$(echo $BAM_INPUT | sed 's/\.bam$//g')
+
+	let HALF=(${THREADS}/2 + 1)
+
+	cmd="${SAMTOOLS} fastq -n $BAM_INPUT -1 ${BAM_PREFIX}_1.fastq -2 ${BAM_PREFIX}_2.fastq -@ ${THREADS}"
+	echo $cmd
+	eval $cmd
+
+	cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -1 ${BAM_PREFIX}_1.fastq -p ${BAM_PREFIX}_1.filtered -t ${HALF} > logs/read_collector_1.log &"
+	echo $cmd
+	eval $cmd
+	cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -1 ${BAM_PREFIX}_2.fastq -p ${BAM_PREFIX}_2.filtered -t ${HALF} > logs/read_collector_2.log &"
+	echo $cmd
+	eval $cmd
+	wait
+
+	cmd="awk 'NR % 4 == 1 {print}' ${BAM_PREFIX}_1.filtered.fastq ${BAM_PREFIX}_2.filtered.fastq | sort | uniq > ${BAM_PREFIX}.filtered.id"
+	echo $cmd
+	eval $cmd
+	
+	cmd="${READ_COLLECTOR} -f ${BAM_PREFIX}.filtered.id -1 ${BAM_PREFIX}_1.fastq -t $HALF -p ${PREFIX}_1 >> logs/read_collector_1.log &"
+	echo $cmd
+	eval $cmd
+	cmd="${READ_COLLECTOR} -f ${BAM_PREFIX}.filtered.id -1 ${BAM_PREFIX}_2.fastq -t $HALF -p ${PREFIX}_2 >> logs/read_collector_2.log &"
+	echo $cmd
+	eval $cmd
+	wait
+
+	#############################
+	#
+	# Sort
+	#
+	echo 
+	echo "[Sort by ID]"
+	mkdir sort_tmp_1 sort_tmp_2
+	awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_1.fastq | sort -T sort_tmp_1 > ${PREFIX}_1.fastq_line &
+	awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_2.fastq | sort -T sort_tmp_2 > ${PREFIX}_2.fastq_line &
+	wait
+	
+	rm -rf sort_tmp_1 sort_tmp_2
+	
+	awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_1.fastq_line > ${PREFIX}_1.fastq &
+	awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_2.fastq_line > ${PREFIX}_2.fastq &
+	wait
+
+	rm -f ${PREFIX}_1.fastq_line ${PREFIX}_2.fastq_line
+
+	#############################
+	#
+	# Mapping
+	#
+	echo
+	echo "[Mapping]"
+	DATE="[$(date)]";echo ${DATE}
+
+	cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq > ${PREFIX}.sam 2> logs/bwa_mem.log"
+	echo $cmd
+	eval $cmd
+
+	#let HALF=${THREADS/2}+1
+	cmd="${SAMTOOLS} view -S -H ${PREFIX}.sam > ${PREFIX}.header"
+	echo $cmd
+	eval $cmd
+	cmd="${SAMTOOLS} view -S -@ ${THREADS} ${PREFIX}.sam | awk '\$6 ~ /H|S|*/ || \$0 !~ \"NM:i:0\" {print}' > ${PREFIX}.SHNM.sam"
+	echo $cmd
+	eval $cmd
+	cmd="cat ${PREFIX}.header ${PREFIX}.SHNM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.bam"
+	echo $cmd
+	eval $cmd
+	cmd="rm -f ${PREFIX}.sam ${PREFIX}.header ${PREFIX}.SHNM.sam ${PREFIX}.sam"
+	echo $cmd
+	eval $cmd
+
+	#cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -b $BAM_INPUT -p $PREFIX -t $THREADS -l ${KMER_SIZE} "
+	#echo $cmd
+	#eval $cmd
+    fi
 fi    
 
 # checking samtools sorting method
