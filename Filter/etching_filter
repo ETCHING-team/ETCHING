@@ -525,7 +525,7 @@ then
     cmd="cat ${PREFIX}.header ${PREFIX}.SHNM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.bam"
     echo $cmd
     eval $cmd
-    cmd="rm -f ${PREFIX}.sam ${PREFIX}.header ${PREFIX}.SHNM.sam ${PREFIX}.sam"
+    cmd="rm -f ${PREFIX}.sam ${PREFIX}.header ${PREFIX}.SHNM.sam"
     echo $cmd
     eval $cmd
 
@@ -628,7 +628,7 @@ else
 	cmd="cat ${PREFIX}.header ${PREFIX}.SHNM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.bam"
 	echo $cmd
 	eval $cmd
-	cmd="rm -f ${PREFIX}.sam ${PREFIX}.header ${PREFIX}.SHNM.sam ${PREFIX}.sam"
+	cmd="rm -f ${PREFIX}.sam ${PREFIX}.header ${PREFIX}.SHNM.sam"
 	echo $cmd
 	eval $cmd
 
