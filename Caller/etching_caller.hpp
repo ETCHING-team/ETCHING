@@ -32,12 +32,12 @@
 #include "Peak_memory_measure.hpp"
 #include "CPU_TIME_measure.hpp"
 
-const std::string version = "ETCHING_v1.1.5 (released 2021.1.1)";
+const std::string version = "ETCHING_v1.1.5a (released 2021.1.3)";
 const std::string PROGRAM = "Program: etching_caller";
 const std::string VERSION = "Version: " + version;
 const std::string CONTACT = "Contact:\n\tJang-il Sohn (sohnjangil@gmail.com)\n\tJin-Wu Nam (jwnam@hanyang.ac.kr)";
 
-using Position = std::pair < int , int > ;
+using Position = std::pair < int64_t , int64_t > ;
 
 void print_version();
 void caller_usage();
@@ -59,29 +59,29 @@ public:
 
 void find_path ( const std::string input_bam, 
 		 const std::string prefix, 
-		 const int insert_size, 
+		 const int64_t insert_size, 
 		 const bool scanall);
   
 void bp_to_vcf ( const std::string genome,
 		 const std::string input_bam,
 		 const std::string bp_file,
 		 const std::string prefix, 
-		 const int insert_size, 
+		 const int64_t insert_size, 
 		 const bool typing, 
 		 const std::string read_orientation, 
 		 const double tumor_purity, 
 		 const double sequencing_coverage, 
 		 const std::string data_type);
 
-int return_discordant_pair_number ( BamTools::BamReader & reader1, 
+int64_t return_discordant_pair_number ( BamTools::BamReader & reader1, 
 				    const Position Pos1, 
 				    const Position Pos2, 
-				    const int insert_size, 
+				    const int64_t insert_size, 
 				    BamTools::RefVector & references);
 
-int return_discordant_pair_number ( BamTools::BamReader & reader1, 
+int64_t return_discordant_pair_number ( BamTools::BamReader & reader1, 
 				    const Position Pos1, 
-				    const int insert_size, 
+				    const int64_t insert_size, 
 				    BamTools::RefVector & references);
 
 double get_wall_time();

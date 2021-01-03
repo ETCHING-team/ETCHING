@@ -11,6 +11,6 @@
 #include <iostream>
 #include <fstream>
 
-int make_bp_pair(std::string input,std::string output);
+int64_t make_bp_pair(std::string input,std::string output);
 
 #endif

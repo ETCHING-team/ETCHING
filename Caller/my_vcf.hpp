@@ -47,12 +47,12 @@ public:
   Feature parse_feature(std::string feature);
 
   std::string chr1;
-  int pos1;
+  int64_t pos1;
   std::string sv_id;
   std::string sv_id_add;
   std::string ref;
   std::string alt;
-  int qual;
+  int64_t qual;
   std::string filter;
   std::string info;
   
@@ -65,45 +65,45 @@ public:
   Feature feature2;
 
    // for comparing with other tools
-  std::vector < int > tool_comp;
-  int tool_count;
+  std::vector < int64_t > tool_comp;
+  int64_t tool_count;
   
   std::string chr2;
-  int pos2;
+  int64_t pos2;
 
   std::string strand;
 
 
   std::string mate_id; // for BND
   std::string svtype; // INS, DEL, DUP, INV, BND
-  int svlen; // SV length
+  int64_t svlen; // SV length
   std::string data_type;
 
   // features of first mate
-  int cr; // number of Clipped Reads supporing the variation
-  int sr; // number of Split Reads supporing the variation
-  int pe; // number of PE reads supporing the variation
-  int mq;
+  int64_t cr; // number of Clipped Reads supporing the variation
+  int64_t sr; // number of Split Reads supporing the variation
+  int64_t pe; // number of PE reads supporing the variation
+  int64_t mq;
   double depdif;
-  int nxa;
-  int tcb; // Number of total clipped base
+  int64_t nxa;
+  int64_t tcb; // Number of total clipped base
   double entropy;
 
   // features of second mate
-  int cr2; // number of Clipped Reads supporing the variation
-  int sr2; // number of Split Reads supporing the variation
-  int pe2; // number of PE reads supporing the variation
-  int mq2;
+  int64_t cr2; // number of Clipped Reads supporing the variation
+  int64_t sr2; // number of Split Reads supporing the variation
+  int64_t pe2; // number of PE reads supporing the variation
+  int64_t mq2;
   double depdif2;
-  int nxa2;
-  int tcb2; // Number of total clipped base
+  int64_t nxa2;
+  int64_t tcb2; // Number of total clipped base
   double entropy2;
 
   // global features
   double purity;
   double seqdep;
 
-  int read_number;
+  int64_t read_number;
 
 
   void modify_svtype_info();
@@ -112,7 +112,7 @@ public:
   std::string to_string();
   std::string to_string_short();
 
-  void resize_tool_comp(int Size);
+  void resize_tool_comp(int64_t Size);
 
 };
 
@@ -152,13 +152,13 @@ public:
   std::string bam_file;
   std::string single_file;
   std::string pair_file;
-  int insert_size;
-  int read_length;
+  int64_t insert_size;
+  int64_t read_length;
 
   
   BamTools::RefVector refvector;
-  std::unordered_map < std::string , int > id_ref_map;
-  std::unordered_map < int , std::string > ref_id_map;
+  std::unordered_map < std::string , int64_t > id_ref_map;
+  std::unordered_map < int64_t , std::string > ref_id_map;
 
   std::map < std::string , std::string > genome;
 
@@ -179,8 +179,8 @@ public:
   void fwrite_short(std::string);
   std::size_t size();
 
-  // void insert ( std::string chr1, int pos1, std::string chr2, int pos2, std::string sv_id, std::string mate_id, std::string strand, std::string svtype);
-  void insert ( std::string chr1, int pos1, std::string chr2, int pos2, std::string sv_id, std::string mate_id, std::string strand, int sr_val, std::string svtype);
+  // void insert ( std::string chr1, int64_t pos1, std::string chr2, int64_t pos2, std::string sv_id, std::string mate_id, std::string strand, std::string svtype);
+  void insert ( std::string chr1, int64_t pos1, std::string chr2, int64_t pos2, std::string sv_id, std::string mate_id, std::string strand, int64_t sr_val, std::string svtype);
 
 
   void insert ( VCF vcf );
@@ -189,15 +189,15 @@ public:
   // void clean_unmate();
 
 
-  void calc_features(const std::string input_bam, const int read_length, const int insert_size, const int confi_window);
-  void calc_features_general(const std::string input_bam, const int read_length, const int insert_size, const int confi_window);
+  void calc_features(const std::string input_bam, const int64_t read_length, const int64_t insert_size, const int64_t confi_window);
+  void calc_features_general(const std::string input_bam, const int64_t read_length, const int64_t insert_size, const int64_t confi_window);
 
   //`void fill_mate_feature();
   
   void add_features_in_id();
 
   VCF_MAP::iterator find(Position Pos);
-  bool check_vcf( std::string chr1, int pos1, std::string chr2, int pos2, std::string BND_type );
+  bool check_vcf( std::string chr1, int64_t pos1, std::string chr2, int64_t pos2, std::string BND_type );
   std::map<Position,double> calc_link_entropy (const std::string pair_file);
 
   std::vector < VCF > & operator [](Position Pos);
@@ -205,7 +205,7 @@ public:
   void make_info();
 };
   
-double return_depdif(Position Pos, std::vector < double > & dep_vec, int Size, double read_length);
+double return_depdif(Position Pos, std::vector < double > & dep_vec, int64_t Size, double read_length);
 
 void copy_info ( VCF_CLASS & source , VCF_CLASS & target );
 
@@ -214,7 +214,7 @@ VCF_CLASS typing_SV_general(VCF_CLASS & source);
 VCF_CLASS typing_SV_manta ( VCF_CLASS & input );
 
 void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & container_vec,
-		   const int read_length, const int insert_size, const int confi_window) ;
+		   const int64_t read_length, const int64_t insert_size, const int64_t confi_window) ;
 
 #endif
 

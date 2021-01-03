@@ -13,6 +13,6 @@
 #include <map>
 
 void parsing_gff_info(std::string input, std::map < std::string , std::string > & info );
-int make_gene_list ( std::string arg1, std::string arg2, std::string arg3, std::string arg4);
+int64_t make_gene_list ( std::string arg1, std::string arg2, std::string arg3, std::string arg4);
 
 #endif

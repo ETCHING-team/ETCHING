@@ -15,20 +15,20 @@
 #include <set>
 
 
-using Position = std::pair < std::string , int > ;
-using Loci = std::pair < int , int > ;
+using Position = std::pair < std::string , int64_t > ;
+using Loci = std::pair < int64_t , int64_t > ;
 
-void read_bp_pair(const std::string BP_pair_file, std::map < int , std::map < Position , std::set < Position > > > & BP_pair);
+void read_bp_pair(const std::string BP_pair_file, std::map < int64_t , std::map < Position , std::set < Position > > > & BP_pair);
 
 void read_gene_list(const std::string gene_list_file,
 		    std::map < std::string , std::map < Loci , std::string > > & gene_list_for,
 		    std::map < std::string , std::map < Loci , std::string > > & gene_list_rev);
 
-void find_fusion_gene ( std::map < int , std::map < Position , std::set < Position > > > & BP_pair,
+void find_fusion_gene ( std::map < int64_t , std::map < Position , std::set < Position > > > & BP_pair,
 			std::map < std::string , std::map < Loci , std::string > > & gene_list_for,
 			std::map < std::string , std::map < Loci , std::string > > & gene_list_rev,
 			std::set < std::string > & fusion_genes);
 
-int find_fg ( std::string BP_pair_file, std::string gene_list_file);
+int64_t find_fg ( std::string BP_pair_file, std::string gene_list_file);
 
 #endif

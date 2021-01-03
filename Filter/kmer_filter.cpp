@@ -68,19 +68,19 @@ int main ( int argc , char ** argv ){
   std::string reference_list_file;
   std::string prefix="filtered_kmer";
 
-  int control_count = 0;
-  int reference_count = 0;
+  int64_t control_count = 0;
+  int64_t reference_count = 0;
 
   std::string infile_list;
   std::vector < std::string > file_list;
   std::string existing;
 
-  int maxRAM = 12;
-  int num_threads = 8 ;
+  int64_t maxRAM = 12;
+  int64_t num_threads = 8 ;
 
-  int cutoff = 0 ;
-  int maxkfreq = 10000;
-  int kl = 31;
+  int64_t cutoff = 0 ;
+  int64_t maxkfreq = 10000;
+  int64_t kl = 31;
 
   std::string data_type="W";
 
@@ -88,7 +88,7 @@ int main ( int argc , char ** argv ){
 
   bool store_kmc = 0 ;
 
-  int opt = 0;
+  int64_t opt = 0;
   while ((opt = getopt ( argc , argv , "i:p:c:r:a:m:t:T:K:M:l:D:Eh") ) != -1 ){
     switch(opt){
     case 'i': infile_list = optarg; break;
@@ -249,7 +249,7 @@ int main ( int argc , char ** argv ){
   std::vector < std::string > fastq_files ;
   std::string file_format;
 
-  int bam_count = 0;
+  int64_t bam_count = 0;
 
   if ( control_count !=0 ){
 
@@ -257,7 +257,7 @@ int main ( int argc , char ** argv ){
       std::string tmp;
       std::ifstream fin ( control_list_file.c_str() );
       
-      int fastq_count = 0;
+      int64_t fastq_count = 0;
       
       while ( fin >> tmp){
 	std::cout << "[Filter as control : " << tmp << "]\n";
@@ -497,7 +497,7 @@ int main ( int argc , char ** argv ){
   std::string tmp;
   std::ifstream fin ( infile_list );
   
-  int fastq_count = 0 ;
+  int64_t fastq_count = 0 ;
   bam_count = 0 ;
   bam_files.clear();
   while ( fin >> tmp){

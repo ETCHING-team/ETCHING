@@ -1,4 +1,4 @@
-default: ../lib/libetching_filter.so gzstream read_collector kmer_filter fastq_check read_length_calc remove_tag_from_fastq
+default: ../lib/libetching_filter.so gzstream read_collector kmer_filter fastq_check read_length_calc sort_fastq_mem_eff
 	chmod a+x etching_filter
 
 all: default
@@ -12,16 +12,15 @@ fastq_check: fastq_check.cpp ../lib/libetching_filter.so
 read_length_calc: read_length_calc.cpp ../lib/libetching_filter.so 
 	g++ -Wall -g -std=c++11 -pthread -Igzstream -I../lib/bamtools -L../lib -letching_filter ../lib/bamtools/api/internal/*/*o ../lib/bamtools/api/*o ../lib/zlib/*.lo read_length_calc.cpp -o read_length_calc
 
-remove_tag_from_fastq: remove_tag_from_fastq.cpp
-	g++ -Wall -g -std=c++11 remove_tag_from_fastq.cpp -o remove_tag_from_fastq
-
 read_collector: read_collector.cpp ../lib/libetching_filter.so 
 	g++ -Wall -g -std=c++11 -fPIC -c read_collector.cpp -o read_collector.lo -L../lib -letching_filter -I gzstream -pthread
 	g++ -Wall -g -std=c++11 ../lib/bamtools/api/internal/*/*o ../lib/bamtools/api/*o read_collector.lo ../lib/zlib/*.lo -L../lib -letching_filter -pthread -o read_collector
+sort_fastq_mem_eff: sort_fastq_mem_eff.cpp
+	g++ -Wall -g -std=c++11 sort_fastq_mem_eff.cpp -o sort_fastq_mem_eff
 
 
 clean:
-	rm -f read_collector kmer_filter fastq_check read_length_calc remove_tag_from_fastq
+	rm -f read_collector kmer_filter fastq_check read_length_calc sort_fastq_mem_eff
 
 cleanlibrary: 
 	rm -f ../lib/libetching_filter.so

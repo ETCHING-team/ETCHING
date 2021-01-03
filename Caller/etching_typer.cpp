@@ -28,7 +28,7 @@ int main ( int argc , char ** argv ){
   std::string outfile = infile.substr(0,infile.size()-3) + "etching_typer.vcf";
 
   std::string id;
-  // int length;
+  // int64_t length;
 
   std::string tmp;
   std::vector < std::string > metainfo;
@@ -36,7 +36,7 @@ int main ( int argc , char ** argv ){
   VCF_CLASS container;
   VCF_CLASS container_SV;
 
-  // int count = 0 ;
+  // int64_t count = 0 ;
   
   std::ifstream fin;
   // fin.open( index.c_str() );

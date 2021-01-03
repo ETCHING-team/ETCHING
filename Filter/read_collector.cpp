@@ -29,8 +29,8 @@ void read_collector_usage(){
 
 
 
-int count_column(std::string infile){
-  int  numberOfColumns=1;
+int64_t  count_column(std::string infile){
+  int64_t   numberOfColumns=1;
   bool previousWasSpace=false;
 
   std::string line;
@@ -68,10 +68,10 @@ int main (int argc , char ** argv){
   std::string input_1;
   std::string input_2;
   std::string input_b;
-  int num_threads = 8;
+  int64_t  num_threads = 8;
   std::string prefix = "filtered_read";
   std::string kmer_table;
-  int kl=31;
+  int64_t  kl=31;
 
   while ( (opt = getopt ( argc, argv, "1:2:b:p:t:l:f:h" ) ) != -1 ){
     switch ( opt ) {
@@ -134,7 +134,7 @@ int main (int argc , char ** argv){
     fin.close();
     
 
-    int gz_check = 0 ;
+    int64_t  gz_check = 0 ;
     if ( input_1.substr(input_1.size()-3) == ".gz" && input_2.substr(input_2.size()-3) == ".gz" ) {
       gz_check = 1;
     }
@@ -169,7 +169,7 @@ int main (int argc , char ** argv){
     // k-mer table mode
     if ( ! id_mode ){
       std::cout << "Entering k-mer table mode\n";
-      int check_collector = collector (kmer_table, kl, prefix, input_1, input_2, gz_check, num_threads);
+      int64_t  check_collector = collector (kmer_table, kl, prefix, input_1, input_2, gz_check, num_threads);
       if ( check_collector != 0 ){
 	std::cout << "ETCHING-Filter was abnormally finished at the collector function in read_collector\n";
 	return check_collector;
@@ -179,7 +179,7 @@ int main (int argc , char ** argv){
     else{
       std::cout << "Entering ID table mode\n";
       std::string id_table = kmer_table;
-      int check_collector_id_mode = collector_id_mode (id_table, kl, prefix, input_1, input_2, gz_check, num_threads);
+      int64_t  check_collector_id_mode = collector_id_mode (id_table, kl, prefix, input_1, input_2, gz_check, num_threads);
       if ( check_collector_id_mode != 0 ){
 	std::cout << "ETCHING-Filter was abnormally finished at the collector function in read_collector\n";
 	return check_collector_id_mode;
@@ -199,7 +199,7 @@ int main (int argc , char ** argv){
     }
     fin.close();
     
-    int gz_check = 0 ;
+    int64_t  gz_check = 0 ;
     if ( input_1.substr(input_1.size()-3) == ".gz" ){
       gz_check = 1;
     }
@@ -221,7 +221,7 @@ int main (int argc , char ** argv){
     // Run collector
     // k-mer table mode
     if ( ! id_mode ){
-      int check_collector_single = collector_single (kmer_table, kl, prefix, input_1, gz_check, num_threads);
+      int64_t  check_collector_single = collector_single (kmer_table, kl, prefix, input_1, gz_check, num_threads);
       if ( check_collector_single != 0 ){
 	std::cout << "ETCHING-Filter was abnormally finished at the collector function in read_collector\n";
 	return check_collector_single;
@@ -229,7 +229,7 @@ int main (int argc , char ** argv){
     }
     else{
       std::string id_table = kmer_table;
-      int check_collector_id_mode_single = collector_id_mode_single (id_table, kl, prefix, input_1, gz_check, num_threads);
+      int64_t  check_collector_id_mode_single = collector_id_mode_single (id_table, kl, prefix, input_1, gz_check, num_threads);
       if ( check_collector_id_mode_single != 0 ){
 	std::cout << "ETCHING-Filter was abnormally finished at the collector function in read_collector\n";
 	return check_collector_id_mode_single;
@@ -241,7 +241,7 @@ int main (int argc , char ** argv){
   // bam mode
   //
   else if ( input_b.size() != 0 ){
-    int check_collector = collector_bam (kmer_table, kl, prefix, input_b, num_threads);
+    int64_t  check_collector = collector_bam (kmer_table, kl, prefix, input_b, num_threads);
     if ( check_collector != 0 ){
       std::cout << "ETCHING-Filter was abnormally finished at the collector_bam function in read_collector\n";
       return check_collector;

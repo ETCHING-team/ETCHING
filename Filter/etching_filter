@@ -466,34 +466,42 @@ then
     # Sort
     #
 
-    TAG_CHECK1=$(head -n 1 ${PREFIX}_1.fastq | grep "/1")
-    TAG_CHECK2=$(head -n 1 ${PREFIX}_1.fastq | grep "/2")
-    TAG_CHECK=${TAG_CHECK1}${TAG_CHECK2}
+    sort_fastq_mem_eff ${PREFIX}_1.fastq ${PREFIX}_1.sort.fastq 4 &
+    sort_fastq_mem_eff ${PREFIX}_2.fastq ${PREFIX}_2.sort.fastq 4 &
+    wait 
 
-    if [ ${#TAG_CHECK} != 0 ]
-    then
-	cmd="remove_tag_from_fastq ${PREFIX}_1.fastq > ${PREFIX}_1.fastq_ ; mv ${PREFIX}_1.fastq_ ${PREFIX}_1.fastq &"
-	echo $cmd
-	eval $cmd
-	cmd="remove_tag_from_fastq ${PREFIX}_2.fastq > ${PREFIX}_2.fastq_ ; mv ${PREFIX}_2.fastq_ ${PREFIX}_2.fastq &"
-	echo $cmd
-	eval $cmd
-	wait
-    fi
-    echo
-    echo "[Sort by ID]"
-    mkdir sort_tmp_1 sort_tmp_2
-    awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_1.fastq | sort -T sort_tmp_1 > ${PREFIX}_1.fastq_line &
-    awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_2.fastq | sort -T sort_tmp_2 > ${PREFIX}_2.fastq_line &
-    wait
-    
-    rm -rf sort_tmp_1 sort_tmp_2
-    
-    awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_1.fastq_line > ${PREFIX}_1.fastq &
-    awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_2.fastq_line > ${PREFIX}_2.fastq &
+    mv ${PREFIX}_1.sort.fastq ${PREFIX}_1.fastq &
+    mv ${PREFIX}_2.sort.fastq ${PREFIX}_2.fastq &
     wait
 
-    rm -f ${PREFIX}_1.fastq_line ${PREFIX}_2.fastq_line
+    #TAG_CHECK1=$(head -n 1 ${PREFIX}_1.fastq | grep "/1")
+    #TAG_CHECK2=$(head -n 1 ${PREFIX}_1.fastq | grep "/2")
+    #TAG_CHECK=${TAG_CHECK1}${TAG_CHECK2}
+
+    #if [ ${#TAG_CHECK} != 0 ]
+    #then
+    #cmd="remove_tag_from_fastq ${PREFIX}_1.fastq > ${PREFIX}_1.fastq_ ; mv ${PREFIX}_1.fastq_ ${PREFIX}_1.fastq &"
+    #echo $cmd
+    #eval $cmd
+    #cmd="remove_tag_from_fastq ${PREFIX}_2.fastq > ${PREFIX}_2.fastq_ ; mv ${PREFIX}_2.fastq_ ${PREFIX}_2.fastq &"
+    #echo $cmd
+    #eval $cmd
+    #wait
+    #fi
+    #echo
+    #echo "[Sort by ID]"
+    #mkdir sort_tmp_1 sort_tmp_2
+    #awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_1.fastq | sort -T sort_tmp_1 > ${PREFIX}_1.fastq_line &
+    #awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_2.fastq | sort -T sort_tmp_2 > ${PREFIX}_2.fastq_line &
+    #wait
+    
+    #rm -rf sort_tmp_1 sort_tmp_2
+    
+    #awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_1.fastq_line > ${PREFIX}_1.fastq &
+    #awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_2.fastq_line > ${PREFIX}_2.fastq &
+    #wait
+
+    #rm -f ${PREFIX}_1.fastq_line ${PREFIX}_2.fastq_line
 
     #############################
     #
@@ -574,20 +582,29 @@ else
 	#
 	# Sort
 	#
-	echo 
-	echo "[Sort by ID]"
-	mkdir sort_tmp_1 sort_tmp_2
-	awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_1.fastq | sort -T sort_tmp_1 > ${PREFIX}_1.fastq_line &
-	awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_2.fastq | sort -T sort_tmp_2 > ${PREFIX}_2.fastq_line &
-	wait
-	
-	rm -rf sort_tmp_1 sort_tmp_2
-	
-	awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_1.fastq_line > ${PREFIX}_1.fastq &
-	awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_2.fastq_line > ${PREFIX}_2.fastq &
+
+	sort_fastq_mem_eff ${PREFIX}_1.fastq ${PREFIX}_1.sort.fastq 4 &
+	sort_fastq_mem_eff ${PREFIX}_2.fastq ${PREFIX}_2.sort.fastq 4 &
+	wait 
+
+	mv ${PREFIX}_1.sort.fastq ${PREFIX}_1.fastq &
+	mv ${PREFIX}_2.sort.fastq ${PREFIX}_2.fastq &
 	wait
 
-	rm -f ${PREFIX}_1.fastq_line ${PREFIX}_2.fastq_line
+	#echo 
+	#echo "[Sort by ID]"
+	#mkdir sort_tmp_1 sort_tmp_2
+	#awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_1.fastq | sort -T sort_tmp_1 > ${PREFIX}_1.fastq_line &
+	#awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_2.fastq | sort -T sort_tmp_2 > ${PREFIX}_2.fastq_line &
+	#wait
+	
+	#rm -rf sort_tmp_1 sort_tmp_2
+	
+	#awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_1.fastq_line > ${PREFIX}_1.fastq &
+	#awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_2.fastq_line > ${PREFIX}_2.fastq &
+	#wait
+
+	#rm -f ${PREFIX}_1.fastq_line ${PREFIX}_2.fastq_line
 
 	#############################
 	#

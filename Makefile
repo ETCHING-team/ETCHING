@@ -16,7 +16,7 @@ default:
 	cp Filter/read_length_calc bin/
 	cp Filter/KMC3/kmc* bin/
 	cp Filter/fastq_check bin/
-	cp Filter/remove_tag_from_fastq bin/
+	cp Filter/sort_fastq_mem_eff bin/
 	cp Caller/estimate_coverage bin/
 	cp Caller/etching_caller bin/
 	cp Caller/etching_typer bin/
