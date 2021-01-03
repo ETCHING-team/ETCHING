@@ -65,7 +65,7 @@ int main(int argc, char ** argv){
   double cputime0 = get_cpu_time();
   double walltime0 = get_wall_time();
 
-  int64_t opt ;
+  int opt ;
 
   std::string infile_pref; // for step 2 and 3
   std::string input_bam;
@@ -73,16 +73,16 @@ int main(int argc, char ** argv){
   std::string prefix;
   std::string genome;
  
-  // int64_t num_threads = 8;
+  // int num_threads = 8;
   
   double purity = 0.75;
   double seqdep = 0 ;
 
-  int64_t insert_size = 500; // -I insert_size
+  int insert_size = 500; // -I insert_size
   bool typing = 1 ;
   bool scanall = 0 ; 
 
-  int64_t step=1;
+  int step=1;
 
   std::string read_orientation = "FR";
   std::string data_type; // WGS, WTS, or PANEL
@@ -208,7 +208,7 @@ int main(int argc, char ** argv){
   // Program start
   //
 
-  int64_t Step = step;
+  int Step = step;
 
 
   //////////////////////////////////////////////////////////////////////////////////////////////

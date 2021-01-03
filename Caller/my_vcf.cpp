@@ -548,7 +548,7 @@ std::string VCF::to_string_short(){
 }
 
 
-void VCF::resize_tool_comp(int64_t Size){
+void VCF::resize_tool_comp(int Size){
   tool_comp.clear();
   tool_comp.resize(Size);
 }
@@ -684,7 +684,7 @@ void VCF_CLASS::build_id_ref_map(const std::string infile){
   std::size_t found;
   std::string tmp;
   std::string id;
-  int64_t count = 0;
+  int count = 0;
 
   const std::string key="##contig=<ID=";
 
@@ -718,7 +718,7 @@ void VCF_CLASS::clear(){
 void VCF_CLASS::insert(VCF vcf){
   Position Pos1;
   if ( id_ref_map.find(vcf.chr1) == id_ref_map.end()){
-    int64_t Size = id_ref_map.size();
+    int Size = id_ref_map.size();
     id_ref_map[vcf.chr1] = Size;
     ref_id_map[Size] = vcf.chr1;
   }
@@ -729,10 +729,10 @@ void VCF_CLASS::insert(VCF vcf){
 
 
 
-void VCF_CLASS::insert ( std::string chr1, int64_t pos1, 
-			 std::string chr2, int64_t pos2, 
+void VCF_CLASS::insert ( std::string chr1, int pos1, 
+			 std::string chr2, int pos2, 
 			 std::string sv_id, std::string mate_id, 
-			 std::string strand, int64_t sr_val, std::string svtype){
+			 std::string strand, int sr_val, std::string svtype){
   VCF input;
   Position Pos;
 
@@ -783,8 +783,8 @@ VCF_MAP::iterator VCF_CLASS::find(Position Pos){
   return vcf_map.find(Pos);
 }
 
-bool VCF_CLASS::check_vcf( std::string chr1, int64_t pos1,
-			   std::string chr2, int64_t pos2,
+bool VCF_CLASS::check_vcf( std::string chr1, int pos1,
+			   std::string chr2, int pos2,
 			   std::string strand ){
   Position Pos1, Pos2;
   Pos1.first  = id_ref_map[chr1];
@@ -942,10 +942,10 @@ VCF_CLASS typing_SV(VCF_CLASS & input){
   copy_info ( input, output );
   Position Pos1;
 
-  int64_t ins_count = 0;
-  int64_t del_count = 0;
-  int64_t dup_count = 0;
-  int64_t inv_count = 0;
+  int ins_count = 0;
+  int del_count = 0;
+  int dup_count = 0;
+  int inv_count = 0;
 
   VCF typed_vcf;
   VCF vcf1;
@@ -1035,10 +1035,10 @@ VCF_CLASS typing_SV_general(VCF_CLASS & input){
   copy_info ( input, output );
   Position Pos1;
 
-  int64_t ins_count = 0;
-  int64_t del_count = 0;
-  int64_t dup_count = 0;
-  int64_t inv_count = 0;
+  int ins_count = 0;
+  int del_count = 0;
+  int dup_count = 0;
+  int inv_count = 0;
 
   VCF typed_vcf;
   VCF vcf1;
@@ -1123,12 +1123,12 @@ VCF_CLASS typing_SV_general(VCF_CLASS & input){
 }
 
 
-double return_depdif(Position Pos, std::vector < double > & dep_vec, int64_t Size, double read_length){
-  int64_t start = Pos.second - read_length - 1;
-  int64_t center = Pos.second - 1;
-  int64_t end = Pos.second + read_length - 1;
+double return_depdif(Position Pos, std::vector < double > & dep_vec, int Size, double read_length){
+  int start = Pos.second - read_length - 1;
+  int center = Pos.second - 1;
+  int end = Pos.second + read_length - 1;
   
-  int64_t max = dep_vec.size();
+  int max = dep_vec.size();
 
   if ( start < 0  ) start = 0    ;
   if ( end > Size ) end   = Size ;
@@ -1138,8 +1138,8 @@ double return_depdif(Position Pos, std::vector < double > & dep_vec, int64_t Siz
 
   double left = 0 ;
   double right = 0;
-  for ( int64_t pos = start ; pos < center ; pos ++ ) left += dep_vec[pos];
-  for ( int64_t pos = center + 1 ; pos < end ; pos ++ ) right += dep_vec[pos];
+  for ( int pos = start ; pos < center ; pos ++ ) left += dep_vec[pos];
+  for ( int pos = center + 1 ; pos < end ; pos ++ ) right += dep_vec[pos];
 
   double output = ( left - right ) / read_length;
   if ( output < 0 ) output *= -1;
@@ -1147,7 +1147,7 @@ double return_depdif(Position Pos, std::vector < double > & dep_vec, int64_t Siz
 }
 
 
-void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_length, const int64_t insert_size, const int64_t confi_window){
+void VCF_CLASS::calc_features(const std::string input_bam, const int read_length, const int insert_size, const int confi_window){
   
   Position Pos;
   Position Pos1;
@@ -1159,19 +1159,19 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_le
   BamTools::BamAlignment al;
   BamTools::BamAlignment exal;
 
-  std::map < Position,  int64_t > cr_map;
-  std::map < Position, std::map < Position , int64_t > > sr_map;
-  std::map < Position, std::map < Position , int64_t > > pe_map;
-  std::map < Position,  int64_t > mq_map; //
-  std::map < Position,  int64_t > tcb_map; //
+  std::map < Position,  int > cr_map;
+  std::map < Position, std::map < Position , int > > sr_map;
+  std::map < Position, std::map < Position , int > > pe_map;
+  std::map < Position,  int > mq_map; //
+  std::map < Position,  int > tcb_map; //
 
-  std::map < Position,  int64_t > un_map; // for single break end
+  std::map < Position,  int > un_map; // for single break end
 
   std::vector < double > dep_vec;
 
-  std::map < int64_t , std::set < Position > > ref_pos_map;
+  std::map < int , std::set < Position > > ref_pos_map;
 
-  int64_t pe_window_size = 100;
+  int pe_window_size = 100;
 
   bool check = false ;
   
@@ -1215,7 +1215,7 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_le
     // Update DEPDIF after scanning one chromosome
     if (al.RefID != exal.RefID && check ){
       std::cout << ref_id_map[exal.RefID] <<" done\n";
-      int64_t Size = (int64_t) references[exal.RefID].RefLength;
+      int Size = (int) references[exal.RefID].RefLength;
       for ( auto & i : ref_pos_map[exal.RefID] ){
 	Pos = i;
 	double depdif = return_depdif(Pos, dep_vec, Size, read_length);
@@ -1232,11 +1232,11 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_le
 	}
       }
       dep_vec.clear();
-      Size = (int64_t) references[al.RefID].RefLength;
+      Size = (int) references[al.RefID].RefLength;
       dep_vec.resize(Size);
     }
     if ( ! check ){
-      int64_t Size = (int64_t) references[al.RefID].RefLength;
+      int Size = (int) references[al.RefID].RefLength;
       dep_vec.resize(Size);
       check = true;
     }
@@ -1337,10 +1337,10 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_le
 
     /////////////////////////////////////////////////////
     // depth array
-    const int64_t start = al.Position ;
-    const int64_t end = al.GetEndPosition() - 1 ;
+    const int start = al.Position ;
+    const int end = al.GetEndPosition() - 1 ;
 
-    for ( int64_t i = start ; i < end ; i ++ ){
+    for ( int i = start ; i < end ; i ++ ){
       dep_vec[i] ++ ;
     }
 
@@ -1348,7 +1348,7 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_le
   } // End of while()
 
   // Update DEPDIF after scanning one chromosome
-  int64_t Size = (int64_t) references[exal.RefID].RefLength;
+  int Size = (int) references[exal.RefID].RefLength;
   for ( auto & i : ref_pos_map[exal.RefID] ){
     Pos = i;
     double depdif = return_depdif(Pos, dep_vec, Size, read_length);
@@ -1372,7 +1372,7 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_le
     Pos1 = i.first;
     Position Posa = Pos1;
     for ( auto & vcf : i.second ){
-      for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+      for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	Posa.second = Pos1.second + k ;
 	if ( cr_map.find(Posa) != cr_map.end() ){
 	  vcf.cr += cr_map [Posa];
@@ -1388,7 +1388,7 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_le
 	Pos2.first = id_ref_map[vcf.chr2];
 	Pos2.second = vcf.pos2;
 	Position Posb = Pos2;
-	for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+	for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	  Posb.second = Pos2.second + k ;
 	  if ( cr_map.find(Posb) != cr_map.end() ){
 	    vcf.cr2 += cr_map [Posb];
@@ -1433,10 +1433,10 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_le
 	Pos2.first = id_ref_map[vcf.chr2];
 	Pos2.second = vcf.pos2;
 	Position Posb = Pos2;
-	for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+	for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	  Posa.second = Pos1.second + k ;
 	  if ( sr_map.find(Posa) != sr_map.end() ){
-	    for ( int64_t l = - confi_window ; l <= confi_window - 1; l ++ ){
+	    for ( int l = - confi_window ; l <= confi_window - 1; l ++ ){
 	      Posb.second = Pos2.second + l ;
 	      if ( sr_map[Posa].find(Posb) != sr_map[Posa].end() ){
 		vcf.sr += sr_map[Posa][Posb];
@@ -1446,7 +1446,7 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_le
 	}
       }
       else{ // SND
-	for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){ 
+	for (int k = - confi_window ; k < confi_window - 1; k ++ ){ 
 	  Posa.second = Pos1.second + k ;
 	  if ( un_map.find(Posa) != un_map.end() ){ 
 	    vcf.sr += un_map[Posa];
@@ -1479,10 +1479,10 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_le
       Position Posb = Pos2;
       Posb.second += read_length / 2;
       Posb.second /= pe_window_size ;
-      for (int64_t k = - 2 * insert_size / pe_window_size ; k <= 2 * insert_size / pe_window_size ; k ++ ){
+      for (int k = - 2 * insert_size / pe_window_size ; k <= 2 * insert_size / pe_window_size ; k ++ ){
 	Posa.second = ( Pos1.second / pe_window_size ) + k ;
 	if ( pe_map.find(Posa) != pe_map.end() ){
-	  for ( int64_t l = - 2 * insert_size / pe_window_size ; l <= 2 * insert_size / pe_window_size ; l ++ ){
+	  for ( int l = - 2 * insert_size / pe_window_size ; l <= 2 * insert_size / pe_window_size ; l ++ ){
 	    Posb.second = ( Pos2.second / pe_window_size ) + l ;
 	    if ( pe_map[Posa].find(Posb) != pe_map[Posa].end() ){
 	      vcf.pe += pe_map[Posa][Posb];
@@ -1552,7 +1552,7 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_le
     Pos1 = i.first;
     Position Posa = Pos1;
     for ( auto & vcf : i.second ){
-      for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+      for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	Posa.second = Pos1.second + k ;
 	if ( entropy_map.find(Posa) != entropy_map.end() ){
 	  vcf.entropy += entropy_map[Posa];
@@ -1562,7 +1562,7 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_le
 	Pos2.first = id_ref_map[vcf.chr2];
 	Pos2.second = vcf.pos2;
 	Position Posb = Pos2;
-	for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+	for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	  Posb.second = Pos2.second + k ;
 	  if ( entropy_map.find(Posb) != entropy_map.end() ){
 	    vcf.entropy2 += entropy_map[Posb];
@@ -1594,7 +1594,7 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int64_t read_le
 
 
 
-void VCF_CLASS::calc_features_general(const std::string input_bam, const int64_t read_length, const int64_t insert_size, const int64_t confi_window){
+void VCF_CLASS::calc_features_general(const std::string input_bam, const int read_length, const int insert_size, const int confi_window){
   
   Position Pos;
   Position Pos1;
@@ -1606,19 +1606,19 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int64_t
   BamTools::BamAlignment al;
   BamTools::BamAlignment exal;
 
-  std::map < Position,  int64_t > cr_map;
-  std::map < Position, std::map < Position , int64_t > > sr_map;
-  std::map < Position, std::map < Position , int64_t > > pe_map;
-  std::map < Position,  int64_t > mq_map; //
-  std::map < Position,  int64_t > tcb_map; //
+  std::map < Position,  int > cr_map;
+  std::map < Position, std::map < Position , int > > sr_map;
+  std::map < Position, std::map < Position , int > > pe_map;
+  std::map < Position,  int > mq_map; //
+  std::map < Position,  int > tcb_map; //
 
-  std::map < Position,  int64_t > un_map; // for single break end
+  std::map < Position,  int > un_map; // for single break end
 
   std::vector < double > dep_vec;
 
-  std::map < int64_t , std::set < Position > > ref_pos_map;
+  std::map < int , std::set < Position > > ref_pos_map;
 
-  int64_t pe_window_size = 100;
+  int pe_window_size = 100;
 
   bool check = false ;
   
@@ -1662,7 +1662,7 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int64_t
     // Update DEPDIF after scanning one chromosome
     if (al.RefID != exal.RefID && check ){
       std::cout << ref_id_map[exal.RefID] <<" done\n";
-      int64_t Size = (int64_t) references[exal.RefID].RefLength;
+      int Size = (int) references[exal.RefID].RefLength;
       for ( auto & i : ref_pos_map[exal.RefID] ){
 	Pos = i;
 	double depdif = return_depdif(Pos, dep_vec, Size, read_length);
@@ -1679,11 +1679,11 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int64_t
 	}
       }
       dep_vec.clear();
-      Size = (int64_t) references[al.RefID].RefLength;
+      Size = (int) references[al.RefID].RefLength;
       dep_vec.resize(Size);
     }
     if ( ! check ){
-      int64_t Size = (int64_t) references[al.RefID].RefLength;
+      int Size = (int) references[al.RefID].RefLength;
       dep_vec.resize(Size);
       check = true;
     }
@@ -1785,10 +1785,10 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int64_t
 
     /////////////////////////////////////////////////////
     // depth array
-    const int64_t start = al.Position ;
-    const int64_t end = al.GetEndPosition() - 1 ;
+    const int start = al.Position ;
+    const int end = al.GetEndPosition() - 1 ;
 
-    for ( int64_t i = start ; i < end ; i ++ ){
+    for ( int i = start ; i < end ; i ++ ){
       dep_vec[i] ++ ;
     }
 
@@ -1796,7 +1796,7 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int64_t
   } // End of while()
 
   // Update DEPDIF after scanning one chromosome
-  int64_t Size = (int64_t) references[exal.RefID].RefLength;
+  int Size = (int) references[exal.RefID].RefLength;
   for ( auto & i : ref_pos_map[exal.RefID] ){
     Pos = i;
     double depdif = return_depdif(Pos, dep_vec, Size, read_length);
@@ -1820,7 +1820,7 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int64_t
     Pos1 = i.first;
     Position Posa = Pos1;
     for ( auto & vcf : i.second ){
-      for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+      for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	Posa.second = Pos1.second + k ;
 	if ( cr_map.find(Posa) != cr_map.end() ){
 	  vcf.cr += cr_map [Posa];
@@ -1832,7 +1832,7 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int64_t
 	Pos2.first = id_ref_map[vcf.chr2];
 	Pos2.second = vcf.pos2;
 	Position Posb = Pos2;
-	for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+	for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	  Posb.second = Pos2.second + k ;
 	  if ( cr_map.find(Posb) != cr_map.end() ){
 	    vcf.cr2 += cr_map [Posb];
@@ -1873,10 +1873,10 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int64_t
 	Pos2.first = id_ref_map[vcf.chr2];
 	Pos2.second = vcf.pos2;
 	Position Posb = Pos2;
-	for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+	for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	  Posa.second = Pos1.second + k ;
 	  if ( sr_map.find(Posa) != sr_map.end() ){
-	    for ( int64_t l = - confi_window ; l <= confi_window - 1; l ++ ){
+	    for ( int l = - confi_window ; l <= confi_window - 1; l ++ ){
 	      Posb.second = Pos2.second + l ;
 	      if ( sr_map[Posa].find(Posb) != sr_map[Posa].end() ){
 		vcf.sr += sr_map[Posa][Posb];
@@ -1886,7 +1886,7 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int64_t
 	}
       }
       else{ // SND
-	for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){ 
+	for (int k = - confi_window ; k < confi_window - 1; k ++ ){ 
 	  Posa.second = Pos1.second + k ;
 	  if ( un_map.find(Posa) != un_map.end() ){ 
 	    vcf.sr += un_map[Posa];
@@ -1919,10 +1919,10 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int64_t
       Position Posb = Pos2;
       Posb.second += read_length / 2;
       Posb.second /= pe_window_size ;
-      for (int64_t k = - 2 * insert_size / pe_window_size ; k <= 2 * insert_size / pe_window_size ; k ++ ){
+      for (int k = - 2 * insert_size / pe_window_size ; k <= 2 * insert_size / pe_window_size ; k ++ ){
 	Posa.second = ( Pos1.second / pe_window_size ) + k ;
 	if ( pe_map.find(Posa) != pe_map.end() ){
-	  for ( int64_t l = - 2 * insert_size / pe_window_size ; l <= 2 * insert_size / pe_window_size ; l ++ ){
+	  for ( int l = - 2 * insert_size / pe_window_size ; l <= 2 * insert_size / pe_window_size ; l ++ ){
 	    Posb.second = ( Pos2.second / pe_window_size ) + l ;
 	    if ( pe_map[Posa].find(Posb) != pe_map[Posa].end() ){
 	      vcf.pe += pe_map[Posa][Posb];
@@ -1982,7 +1982,7 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int64_t
     Pos1 = i.first;
     Position Posa = Pos1;
     for ( auto & vcf : i.second ){
-      for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+      for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	Posa.second = Pos1.second + k ;
 	if ( entropy_map.find(Posa) != entropy_map.end() ){
 	  vcf.entropy += entropy_map[Posa];
@@ -1992,7 +1992,7 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int64_t
 	Pos2.first = id_ref_map[vcf.chr2];
 	Pos2.second = vcf.pos2;
 	Position Posb = Pos2;
-	for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+	for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	  Posb.second = Pos2.second + k ;
 	  if ( entropy_map.find(Posb) != entropy_map.end() ){
 	    vcf.entropy2 += entropy_map[Posb];
@@ -2033,7 +2033,7 @@ void VCF_CLASS::make_info(){
 }
 
 void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & container_vec,
-		   const int64_t read_length, const int64_t insert_size, const int64_t confi_window){
+		   const int read_length, const int insert_size, const int confi_window){
   
   Position Pos;
   Position Pos1;
@@ -2045,26 +2045,26 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
   BamTools::BamAlignment al;
   BamTools::BamAlignment exal;
 
-  std::map < Position,  int64_t > cr_map;
-  std::map < Position, std::map < Position , int64_t > > sr_map;
-  std::map < Position, std::map < Position , int64_t > > pe_map;
-  std::map < Position,  int64_t > mq_map; //
-  std::map < Position,  int64_t > tcb_map; //
+  std::map < Position,  int > cr_map;
+  std::map < Position, std::map < Position , int > > sr_map;
+  std::map < Position, std::map < Position , int > > pe_map;
+  std::map < Position,  int > mq_map; //
+  std::map < Position,  int > tcb_map; //
 
-  std::map < Position,  int64_t > un_map; // for single break end
+  std::map < Position,  int > un_map; // for single break end
 
   std::vector < double > dep_vec;
 
-  // std::map < int64_t , std::set < Position > > ref_pos_map;
-  std::vector < std::map < int64_t , std::set < Position > > > ref_pos_map ( container_vec.size() );
+  // std::map < int , std::set < Position > > ref_pos_map;
+  std::vector < std::map < int , std::set < Position > > > ref_pos_map ( container_vec.size() );
   
-  int64_t pe_window_size = 100;
+  int pe_window_size = 100;
 
   bool check = false ;
   
 
-  std::unordered_map < std::string , int64_t > id_ref_map = container_vec[0].id_ref_map;
-  std::unordered_map < int64_t , std::string > ref_id_map = container_vec[0].ref_id_map;
+  std::unordered_map < std::string , int > id_ref_map = container_vec[0].id_ref_map;
+  std::unordered_map < int , std::string > ref_id_map = container_vec[0].ref_id_map;
   /////////////////////////////////////////////////////////////////
   
   reader.Open(input_bam);
@@ -2106,7 +2106,7 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
     // Update DEPDIF after scanning one chromosome
     if (al.RefID != exal.RefID && check ){
       std::cout << ref_id_map[exal.RefID] <<" done\n";
-      int64_t Size = (int64_t) references[exal.RefID].RefLength;
+      int Size = (int) references[exal.RefID].RefLength;
 
       for ( std::size_t con = 0 ; con < container_vec.size() ; con ++ ){
 	for ( auto & i : ref_pos_map[con][exal.RefID] ){
@@ -2126,11 +2126,11 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
 	}
       }
       dep_vec.clear();
-      Size = (int64_t) references[al.RefID].RefLength;
+      Size = (int) references[al.RefID].RefLength;
       dep_vec.resize(Size);
     }
     if ( ! check ){
-      int64_t Size = (int64_t) references[al.RefID].RefLength;
+      int Size = (int) references[al.RefID].RefLength;
       dep_vec.resize(Size);
       check = true;
     }
@@ -2232,10 +2232,10 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
 
     /////////////////////////////////////////////////////
     // depth array
-    const int64_t start = al.Position ;
-    const int64_t end = al.GetEndPosition() - 1 ;
+    const int start = al.Position ;
+    const int end = al.GetEndPosition() - 1 ;
 
-    for ( int64_t i = start ; i < end ; i ++ ){
+    for ( int i = start ; i < end ; i ++ ){
       dep_vec[i] ++ ;
     }
 
@@ -2244,7 +2244,7 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
 
 
   // Update DEPDIF after scanning one chromosome
-  int64_t Size = (int64_t) references[exal.RefID].RefLength;
+  int Size = (int) references[exal.RefID].RefLength;
   for ( std::size_t con = 0 ; con < container_vec.size() ; con ++ ){
     for ( auto & i : ref_pos_map[con][exal.RefID] ){
       Pos = i;
@@ -2271,7 +2271,7 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
       Pos1 = i.first;
       Position Posa = Pos1;
       for ( auto & vcf : i.second ){
-	for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+	for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	  Posa.second = Pos1.second + k ;
 	  if ( cr_map.find(Posa) != cr_map.end() ){
 	    vcf.cr += cr_map [Posa];
@@ -2283,7 +2283,7 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
 	  Pos2.first = id_ref_map[vcf.chr2];
 	  Pos2.second = vcf.pos2;
 	  Position Posb = Pos2;
-	  for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+	  for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	    Posb.second = Pos2.second + k ;
 	    if ( cr_map.find(Posb) != cr_map.end() ){
 	      vcf.cr2 += cr_map [Posb];
@@ -2327,10 +2327,10 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
 	  Pos2.first = id_ref_map[vcf.chr2];
 	  Pos2.second = vcf.pos2;
 	  Position Posb = Pos2;
-	  for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+	  for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	    Posa.second = Pos1.second + k ;
 	    if ( sr_map.find(Posa) != sr_map.end() ){
-	      for ( int64_t l = - confi_window ; l <= confi_window - 1; l ++ ){
+	      for ( int l = - confi_window ; l <= confi_window - 1; l ++ ){
 		Posb.second = Pos2.second + l ;
 		if ( sr_map[Posa].find(Posb) != sr_map[Posa].end() ){
 		  vcf.sr += sr_map[Posa][Posb];
@@ -2340,7 +2340,7 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
 	  }
 	}
 	else{ // SND
-	  for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){ 
+	  for (int k = - confi_window ; k < confi_window - 1; k ++ ){ 
 	    Posa.second = Pos1.second + k ;
 	    if ( un_map.find(Posa) != un_map.end() ){ 
 	      vcf.sr += un_map[Posa];
@@ -2375,10 +2375,10 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
 	Position Posb = Pos2;
 	Posb.second += read_length / 2;
 	Posb.second /= pe_window_size ;
-	for (int64_t k = - 2 * insert_size / pe_window_size ; k <= 2 * insert_size / pe_window_size ; k ++ ){
+	for (int k = - 2 * insert_size / pe_window_size ; k <= 2 * insert_size / pe_window_size ; k ++ ){
 	  Posa.second = ( Pos1.second / pe_window_size ) + k ;
 	  if ( pe_map.find(Posa) != pe_map.end() ){
-	    for ( int64_t l = - 2 * insert_size / pe_window_size ; l <= 2 * insert_size / pe_window_size ; l ++ ){
+	    for ( int l = - 2 * insert_size / pe_window_size ; l <= 2 * insert_size / pe_window_size ; l ++ ){
 	      Posb.second = ( Pos2.second / pe_window_size ) + l ;
 	      if ( pe_map[Posa].find(Posb) != pe_map[Posa].end() ){
 		vcf.pe += pe_map[Posa][Posb];
@@ -2440,7 +2440,7 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
       Pos1 = i.first;
       Position Posa = Pos1;
       for ( auto & vcf : i.second ){
-	for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+	for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	  Posa.second = Pos1.second + k ;
 	  if ( entropy_map.find(Posa) != entropy_map.end() ){
 	    vcf.entropy += entropy_map[Posa];
@@ -2450,7 +2450,7 @@ void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & cont
 	  Pos2.first = id_ref_map[vcf.chr2];
 	  Pos2.second = vcf.pos2;
 	  Position Posb = Pos2;
-	  for (int64_t k = - confi_window ; k < confi_window - 1; k ++ ){
+	  for (int k = - confi_window ; k < confi_window - 1; k ++ ){
 	    Posb.second = Pos2.second + k ;
 	    if ( entropy_map.find(Posb) != entropy_map.end() ){
 	      vcf.entropy2 += entropy_map[Posb];

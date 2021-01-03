@@ -30,11 +30,11 @@
 
 using namespace std;
 
-int64_t collector (string kmer_table, int64_t kmer_size, string out_prefix, string read_file_1, string read_file_2, int64_t gz_check, int64_t NT);
-int64_t collector_id_mode_single (string kmer_table, int64_t kmer_size, string out_prefix, string read_file_1, int64_t gz_check, int64_t NT);
-int64_t collector_id_mode (string kmer_table, int64_t kmer_size, string out_prefix, string read_file_1, string read_file_2, int64_t gz_check, int64_t NT);
-int64_t collector_bam (string kmer_table, int64_t kmer_size, string out_prefix, string read_file_b, int64_t NT);
-int64_t collector_single (string kmer_table, int64_t kmer_size, string out_prefix, string read_file_1, int64_t gz_check, int64_t NT);
+int collector (string kmer_table, int kmer_size, string out_prefix, string read_file_1, string read_file_2, int gz_check, int NT);
+int collector_id_mode_single (string kmer_table, int kmer_size, string out_prefix, string read_file_1, int gz_check, int NT);
+int collector_id_mode (string kmer_table, int kmer_size, string out_prefix, string read_file_1, string read_file_2, int gz_check, int NT);
+int collector_bam (string kmer_table, int kmer_size, string out_prefix, string read_file_b, int NT);
+int collector_single (string kmer_table, int kmer_size, string out_prefix, string read_file_1, int gz_check, int NT);
    
 #endif
 

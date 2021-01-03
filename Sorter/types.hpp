@@ -10,7 +10,7 @@
 #include <string>
 #include <map>
 
-using Position = std::pair < int64_t , int64_t > ;
+using Position = std::pair < int , int > ;
 using Feature = std::map < std::string , double > ;
 using FEATURE = std::map < std::string , Feature > ;
 

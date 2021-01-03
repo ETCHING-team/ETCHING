@@ -80,8 +80,9 @@ void split_file ( std::string infile , std::vector < std::string > fname_vec, in
 
   // open file streams
   fin.open(infile.c_str());
-  std::vector < std::ofstream > fout;
-  fout.resize(fsize);
+  //std::vector < std::ofstream > fout;
+  std::ofstream * fout = new std::ofstream [fsize];
+  //fout.resize(fsize);
   for ( uint i = 0 ; i < fsize ; i ++ ){
     fout[i].open(fname_vec[i].c_str());
   }
@@ -104,6 +105,7 @@ void split_file ( std::string infile , std::vector < std::string > fname_vec, in
     fout[i].close();
   }
 
+  delete [] fout;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +134,6 @@ int main ( int argc , char ** argv ){
   //std::cout << "File size: " << file_size(infile) << " Byte\n";
 
   if ( fsize == 1 ){
-    //std::cout << "Just sort\n";
     sort_and_write_fastq(infile, outfile);
   }
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,7 +173,7 @@ int main ( int argc , char ** argv ){
       remove(fname_vec[i].c_str());
     }
 
-    // merge and print64_t
+    // merge and print
     std::ofstream fout ( outfile.c_str() );
     for ( uint i = 0 ; i < fsize ; i ++ ){
       std::string sname = sname_vec[i];
@@ -197,6 +198,7 @@ int main ( int argc , char ** argv ){
     }
 
     fout.close();
+
   }
 
   return 0;
