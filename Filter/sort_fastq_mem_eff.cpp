@@ -49,7 +49,7 @@ void sort_and_write_fastq ( std::string infile , std::string outfile ){
 
   while ( std::getline ( fin , id ) && std::getline ( fin , seq ) && 
 	  std::getline ( fin , desc ) && std::getline ( fin , qual ) ){
-    if ( id.substr(id.size()-2) == "\1" || id.substr(id.size()-2) == "\2"){
+    if ( id.substr(id.size()-2) == "/1" || id.substr(id.size()-2) == "/2"){
       id = id.substr(0,id.size()-2);
     }
     fastq_map[id].first = seq;
