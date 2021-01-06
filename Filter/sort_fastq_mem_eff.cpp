@@ -90,7 +90,7 @@ void split_file ( std::string infile , std::vector < std::string > fname_vec, in
 
   while ( std::getline ( fin , id ) && std::getline ( fin , seq ) && 
 	  std::getline ( fin , desc ) && std::getline ( fin , qual ) ){
-    if ( id.substr(id.size()-2) == "\1" || id.substr(id.size()-2) == "\2"){
+    if ( id.substr(id.size()-2) == "/1" || id.substr(id.size()-2) == "/2"){
       id = id.substr(0,id.size()-2);
     }
     std::size_t hval = hashing ( id );
@@ -184,7 +184,7 @@ int main ( int argc , char ** argv ){
       std::ifstream fin ( sname.c_str() );
       while ( std::getline ( fin , id ) && std::getline ( fin , seq ) &&
 	      std::getline ( fin , desc ) && std::getline ( fin , qual ) ){
-	if ( id.substr(id.size()-2) == "\1" || id.substr(id.size()-2) == "\2"){
+	if ( id.substr(id.size()-2) == "/1" || id.substr(id.size()-2) == "/2"){
 	  id = id.substr(0,id.size()-2);
 	}
 	fout << id << "\n" << seq << "\n+\n" << qual << "\n";
