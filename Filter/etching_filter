@@ -474,34 +474,6 @@ then
     mv ${PREFIX}_2.sort.fastq ${PREFIX}_2.fastq &
     wait
 
-    #TAG_CHECK1=$(head -n 1 ${PREFIX}_1.fastq | grep "/1")
-    #TAG_CHECK2=$(head -n 1 ${PREFIX}_1.fastq | grep "/2")
-    #TAG_CHECK=${TAG_CHECK1}${TAG_CHECK2}
-
-    #if [ ${#TAG_CHECK} != 0 ]
-    #then
-    #cmd="remove_tag_from_fastq ${PREFIX}_1.fastq > ${PREFIX}_1.fastq_ ; mv ${PREFIX}_1.fastq_ ${PREFIX}_1.fastq &"
-    #echo $cmd
-    #eval $cmd
-    #cmd="remove_tag_from_fastq ${PREFIX}_2.fastq > ${PREFIX}_2.fastq_ ; mv ${PREFIX}_2.fastq_ ${PREFIX}_2.fastq &"
-    #echo $cmd
-    #eval $cmd
-    #wait
-    #fi
-    #echo
-    #echo "[Sort by ID]"
-    #mkdir sort_tmp_1 sort_tmp_2
-    #awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_1.fastq | sort -T sort_tmp_1 > ${PREFIX}_1.fastq_line &
-    #awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_2.fastq | sort -T sort_tmp_2 > ${PREFIX}_2.fastq_line &
-    #wait
-    
-    #rm -rf sort_tmp_1 sort_tmp_2
-    
-    #awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_1.fastq_line > ${PREFIX}_1.fastq &
-    #awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_2.fastq_line > ${PREFIX}_2.fastq &
-    #wait
-
-    #rm -f ${PREFIX}_1.fastq_line ${PREFIX}_2.fastq_line
 
     #############################
     #
@@ -515,7 +487,6 @@ then
     echo $cmd
     eval $cmd
 
-    #let HALF=${THREADS/2}+1
     cmd="${SAMTOOLS} view -S -H ${PREFIX}.sam > ${PREFIX}.header"
     echo $cmd
     eval $cmd
@@ -578,33 +549,30 @@ else
 	eval $cmd
 	wait
 
+	cmd="rm -f ${BAM_PREFIX}_1.fastq ${BAM_PREFIX}_2.fastq"
+	echo $cmd
+	eval $cmd
+
 	#############################
 	#
 	# Sort
 	#
 
-	sort_fastq_mem_eff ${PREFIX}_1.fastq ${PREFIX}_1.sort.fastq 4 &
-	sort_fastq_mem_eff ${PREFIX}_2.fastq ${PREFIX}_2.sort.fastq 4 &
+	cmd="sort_fastq_mem_eff ${PREFIX}_1.fastq ${PREFIX}_1.sort.fastq 4 &"
+	echo $cmd
+	eval $cmd
+	cmd="sort_fastq_mem_eff ${PREFIX}_2.fastq ${PREFIX}_2.sort.fastq 4 &"
+	echo $cmd
+	eval $cmd
 	wait 
 
-	mv ${PREFIX}_1.sort.fastq ${PREFIX}_1.fastq &
-	mv ${PREFIX}_2.sort.fastq ${PREFIX}_2.fastq &
+	cmd="mv ${PREFIX}_1.sort.fastq ${PREFIX}_1.fastq &"
+	echo $cmd
+	eval $cmd
+	cmd="mv ${PREFIX}_2.sort.fastq ${PREFIX}_2.fastq &"
+	echo $cmd
+	eval $cmd
 	wait
-
-	#echo 
-	#echo "[Sort by ID]"
-	#mkdir sort_tmp_1 sort_tmp_2
-	#awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_1.fastq | sort -T sort_tmp_1 > ${PREFIX}_1.fastq_line &
-	#awk '{printf $1;getline;printf "\t"$0;getline;getline;print "\t"$0}' ${PREFIX}_2.fastq | sort -T sort_tmp_2 > ${PREFIX}_2.fastq_line &
-	#wait
-	
-	#rm -rf sort_tmp_1 sort_tmp_2
-	
-	#awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_1.fastq_line > ${PREFIX}_1.fastq &
-	#awk '{print $1"\n"$2"\n+\n"$3}' ${PREFIX}_2.fastq_line > ${PREFIX}_2.fastq &
-	#wait
-
-	#rm -f ${PREFIX}_1.fastq_line ${PREFIX}_2.fastq_line
 
 	#############################
 	#
@@ -618,7 +586,6 @@ else
 	echo $cmd
 	eval $cmd
 
-	#let HALF=${THREADS/2}+1
 	cmd="${SAMTOOLS} view -S -H ${PREFIX}.sam > ${PREFIX}.header"
 	echo $cmd
 	eval $cmd
@@ -632,9 +599,6 @@ else
 	echo $cmd
 	eval $cmd
 
-	#cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -b $BAM_INPUT -p $PREFIX -t $THREADS -l ${KMER_SIZE} "
-	#echo $cmd
-	#eval $cmd
     fi
 fi    
 
