@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.1.5b (released 2021.1.7)"
+VERSION="ETCHING_v1.1.5c (released 2021.1.8)"
 
 #--------------------------------------------------------------------
 # Copyright 2020. Bioinformatic and Genomics Lab.
@@ -11,6 +11,11 @@ VERSION="ETCHING_v1.1.5b (released 2021.1.7)"
 #############################
 #
 # Help message
+#
+
+#############################
+#
+# Convert to absolute path if relative path
 #
 
 function USAGE {
@@ -497,10 +502,22 @@ done
 
 #############################
 #
+# Convert to absolute path if relative path
+#
+
+DIR=$(echo $0 | sed 's/etching$//g')
+check_dir=$(echo $DIR | cut -b 1 )
+if [ $check_dir != "/" ]
+then
+    cd $DIR
+    DIR=$PWD"/"
+    cd - > /dev/null
+fi 
+
+#############################
+#
 # CHECKING REQUIRED PROGRAMS
 #
-DIR=$(echo $0 | sed 's/etching$//g')
-#echo $DIR
 for i in etching_filter estimate_coverage etching_caller etching_sorter etching_fg_identifier kmer_filter read_collector read_length_calc fastq_check
 do
     CHECK=$(which ${DIR}${i})
