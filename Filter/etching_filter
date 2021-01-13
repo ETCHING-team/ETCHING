@@ -483,20 +483,22 @@ then
     echo "[Mapping]"
     DATE="[$(date)]";echo ${DATE}
 
-    cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq > ${PREFIX}.sam 2> logs/bwa_mem.log"
+    let HALF=(${THREADS}/2 + 1)
+
+    cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq 2> logs/bwa_mem.log | samtools view -@ ${HALF} -Sbh - > ${PREFIX}.bam"
     echo $cmd
     eval $cmd
 
-    cmd="${SAMTOOLS} view -S -H ${PREFIX}.sam > ${PREFIX}.header"
+    cmd="${SAMTOOLS} view -S -H ${PREFIX}.bam > ${PREFIX}.header"
     echo $cmd
     eval $cmd
-    cmd="${SAMTOOLS} view -S -@ ${THREADS} ${PREFIX}.sam | awk '\$6 ~ /H|S|*/ || \$0 !~ \"NM:i:0\" {print}' > ${PREFIX}.SHNM.sam"
+    cmd="${SAMTOOLS} view -S -@ ${THREADS} ${PREFIX}.bam | awk '\$6 ~ /H|S|*/ || \$0 !~ \"NM:i:0\" {print}' > ${PREFIX}.SHNM.sam"
     echo $cmd
     eval $cmd
-    cmd="cat ${PREFIX}.header ${PREFIX}.SHNM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.bam"
+    cmd="cat ${PREFIX}.header ${PREFIX}.SHNM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.SHNM.bam"
     echo $cmd
     eval $cmd
-    cmd="rm -f ${PREFIX}.sam ${PREFIX}.header ${PREFIX}.SHNM.sam"
+    cmd="rm -f ${PREFIX}.header ${PREFIX}.SHNM.sam"
     echo $cmd
     eval $cmd
 
@@ -512,7 +514,7 @@ else
 	DATE="[$(date)]";echo ${DATE}
 	
 	BAM_INPUT=$(head -n 1 sample.list)
-	cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -b $BAM_INPUT -p $PREFIX -t $THREADS -l ${KMER_SIZE} "
+	cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -b $BAM_INPUT -p ${PREFIX}.SHNM -t $THREADS -l ${KMER_SIZE} "
 	echo $cmd
 	eval $cmd
     else
@@ -582,20 +584,22 @@ else
 	echo "[Mapping]"
 	DATE="[$(date)]";echo ${DATE}
 
-	cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq > ${PREFIX}.sam 2> logs/bwa_mem.log"
+	let HALF=(${THREADS}/2 + 1)
+	
+	cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq 2> logs/bwa_mem.log | samtools view -Sbh -@ ${HALF} - > ${PREFIX}.bam"
 	echo $cmd
 	eval $cmd
 
-	cmd="${SAMTOOLS} view -S -H ${PREFIX}.sam > ${PREFIX}.header"
+	cmd="${SAMTOOLS} view -S -H ${PREFIX}.bam > ${PREFIX}.header"
 	echo $cmd
 	eval $cmd
-	cmd="${SAMTOOLS} view -S -@ ${THREADS} ${PREFIX}.sam | awk '\$6 ~ /H|S|*/ || \$0 !~ \"NM:i:0\" {print}' > ${PREFIX}.SHNM.sam"
+	cmd="${SAMTOOLS} view -S -@ ${THREADS} ${PREFIX}.bam | awk '\$6 ~ /H|S|*/ || \$0 !~ \"NM:i:0\" {print}' > ${PREFIX}.SHNM.sam"
 	echo $cmd
 	eval $cmd
-	cmd="cat ${PREFIX}.header ${PREFIX}.SHNM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.bam"
+	cmd="cat ${PREFIX}.header ${PREFIX}.SHNM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.SHNM.bam"
 	echo $cmd
 	eval $cmd
-	cmd="rm -f ${PREFIX}.sam ${PREFIX}.header ${PREFIX}.SHNM.sam"
+	cmd="rm -f ${PREFIX}.header ${PREFIX}.SHNM.sam"
 	echo $cmd
 	eval $cmd
 
@@ -607,18 +611,24 @@ CHECK=$($SAMTOOLS sort 2>&1 | grep "\-o" | grep "final output to stdout")
 
 if [ ${#CHECK} == 0 ]
 then
-    cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.bam -o ${PREFIX}.sort.bam"
+    cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.SHNM.bam -o ${PREFIX}.SHNM.sort.bam"
     echo $cmd
     eval $cmd
 else
-    cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.bam ${PREFIX}.sort"
+    cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.SHNM.bam ${PREFIX}.SHNM.sort"
     echo $cmd
     eval $cmd
 fi
 
-cmd="rm -rf ${PREFIX}.bam"
+cmd="rm -f ${PREFIX}.SHNM.bam"
 echo $cmd
 eval $cmd
+
+
+cmd="ln -s ${PREFIX}.SHNM.sort.bam ${PREFIX}.sort.bam"
+echo $cmd
+eval $cmd
+
 
 cmd="${SAMTOOLS} index ${PREFIX}.sort.bam"
 echo $cmd

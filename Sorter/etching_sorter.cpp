@@ -26,10 +26,7 @@ void usage(){
     << "\t" << "           \t" << "Use this if you want to specify machine learning model.\n"
     << "\n"
     << "I/O option:\n"
-    << "\t" << "-T         \t" << "Tag SVs instead of removing low quality SVs [NONE]\n"
-    << "\t" << "           \t" << "If you use this option, high confidential SVs will be tagged with\n"
-    << "\t" << "           \t" << "\"PASS\", and low quality SVs will be tagged with \"LOWQUAL\" in\n"
-    << "\t" << "           \t" << "FILTER field.\n"
+    << "\t" << "-Q         \t" << "Tag SVs with \"PASS\" or \"LOWQUAL\" instead of removing low quality SVs [NONE]\n"
     << "\n";
 }
 
@@ -107,7 +104,7 @@ int main ( int argc , char ** argv ){
 
   std::size_t sz;
 
-  while ( (opt = getopt ( argc, argv, "i:o:c:m:RXT" ) ) != -1 ){
+  while ( (opt = getopt ( argc, argv, "i:o:c:m:RXQ" ) ) != -1 ){
     switch ( opt ) {
     case 'i': infile=optarg; break; // infile name
     case 'o': prefix=optarg; break; // output prefix
@@ -115,7 +112,7 @@ int main ( int argc , char ** argv ){
     case 'm': path=optarg; break; // path to machine learning model
     case 'R': method+="RandomForest"; break; // Random Forest
     case 'X': method+="XGBoost"; break; // XGBoost
-    case 'T': tagging=1; break; // Tagging SVs instead of ramoving low quality SVs.
+    case 'Q': tagging=1; break; // Tagging SVs instead of ramoving low quality SVs.
     default: std::cout << "ERROR!!! Check options!!!\n\n" ; usage(); return 0 ; 
     }
   }

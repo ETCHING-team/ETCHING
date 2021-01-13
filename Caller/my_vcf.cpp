@@ -1,3 +1,4 @@
+
 //--------------------------------------------------------------------
 // Copyright 2020. Bioinformatic and Genomics Lab.
 // Hanyang University, Seoul, Korea
@@ -633,11 +634,11 @@ void VCF_CLASS::make_header_short(){
 
 
 VCF_CLASS::VCF_CLASS(){
-  etching_version="ETCHING_v1.1.5c (released 2021.1.8.)";
+  etching_version="ETCHING_v1.1.6 (released 2021.1.12.)";
 }
 
 VCF_CLASS::VCF_CLASS(const std::string infile){
-  etching_version="ETCHING_v1.1.5c (released 2021.1.8.)";
+  etching_version="ETCHING_v1.1.6 (released 2021.1.12.)";
   read_vcf_file(infile);
 }
 
@@ -1174,7 +1175,11 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int read_length
   int pe_window_size = 100;
 
   bool check = false ;
-  
+
+  // for calculation paired-end count
+  std::set < Position > reduced_ref_pos_map;
+  std::set < std::string > counted_read_set;
+
   /////////////////////////////////////////////////////////////////
   
   reader.Open(input_bam);
@@ -1208,10 +1213,19 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int read_length
     }
   }
 
+
+  // for calculation paired-end count
+  for ( auto & i : vcf_map ){
+    for (int k = - 2 * insert_size / pe_window_size ; k <= 2 * insert_size / pe_window_size ; k ++ ){
+      Pos1 = i.first;
+      Pos1.second = Pos1.second / pe_window_size + k ;
+      reduced_ref_pos_map.insert(Pos1);
+    }
+  }
   /////////////////////////////////////////////////////////////////
-
+  
   while ( reader.GetNextAlignment(al) ){
-
+    
     // Update DEPDIF after scanning one chromosome
     if (al.RefID != exal.RefID && check ){
       std::cout << ref_id_map[exal.RefID] <<" done\n";
@@ -1320,17 +1334,23 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int read_length
     Pos2.second = al.MatePosition + read_length / 2 ;
     Pos2.second /= pe_window_size ;
 
-    if ( Pos1.first != Pos2.first ){
-      pe_map[Pos1][Pos2]=1;
-      pe_map[Pos2][Pos1]=1;
-      // pe_map[Pos1][Pos2]++;
-      // pe_map[Pos2][Pos1]++;
-    }
-    else if ( Pos1.second - Pos2.second > 2 * insert_size / pe_window_size || Pos1.second - Pos2.second < - 2 * insert_size / pe_window_size ){
-      pe_map[Pos1][Pos2]=1;
-      pe_map[Pos2][Pos1]=1;
-      // pe_map[Pos1][Pos2]++;
-      // pe_map[Pos2][Pos1]++;
+    if ( reduced_ref_pos_map.find(Pos1) != reduced_ref_pos_map.end() &&
+	 reduced_ref_pos_map.find(Pos2) != reduced_ref_pos_map.end() &&
+	 counted_read_set.find ( al.Name ) == counted_read_set.end() ){
+      if ( Pos1.first != Pos2.first ){
+	// pe_map[Pos1][Pos2]=1;
+	// pe_map[Pos2][Pos1]=1;
+	pe_map[Pos1][Pos2]++;
+	pe_map[Pos2][Pos1]++;
+	counted_read_set.insert ( al.Name );
+      }
+      else if ( Pos1.second - Pos2.second > 2 * insert_size / pe_window_size || Pos1.second - Pos2.second < - 2 * insert_size / pe_window_size ){
+	// pe_map[Pos1][Pos2]=1;
+	// pe_map[Pos2][Pos1]=1;
+	pe_map[Pos1][Pos2]++;
+	pe_map[Pos2][Pos1]++;
+	counted_read_set.insert ( al.Name );
+      }
     }
 
 
@@ -1463,7 +1483,7 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int read_length
     }
   }
 
-  std::cout << "Complete: SR\n";
+  std::cout << "Complete: SR----\n";
 
 
   /////////////////////////////////////////////////////
@@ -1621,6 +1641,11 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int rea
   int pe_window_size = 100;
 
   bool check = false ;
+
+
+  // for calculation paired-end count
+  std::set < Position > reduced_ref_pos_map;
+  std::set < std::string > counted_read_set;
   
   /////////////////////////////////////////////////////////////////
   
@@ -1652,6 +1677,15 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int rea
       j.tcb2 = 0;
       j.depdif2 = 0 ;
       j.entropy2 = 0 ;
+    }
+  }
+
+  // for calculation paired-end count
+  for ( auto & i : vcf_map ){
+    for (int k = - 2 * insert_size / pe_window_size ; k <= 2 * insert_size / pe_window_size ; k ++ ){
+      Pos1 = i.first;
+      Pos1.second = Pos1.second / pe_window_size + k ;
+      reduced_ref_pos_map.insert(Pos1);
     }
   }
 
@@ -1768,19 +1802,24 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int rea
     Pos2.second = al.MatePosition + read_length / 2 ;
     Pos2.second /= pe_window_size ;
 
-    if ( Pos1.first != Pos2.first ){
-      pe_map[Pos1][Pos2]=1;
-      pe_map[Pos2][Pos1]=1;
-      // pe_map[Pos1][Pos2]++;
-      // pe_map[Pos2][Pos1]++;
+    if ( reduced_ref_pos_map.find(Pos1) != reduced_ref_pos_map.end() &&
+	 reduced_ref_pos_map.find(Pos2) != reduced_ref_pos_map.end() &&
+	 counted_read_set.find ( al.Name ) == counted_read_set.end() ){
+      if ( Pos1.first != Pos2.first ){
+	// pe_map[Pos1][Pos2]=1;
+	// pe_map[Pos2][Pos1]=1;
+	pe_map[Pos1][Pos2]++;
+	pe_map[Pos2][Pos1]++;
+	counted_read_set.insert ( al.Name );
+      }
+      else if ( Pos1.second - Pos2.second > 2 * insert_size / pe_window_size || Pos1.second - Pos2.second < - 2 * insert_size / pe_window_size ){
+	// pe_map[Pos1][Pos2]=1;
+	// pe_map[Pos2][Pos1]=1;
+	pe_map[Pos1][Pos2]++;
+	pe_map[Pos2][Pos1]++;
+	counted_read_set.insert ( al.Name );
+      }
     }
-    else if ( Pos1.second - Pos2.second > 2 * insert_size / pe_window_size || Pos1.second - Pos2.second < - 2 * insert_size / pe_window_size ){
-      pe_map[Pos1][Pos2]=1;
-      pe_map[Pos2][Pos1]=1;
-      // pe_map[Pos1][Pos2]++;
-      // pe_map[Pos2][Pos1]++;
-    }
-
 
 
     /////////////////////////////////////////////////////
@@ -2024,458 +2063,12 @@ void VCF_CLASS::calc_features_general(const std::string input_bam, const int rea
 
 
 
+
 void VCF_CLASS::make_info(){
   for ( auto & i : vcf_map ){
     for ( auto & j : i.second ){
       j.make_info();
     }
-  }  
+  }
 }
 
-void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & container_vec,
-		   const int read_length, const int insert_size, const int confi_window){
-  
-  Position Pos;
-  Position Pos1;
-  Position Pos2;
-  std::string tag;
-
-  BamTools::BamReader reader;
-  BamTools::RefVector references;
-  BamTools::BamAlignment al;
-  BamTools::BamAlignment exal;
-
-  std::map < Position,  int > cr_map;
-  std::map < Position, std::map < Position , int > > sr_map;
-  std::map < Position, std::map < Position , int > > pe_map;
-  std::map < Position,  int > mq_map; //
-  std::map < Position,  int > tcb_map; //
-
-  std::map < Position,  int > un_map; // for single break end
-
-  std::vector < double > dep_vec;
-
-  // std::map < int , std::set < Position > > ref_pos_map;
-  std::vector < std::map < int , std::set < Position > > > ref_pos_map ( container_vec.size() );
-  
-  int pe_window_size = 100;
-
-  bool check = false ;
-  
-
-  std::unordered_map < std::string , int > id_ref_map = container_vec[0].id_ref_map;
-  std::unordered_map < int , std::string > ref_id_map = container_vec[0].ref_id_map;
-  /////////////////////////////////////////////////////////////////
-  
-  reader.Open(input_bam);
-  if ( !reader.OpenIndex(input_bam + ".bai") ) {
-    reader.CreateIndex();
-  }
-  references = reader.GetReferenceData();
-
-  for ( std::size_t con = 0 ; con < container_vec.size() ; con ++ ){
-    for ( auto & i : container_vec[con].vcf_map ){
-      Pos1 = i.first;
-      ref_pos_map[con][Pos1.first].insert(Pos1);
-      for ( auto & j : i.second ){
-	j.cr = 0 ;
-	j.sr = 0 ;
-	j.pe = 0 ;
-	j.mq = 0 ;
-	j.nxa = 0;
-	j.tcb = 0;
-	j.depdif = 0 ;
-	j.entropy = 0 ;
-
-	j.cr2 = 0 ;
-	j.sr2 = 0 ;
-	j.pe2 = 0 ;
-	j.mq2 = 0 ;
-	j.nxa2 = 0;
-	j.tcb2 = 0;
-	j.depdif2 = 0 ;
-	j.entropy2 = 0 ;
-      }
-    }
-  }
-
-  /////////////////////////////////////////////////////////////////
-
-  while ( reader.GetNextAlignment(al) ){
-
-    // Update DEPDIF after scanning one chromosome
-    if (al.RefID != exal.RefID && check ){
-      std::cout << ref_id_map[exal.RefID] <<" done\n";
-      int Size = (int) references[exal.RefID].RefLength;
-
-      for ( std::size_t con = 0 ; con < container_vec.size() ; con ++ ){
-	for ( auto & i : ref_pos_map[con][exal.RefID] ){
-	  Pos = i;
-	  double depdif = return_depdif(Pos, dep_vec, Size, read_length);
-	  for ( auto & vcf : container_vec[con].vcf_map[Pos] ){
-	    if ( vcf.svtype != "SND" ){
-	      vcf.depdif = depdif ; // update depdif
-	      Pos.first = id_ref_map[vcf.chr2];
-	      Pos.second= vcf.pos2;
-	      vcf.depdif2 = return_depdif(Pos, dep_vec, Size, read_length);
-	    }
-	    else{
-	      vcf.depdif2 = vcf.depdif;
-	    }
-	  }
-	}
-      }
-      dep_vec.clear();
-      Size = (int) references[al.RefID].RefLength;
-      dep_vec.resize(Size);
-    }
-    if ( ! check ){
-      int Size = (int) references[al.RefID].RefLength;
-      dep_vec.resize(Size);
-      check = true;
-    }
-    
-    
-    /////////////////////////////////////////////////////
-    // Scanning clipped read map and mapping quality map
-    if ( al.CigarData.size() > 0 ){
-      if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
-	Pos1.first = al.RefID;
-	Pos1.second = al.Position;
-	if ( Pos1.first >= 0 && Pos1.second >= 0 ){
-	  cr_map [ Pos1 ] ++;
-	  mq_map [ Pos1 ] += al.MapQuality ;
-	  tcb_map [ Pos1 ]+= al.CigarData[0].Length ; 
-	}
-      }
-      if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
-	Pos1.first = al.RefID;
-	Pos1.second = al.GetEndPosition() - 1;
-	if ( Pos1.first >= 0 && Pos1.second >= 0 ){
-	  cr_map [ Pos1 ] ++ ;
-	  mq_map [ Pos1 ] += al.MapQuality ;
-	  tcb_map [ Pos1 ]+= al.CigarData[al.CigarData.size()-1].Length ; 
-	}
-      }
-    }
-
-    /////////////////////////////////////////////////////
-    // Scanning split read map
-    std::string Tag;
-    if ( al.GetTag<std::string>("SA",Tag) ){
-      std::vector < std::string > tag_vec;
-      while ( Tag.size() > 0 ){
-	std::string tmp = parse_SA_tag(Tag);
-	tag_vec.push_back( tmp );
-      }
-      for ( auto tag : tag_vec){
-	if ( al.CigarData.size() > 0 ){
-	  if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
-	    Pos1.first = al.RefID ;
-	    Pos1.second = al.GetEndPosition()-1;
-	    Pos2 = find_split(tag,id_ref_map);
-	    if ( Pos2.second > -1 ){
-	      sr_map[Pos1][Pos2]++;
-	    }
-	  }
-	  if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
-	    Pos1.first = al.RefID ;
-	    Pos1.second = al.Position;
-	    Pos2 = find_split(tag,id_ref_map);
-	    if ( Pos2.second > -1 ){
-	      sr_map[Pos1][Pos2]++;
-	    }
-	  }
-	}
-      }
-    }    
-    // SND
-    if ( ! al.IsMateMapped () ){
-      if ( al.CigarData.size() > 0 ){
-	if ( al.CigarData[al.CigarData.size()-1].Type == 'S' || al.CigarData[al.CigarData.size()-1].Type == 'H' ){
-	  Pos1.first = al.RefID ;
-	  Pos1.second = al.GetEndPosition()-1;
-	  un_map[Pos1] ++;
-	}
-	if ( al.CigarData[0].Type == 'S' || al.CigarData[0].Type == 'H' ){
-	  Pos1.first = al.RefID ;
-	  Pos1.second = al.Position;
-	  un_map[Pos1] ++;
-	}
-      }
-    }
-
-    /////////////////////////////////////////////////////
-    // Scanning discordant map
-    Pos1.first = al.RefID;
-    Pos1.second = al.Position + read_length / 2 ;
-    Pos1.second /= pe_window_size ;
-
-    Pos2.first = al.MateRefID;
-    Pos2.second = al.MatePosition + read_length / 2 ;
-    Pos2.second /= pe_window_size ;
-
-    if ( Pos1.first != Pos2.first ){
-      pe_map[Pos1][Pos2]=1;
-      pe_map[Pos2][Pos1]=1;
-      // pe_map[Pos1][Pos2]++;
-      // pe_map[Pos2][Pos1]++;
-    }
-    else if ( Pos1.second - Pos2.second > 2 * insert_size / pe_window_size || Pos1.second - Pos2.second < - 2 * insert_size / pe_window_size ){
-      pe_map[Pos1][Pos2]=1;
-      pe_map[Pos2][Pos1]=1;
-      // pe_map[Pos1][Pos2]++;
-      // pe_map[Pos2][Pos1]++;
-    }
-
-
-
-    /////////////////////////////////////////////////////
-    // depth array
-    const int start = al.Position ;
-    const int end = al.GetEndPosition() - 1 ;
-
-    for ( int i = start ; i < end ; i ++ ){
-      dep_vec[i] ++ ;
-    }
-
-    exal = al;
-  } // End of while()
-
-
-  // Update DEPDIF after scanning one chromosome
-  int Size = (int) references[exal.RefID].RefLength;
-  for ( std::size_t con = 0 ; con < container_vec.size() ; con ++ ){
-    for ( auto & i : ref_pos_map[con][exal.RefID] ){
-      Pos = i;
-      double depdif = return_depdif(Pos, dep_vec, Size, read_length);
-      for ( auto & vcf : container_vec[con].vcf_map[Pos] ){
-	vcf.depdif = depdif ; // update depdif
-	Pos.first = id_ref_map[vcf.chr2];
-	Pos.second= vcf.pos2;
-	vcf.depdif2 = return_depdif(Pos, dep_vec, Size, read_length);
-      }
-    }
-  }
-  dep_vec.clear();
-
-  std::cout << "Scanning done\n";
-  std::cout << "Complete: DEPDIF\n";
-
-  
-  /////////////////////////////////////////////////////
-  // Calculatiing CR
-  for ( std::size_t con = 0 ; con < container_vec.size() ; con ++ ){
-    for ( auto & i : container_vec[con].vcf_map ){
-      // cr
-      Pos1 = i.first;
-      Position Posa = Pos1;
-      for ( auto & vcf : i.second ){
-	for (int k = - confi_window ; k < confi_window - 1; k ++ ){
-	  Posa.second = Pos1.second + k ;
-	  if ( cr_map.find(Posa) != cr_map.end() ){
-	    vcf.cr += cr_map [Posa];
-	    vcf.mq += mq_map [Posa];
-	    vcf.tcb+= tcb_map[Posa];
-	  }
-	}
-	if ( vcf.svtype != "SND" ){
-	  Pos2.first = id_ref_map[vcf.chr2];
-	  Pos2.second = vcf.pos2;
-	  Position Posb = Pos2;
-	  for (int k = - confi_window ; k < confi_window - 1; k ++ ){
-	    Posb.second = Pos2.second + k ;
-	    if ( cr_map.find(Posb) != cr_map.end() ){
-	      vcf.cr2 += cr_map [Posb];
-	      vcf.mq2 += mq_map [Posb];
-	      vcf.tcb2+= tcb_map[Posb];
-	    }
-	  }
-	}
-	else{
-	  vcf.cr2 = vcf.cr;
-	  vcf.mq2 = vcf.mq;
-	  vcf.tcb2= vcf.tcb;
-	}
-      }
-    }
-  }
-
-  /////////////////////////////////////////////////////
-  // Calculatiing MQ
-  for ( std::size_t con = 0 ; con < container_vec.size() ; con ++ ){
-    for ( auto & i : container_vec[con].vcf_map ){
-      for ( auto & vcf : i.second ){
-	if ( vcf.cr !=0 ) vcf.mq  /= vcf.cr ;
-	if ( vcf.cr2!=0 ) vcf.mq2 /= vcf.cr2;
-      }
-    }
-  }
-  std::cout << "Complete: CR\n";
-  std::cout << "Complete: MQ\n";
-  std::cout << "Complete: TCB\n";
-
-
-  /////////////////////////////////////////////////////
-  // Calculatiing SR
-  for ( std::size_t con = 0 ; con < container_vec.size() ; con ++ ){
-    for ( auto & i : container_vec[con].vcf_map ){
-      Pos1 = i.first;
-      Position Posa = Pos1;
-      for ( auto & vcf : i.second ){
-	if ( vcf.svtype!="SND"){
-	  Pos2.first = id_ref_map[vcf.chr2];
-	  Pos2.second = vcf.pos2;
-	  Position Posb = Pos2;
-	  for (int k = - confi_window ; k < confi_window - 1; k ++ ){
-	    Posa.second = Pos1.second + k ;
-	    if ( sr_map.find(Posa) != sr_map.end() ){
-	      for ( int l = - confi_window ; l <= confi_window - 1; l ++ ){
-		Posb.second = Pos2.second + l ;
-		if ( sr_map[Posa].find(Posb) != sr_map[Posa].end() ){
-		  vcf.sr += sr_map[Posa][Posb];
-		}
-	      }
-	    }
-	  }
-	}
-	else{ // SND
-	  for (int k = - confi_window ; k < confi_window - 1; k ++ ){ 
-	    Posa.second = Pos1.second + k ;
-	    if ( un_map.find(Posa) != un_map.end() ){ 
-	      vcf.sr += un_map[Posa];
-	      vcf.pe += un_map[Posa];
-	    }
-	  }
-	}
-      }
-    }
-
-    for ( auto & i : container_vec[con].vcf_map ){
-      for ( auto & vcf : i.second ){
-	vcf.sr2 = vcf.sr;
-      }
-    }
-  }
-
-  std::cout << "Complete: SR\n";
-
-
-  /////////////////////////////////////////////////////
-  // Calculatiing PE
-  for ( std::size_t con = 0 ; con < container_vec.size() ; con ++ ){
-    for ( auto & i : container_vec[con].vcf_map ){
-      Pos1 = i.first;
-      Position Posa = Pos1;
-      Posa.second += read_length / 2;
-      Posa.second /= pe_window_size;
-      for ( auto & vcf : i.second ){
-	Pos2.first = id_ref_map[vcf.chr2];
-	Pos2.second = vcf.pos2;
-	Position Posb = Pos2;
-	Posb.second += read_length / 2;
-	Posb.second /= pe_window_size ;
-	for (int k = - 2 * insert_size / pe_window_size ; k <= 2 * insert_size / pe_window_size ; k ++ ){
-	  Posa.second = ( Pos1.second / pe_window_size ) + k ;
-	  if ( pe_map.find(Posa) != pe_map.end() ){
-	    for ( int l = - 2 * insert_size / pe_window_size ; l <= 2 * insert_size / pe_window_size ; l ++ ){
-	      Posb.second = ( Pos2.second / pe_window_size ) + l ;
-	      if ( pe_map[Posa].find(Posb) != pe_map[Posa].end() ){
-		vcf.pe += pe_map[Posa][Posb];
-	      }
-	    }
-	  }
-	}
-      }
-    }
-    for ( auto & i : container_vec[con].vcf_map ){
-      for ( auto & vcf : i.second ){
-	vcf.pe /= 2;
-      }
-    }
-
-  // If sv type is SND, it is assumed that its PE is same with SR.
-    for ( auto & i : container_vec[con].vcf_map ){
-      for ( auto & vcf : i.second ){
-	if ( vcf.svtype == "SND" ){
-	  vcf.pe = vcf.sr;
-	}
-      }
-    }
-    
-    for ( auto & i : container_vec[con].vcf_map ){
-      for ( auto & vcf : i.second ){
-	vcf.pe2 = vcf.pe;
-      }
-    }
-  }
-
-  std::cout << "Complete: PE \n";
-
-
-  /////////////////////////////////////////////////////
-  // Calculatiing ENTROPY
-  std::map<Position,double> entropy_map;
-  for ( auto & i : sr_map ){
-    if ( i.second.size() < 2 ){
-      entropy_map[i.first] = 0 ;
-    }
-    else{
-      double sum = 0, prob = 0, entropy = 0 ;
-      for ( auto & j : i.second ){
-        sum += (double) j.second ;
-      }
-      for ( auto & j : i.second ){
-        if ( sum > 0 ) prob = ( (double) j.second ) / sum ;
-	if ( prob > 0 ) entropy = - prob * log ( prob );
-      }
-      if ( entropy < 0.000001 ) entropy = 0;
-      entropy_map[i.first]=entropy;
-    }
-  }
-
-
-  for ( std::size_t con = 0 ; con < container_vec.size() ; con ++ ){
-    for ( auto & i : container_vec[con].vcf_map ){
-      Pos1 = i.first;
-      Position Posa = Pos1;
-      for ( auto & vcf : i.second ){
-	for (int k = - confi_window ; k < confi_window - 1; k ++ ){
-	  Posa.second = Pos1.second + k ;
-	  if ( entropy_map.find(Posa) != entropy_map.end() ){
-	    vcf.entropy += entropy_map[Posa];
-	  }
-	}
-	if ( vcf.svtype != "SND" ){
-	  Pos2.first = id_ref_map[vcf.chr2];
-	  Pos2.second = vcf.pos2;
-	  Position Posb = Pos2;
-	  for (int k = - confi_window ; k < confi_window - 1; k ++ ){
-	    Posb.second = Pos2.second + k ;
-	    if ( entropy_map.find(Posb) != entropy_map.end() ){
-	      vcf.entropy2 += entropy_map[Posb];
-	    }
-	  }
-	}
-	else{
-	  vcf.entropy2 = vcf.entropy;
-	}
-      }
-    }
-  }
-  std::cout << "Complete: ENTROPY\n";
-
-
-
-  /////////////////////////////////////////////////////
-  // make info field
-  for ( std::size_t con = 0 ; con < container_vec.size() ; con ++ ){
-    for ( auto & i : container_vec[con].vcf_map ){
-      for ( auto & j : i.second ){
-	j.make_info(); // update info
-      }
-    }
-  }
-  std::cout << "Complete: feature calculation\n";
-
-}
