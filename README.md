@@ -1,7 +1,7 @@
 ---
 # ETCHING
 
-### Version 1.1.6 (2020.1.12.)
+### Version 1.2.0 (2020.1.19.)
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 

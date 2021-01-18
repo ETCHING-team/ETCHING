@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.1.6 (released 2021.1.12)"
+VERSION="ETCHING_v1.2.0 (released 2021.1.19)"
 
 #--------------------------------------------------------------------
 # Copyright 2020. Bioinformatic and Genomics Lab.

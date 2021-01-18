@@ -184,6 +184,7 @@ int main ( int argc , char ** argv ){
 
   std::cout << "Calculating features\n";
   calc_feature(infile,feature_file);
+
   std::cout << "Scoring_command:\t";
   command = "scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
   echo="echo \"" + command + "\"";

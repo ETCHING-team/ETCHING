@@ -634,11 +634,11 @@ void VCF_CLASS::make_header_short(){
 
 
 VCF_CLASS::VCF_CLASS(){
-  etching_version="ETCHING_v1.1.6 (released 2021.1.12.)";
+  etching_version="ETCHING_v1.2.0 (released 2021.1.19.)";
 }
 
 VCF_CLASS::VCF_CLASS(const std::string infile){
-  etching_version="ETCHING_v1.1.6 (released 2021.1.12.)";
+  etching_version="ETCHING_v1.2.0 (released 2021.1.19.)";
   read_vcf_file(infile);
 }
 
