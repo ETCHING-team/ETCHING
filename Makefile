@@ -8,7 +8,7 @@ default:
 	cd Sorter && make
 	cd FG_identifier && make
 	bash decomp.sh
-	if [[ ! -d "bin" ]]; then mkdir bin ; fi
+	if [ ! -d "bin" ]; then mkdir bin ; fi
 	cp ETCHING/etching bin/
 	cp Filter/etching_filter bin/
 	cp Filter/kmer_filter bin/
@@ -17,20 +17,23 @@ default:
 	cp Filter/KMC3/kmc* bin/
 	cp Filter/fastq_check bin/
 	cp Filter/sort_fastq_mem_eff bin/
+	cp Filter/match_pair bin/
 	cp Caller/estimate_coverage bin/
 	cp Caller/etching_caller bin/
 	cp Caller/etching_typer bin/
 	cp Sorter/etching_sorter bin/
 	cp Sorter/scorer_RandomForest bin/
 	cp Sorter/scorer_XGBoost bin/
+	cp Sorter/cut_by_score bin/
 	cp FG_identifier/etching_fg_identifier bin/
+	cp -ar ETCHING_ML_model bin/
 
 all: library default
 
 
 	cd lib/zlib && make
 clean:
-	rm -f bin/*
+	rm -rf bin/*
 	cd ETCHING && make clean
 	cd Filter && make clean
 	cd Caller && make clean

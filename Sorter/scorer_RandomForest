@@ -6,6 +6,8 @@
 # Coded by A. Vipin Menon (a.vipin.menon@gmail.com)
 #-------------------------------------------------------------------- 
 
+# version 1.2.0
+
 import pickle
 import os
 import sys

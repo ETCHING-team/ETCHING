@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.2.0 (released 2021.1.19)"
+VERSION="ETCHING_v1.2.1 (released 2021.1.20.)"
 
 #--------------------------------------------------------------------
 # Copyright 2020. Bioinformatic and Genomics Lab.
 # Hanyang University, Seoul, Korea
 # Coded by Jang-il Sohn (sohnjangil@gmail.com)
 #--------------------------------------------------------------------  
+
+MODEL_VERSION="1.2.0"
 
 #############################
 #
@@ -31,73 +33,87 @@ function USAGE {
     echo -e
     echo -e "[Options]"
     echo -e "-p  (string)\tPrefix of output [etching]"
+    echo -e "-w  (string)\tWorking directory [-p]"
     echo -e "-t  (int)   \tNumber of threads [8]"
-    echo -e "-l  (int)   \tk-mer size (<=32) [31]"
-    echo -e "            \tPlease check k-mer size before using -f option."
-    echo -e "-a  (string)\tAnnotation file in gtf [null]. Only if you use this option, Fusion-genes will be predicted in a genome level."
-    echo -e "-F          \tFast-bam mode only for -b option [null]"
+    #echo -e "-l  (int)   \tk-mer size (<=32) [31]"
+    #echo -e "            \tWarning! Do not use this option, unless you know the details of ETCHING-Filter."
+    echo -e "-a  (string)\tAnnotation file in gtf. If you use this option, Fusion-genes will be predicted in a genome level."
+    echo -e "-F          \tFast-bam mode for -b option"
+    echo -e "-M          \tUsing pre-alignment result for -b option"
     echo -e
     echo -e "Samples"
-    echo -e "-T  (string)\tW for WGS, P for Panel [W]"
-    echo -e "-P  (double)\tTumor purity in somatic call (0-1) [0.75]. Note: Set 1 for germline call."
-    echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from sample sequencing reads [automatic]"
-    echo -e "            \tif you want to specify it, we recommand 3-7 for WGS data, and 5-10 for targeted panel sequencing data."
-    echo -e "            \tThe lesser, the more sensitive, and the more, the more specific."
-    echo -e "-M  (int)   \tExclude the k-mers counted more than this [10000]."
+    #echo -e "-T  (string)\tW for WGS, P for Panel [W]"
+    #echo -e "-P  (double)\tTumor purity in somatic call (0-1) [0.75]. Note: Set 1 for germline call."
+    echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from sample sequencing reads [3]"
+    #echo -e "            \tif you want to specify it, we recommand 3-7 for WGS data, and 5-10 for targeted panel sequencing data."
+    #echo -e "--max-kmer  (int)   \tExclude the k-mers counted more than this [10000]."
     echo -e "-I  (int)   \tInsert-size [500]"
-    echo -e "-L  (int)   \tRead-length [automatic]"
+    #echo -e "-L  (int)   \tRead-length [automatic]"
     echo -e "-O  (string)\tRead-orientation FR or RF. [FR]"
-    echo -e "-D  (int)   \tSequencing depth [automatic]"
-    echo -e "            \tNote: In case of panel, sequencing data have ~500X or more depth. However, we set to 50 for panel."
+    #echo -e "-D  (int)   \tSequencing depth [automatic for WGS; 500 for panel]"
+    #echo -e "            \tNote: This is used only for WGS read filtration, and not affecting on SV calling or scoring."
     echo -e
     echo -e "Control sample (matched normal in somatic call)"
-    echo -e "-1c (string)\tFirst fastq file of paried-end [null]"
-    echo -e "-2c (string)\tSecond fastq file of paried-end [null]. -1c and -2c must be used together."
-    echo -e "-bc (string)\tAligned bam file of paried-end [null]"
+    echo -e "-1c (string)\tFirst fastq file of paried-end"
+    echo -e "-2c (string)\tSecond fastq file of paried-end. -1c and -2c must be used together."
+    echo -e "-bc (string)\tAligned bam file of paried-end"
+    echo -e "--kmer-table (string)\tUsing already made k-mer table ignoring -1/2/bc options"
     echo -e 
     echo -e "K-mer database"
-    echo -e "-f  (string)\tPrefix of KMC3 k-mer database [null]"
-    echo -e "            \tIf you have /path/to/PGK.kmc_pre and /path/to/PGK.kmc_suf, use \"-f /path/to/PGK\""
+    echo -e "-f  (string)\tPrefix of KMC3 k-mer database"
+    echo -e "            \tuse \"-f /path/to/PGK\" for /path/to/PGK.kmc_pre and /path/to/PGK.kmc_suf"
     echo -e 
-    echo -e "Initial SV call"
-    echo -e "-A          \tUse all split-reads [Null]"
-    echo -e "            \tThis option increases recall. However, lots of false-positives also can be generated."
-    echo -e 
+    #echo -e "Initial SV call"
+    #echo -e "-A          \tUse all split-reads"
+    #echo -e "            \tThis option increases recall. However, lots of false-positives also can be generated."
+    #echo -e 
     echo -e "FP SV removing"
-    echo -e "-R          \tRandom Forest in scoring [default]"
-    echo -e "-X          \tXGBoost in scoring"
+    #echo -e "-R          \tRandom Forest in scoring [default]"
+    #echo -e "-X          \tXGBoost in scoring"
     echo -e "-C  (double)\tCut-off of false SVs [0.4]"
-    echo -e "-m  (string)\tPath to ETCHING machine learning model [\$ETCHING_ML_PATH]"
-    echo -e "-Q          \tTag SVs with quality tags \"PASS\"or \"LOWQUAL\" not removing low quality SVs [NONE]"
+    echo -e "-m  (string)\tPath to ETCHING machine learning model"
     echo -e 
     echo -e "Others"
-    echo -e "-S  (string)\t/path/to/samtools [system]"
-    echo -e "-B  (string)\t/path/to/bwa [system]"
-    echo -e "-E          \tStore k-mer database files [remove kmc files]"
+    echo -e "-S  (string)\t/path/to/samtools"
+    echo -e "-B  (string)\t/path/to/bwa"
+    echo -e "-E          \tStore k-mer database files"
     echo -e 
     echo -e "About ETCHING"
     echo -e "-h          \tPrint this message"
     echo -e "-v          \tPrint version"
+    echo -e "--example   \tShow examples"
     echo -e 
-    echo -e "Examples)"
-    echo -e "For WGS data of read-length 150, insert-size 500, and tumor purity 0.5,"
-    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -p OUTPUT_prefix -t 30 -L 150 -P 0.5"
-    echo -e 
-    echo -e "If you have a bam file for tumor sample, you can use bam mode with the command below"
-    echo -e "\$ etching -b tumor.bam -1c normal_1.fq -2c normal_2.fq -p OUTPUT_prefix -t 30 -L 150 -P 0.5"
+    echo -e "[Contact]"
+    echo -e "Please report bugs to"
+    echo -e "\tJang-il Sohn (sohnjangil@gmail.com)"
+    echo -e "\tJin-Wu Nam (jwnam@hanyang.ac.kr)"
     echo -e
-    echo -e "Fastq-bam mode"
-    echo -e "\$ etching -b tumor.bam -F -1c normal_1.fq -2c normal_2.fq -p OUTPUT_prefix -t 30 -L 150 -P 0.5"
+}
+
+function EXAMPLE {
+    echo -e "ETCHING examples)"
+    echo -e 
+    echo -e "Fastq input files: tumor_1/2.fq, normal_1/2.fq"
+    echo -e "Pre-made PGK (kmc database file): PGK.kmc_pre, PGK.kmc_suf"
+    echo -e "Thread 30"
+    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -f PGK -p OUTPUT_prefix -t 30"
+    echo -e 
+    echo -e "Bam input files"
+    echo -e "\$ etching -b tumor.bam -F -bc normal.bam -f PGK -p OUTPUT_prefix -t 30"
+    echo -e
+    echo -e "You can use a bam file for tumor sample"
+    echo -e "\$ etching -b tumor.bam 1c normal_1.fq -2c normal_2.fq -p OUTPUT_prefix -t 30"
     echo -e
     echo -e "You can use a bam file for normal sample"
-    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -bc normal.bam -p OUTPUT_prefix -t 30 -L 150 -P 0.5"
+    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -bc normal.bam -p OUTPUT_prefix -t 30"
     echo -e
-    echo -e "Sequencing depth is calculated automatically."
-    echo -e "If you want to specify sequencing depth, use -D."
-    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -bc normal.bam -p OUTPUT_prefix -t 30 -L 150 -P 0.5 -D 35"
-    echo -e
-    echo -e "For panel data, add -T P"
-    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -p OUTPUT_prefix -t 30 -L 150 -P 0.5 -T P"
+    echo -e "If you want to use pre-made k-mer table (31-mer only), use --kmer-table option"
+    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -p OUTPUT_prefix -t 30 --kmer-table tumor_specific_kmer_table.txt"
+    echo -e 
+    echo -e "k-mer table must be like:"
+    echo -e "AACCTAACCTAACCTAACCTAACCTAACCTG 14"
+    echo -e "AACCTAACCTAACCTAACCTAACCTAACCAA 12"
+    echo -e "AACCTAACCTAACCTAACCTAACCTAACCAC 4"
     echo -e 
     echo -e "[Contact]"
     echo -e "Please report bugs to"
@@ -131,7 +147,7 @@ FAST_BAM=
 
 DATATYPE=W
 PURITY=0.75
-KMERCUTOFF=
+KMERCUTOFF=3
 MAXK=10000
 INSERTSIZE=500
 READLENGTH=
@@ -142,7 +158,9 @@ SECOND_CONT=
 BAM_CONT=
 FILTER=
 
-ALLSPLIT=
+KMER_TABLE=
+
+ALLSPLIT="-A"
 DEPTH=
 
 ALGOR=
@@ -150,13 +168,12 @@ ALGOR_R=0
 ALGOR_X=0
 CUTOFF=0.4
 ML_PATH=
-QUALITY_TAG=
 
 MAPPER=
 SAMTOOLS=
 STORE_KMC=
 
-while [ "$1" != "" ]; do
+while [ ${#1} != 0 ]; do
     case $1 in
         -1 | --first )  shift
             FIRST=$1
@@ -175,18 +192,24 @@ while [ "$1" != "" ]; do
         -p | --prefix )  shift
             PREFIX=$1
             ;;
+        -w | --work-dir )  shift
+            WORKDIR=$1
+            ;;
         -t | --threads ) shift
 	    THREADS=$1
             ;;
-        -l | --k-mer-size ) shift
-	    KL=$1
-            ;;
+        #-l | --k-mer-size ) shift
+	#    KL=$1
+        #-l    ;;
 
 
         -a | --annotation ) shift
 	    ANNOTATION=$1
             ;;
 
+        -M )
+	    KEEP_ALIGNMENT="-M"
+            ;;
         -F | --fastq-bam )
 	    FAST_BAM="-F"
             ;;
@@ -201,15 +224,15 @@ while [ "$1" != "" ]; do
         -K | --kmer_cutoff ) shift
 	    KMERCUTOFF=$1
             ;;
-        -M | --max-k-mer-freq ) shift
+        --max-kmer ) shift
 	    MAXK=$1
             ;;
         -I | --insert ) shift
 	    INSERTSIZE=$1
             ;;
-        -L | --read_length ) shift
-	    READLENGTH=$1
-            ;;
+        #-L | --read_length ) shift
+	#    READLENGTH=$1
+        #    ;;
         -O | --orientation ) shift
 	    ORIENT=$1
             ;;
@@ -230,6 +253,9 @@ while [ "$1" != "" ]; do
 	-f | --k-mer-database ) shift
 	    FILTER=$1
 	    ;;
+	--kmer-table ) shift
+	    KMER_TABLE=$1
+	    ;;
 
 
         -A | --all_split )
@@ -249,10 +275,6 @@ while [ "$1" != "" ]; do
         -m | --path_to_machine_learning_model ) shift
 	    ML_PATH=$1
             ;;
-        -Q  ) 
-	    QUALITY_TAG="-Q"
-            ;;
-
 
         -S | --samtools ) shift
 	    SAMTOOLS=$1
@@ -265,11 +287,17 @@ while [ "$1" != "" ]; do
             ;;
 
         -h | --help ) USAGE
-            exit
+            exit 0
+            ;;
+
+        --example ) EXAMPLE
+            exit 0
             ;;
 
 
-        -v | --version ) echo -e $VERSION
+        -v | --version ) 
+	    echo -e $VERSION
+	    echo -e "ML model version: ${MODEL_VERSION}"
             exit
             ;;
 
@@ -282,6 +310,13 @@ while [ "$1" != "" ]; do
     esac
     shift
 done
+
+
+#############################
+#
+# example
+#
+
 
 
 
@@ -316,6 +351,12 @@ then
     if [ ${#BAM} != 0 ]
     then
 	echo "ERROR!!! Do not use -1, -2 and -b at a same time."
+	exit -1
+    fi
+
+    if [ ${#KEEP_ALIGNMENT} != 0 ]
+    then
+	echo "ERROR!!! Do not use -M with -1 and -2 options."
 	exit -1
     fi
 
@@ -483,73 +524,76 @@ fi
 
 
 #############################
+#
+# Convert to absolute path if relative path
+#
+
+
+DIR=$(echo $0 | sed 's/etching$//g')
+cd $DIR
+PATH=$PWD:$PATH
+cd - > /dev/null
+
+PRESENT_PATH=$PWD
+
+
+#############################
 # 
 # Check machine learning paths and files
 #
-if [ ${#ETCHING_ML_PATH} == 0 ] && [ ${#ML_PATH} == 0 ]
-then
-    echo "ERROR!!!"
-    echo "You need to set"
-    echo " export ETCHING_ML_PATH=/path/to/etching/ML_model"
-    echo "or run with the option"
-    echo " -m /path/to/etching/ML_model"
-    exit -1
-fi
+
+ETCHING_ML_PATH=$DIR/ETCHING_ML_model
+
+#if [ ${#ETCHING_ML_PATH} == 0 ] && [ ${#ML_PATH} == 0 ]
+#then
+#    echo "ERROR!!!"
+#    echo "You need to set -m /path/to/etching/ML_model"
+#    exit -1
+#fi
 
 if [ ${#ML_PATH} != 0 ]
 then
-    PRESENT_PATH=$PWD
     cd ${ML_PATH}
     ML_PATH=$PWD
     cd $PRESENT_PATH
+else
+    ML_PATH=$ETCHING_ML_PATH
 fi
+cd $ML_PATH
+ML_PATH=$PWD
+cd - > /dev/null
 
-
-CHECK_PATH=$ETCHING_ML_PATH
-if [ ${#ML_PATH} != 0 ]
-then
-    CHECK_PATH=$ML_PATH
-fi
-
-TMP="rf"
+TMP="rf_${MODEL_VERSION}"
 if [ $ALGOR == "-X" ]
 then
     TMP="xgb"
 fi
 
+
 for i in {1..10}
 do
-    if [ ! -f ${CHECK_PATH}/etching_${TMP}_${i}.sav ]
+    if [ ! -f ${ML_PATH}/etching_${TMP}_${i}.sav ]
     then
-	echo "ERROR!!!"
-	echo "No model files in ${CHECK_PATH}"
-	echo "-------------------------------"
-	exit -1
+	if [ -f ${ML_PATH}/etching_${TMP}_${i}.sav.gz ]
+	then
+	    gzip -dc ${ML_PATH}/etching_${TMP}_${i}.sav.gz > ${ML_PATH}/etching_${TMP}_${i}.sav
+	else
+	    echo "ERROR!!!"
+	    echo "No model files in ${CHECK_PATH}"
+	    echo "-------------------------------"
+	    exit -1
+	fi
     fi
 done
 
 
 #############################
 #
-# Convert to absolute path if relative path
-#
-
-DIR=$(echo $0 | sed 's/etching$//g')
-check_dir=$(echo $DIR | cut -b 1 )
-if [ $check_dir != "/" ]
-then
-    cd $DIR
-    DIR=$PWD"/"
-    cd - > /dev/null
-fi 
-
-#############################
-#
 # CHECKING REQUIRED PROGRAMS
 #
-for i in etching_filter estimate_coverage etching_caller etching_sorter etching_fg_identifier kmer_filter read_collector read_length_calc fastq_check
+for i in cut_by_score estimate_coverage etching etching_caller etching_fg_identifier etching_filter etching_sorter etching_typer fastq_check kmc kmc_dump kmc_tools kmer_filter match_pair read_collector read_length_calc scorer_RandomForest scorer_XGBoost sort_fastq_mem_eff
 do
-    CHECK=$(which ${DIR}${i})
+    CHECK=$(which ${i})
     
     if [ ${#CHECK} == 0 ]
     then
@@ -562,9 +606,13 @@ done
 
 
 
+#############################
+#
+# CHECKING REQUIRED LD_LIBRARY_PATH
+#
 for i in etching_caller etching_sorter etching_fg_identifier read_collector read_length_calc fastq_check
 do
-    CHECK=$(${DIR}${i} 2> library_check.txt)
+    CHECK=$(${i} 2> library_check.txt)
     CHECK=$(cat library_check.txt)
     if [ ${#CHECK} != 0 ]
     then
@@ -621,14 +669,23 @@ fi
 #
 # check working directory
 #
-WORKDIR=${PREFIX}
 
-if [ -d ${WORKDIR} ]
+if [ ${#WORKDIR} == 0 ]
 then
-    echo "Warning!!! There is a directory: ${WORKDIR}"
-else
-    mkdir ${WORKDIR}
+    WORKDIR=${PREFIX}
 fi
+
+if [ ! -d ${WORKDIR} ]
+then
+    cmd="mkdir ${WORKDIR}"
+    echo $cmd
+    eval $cmd
+fi
+
+cd $WORKDIR
+WORKDIR=$PWD
+cd - > /dev/null
+
 
 cmd="cd $WORKDIR"
 echo $cmd
@@ -642,7 +699,7 @@ then
     then
 	ln -s $FIRST
     else
-	ln -s ../$FIRST
+	ln -s ${PRESENT_PATH}/$FIRST
     fi
     FIRST=$(echo $FIRST | awk -F "/" '{print $NF}')
 fi
@@ -654,7 +711,7 @@ then
     then
 	ln -s $FIRST_CONT
     else
-	ln -s ../$FIRST_CONT
+	ln -s ${PRESENT_PATH}/$FIRST_CONT
     fi
     FIRST_CONT=$(echo $FIRST_CONT | awk -F "/" '{print $NF}')
 fi
@@ -667,7 +724,7 @@ then
     then
 	ln -s $SECOND
     else
-	ln -s ../$SECOND
+	ln -s ${PRESENT_PATH}/$SECOND
     fi
     SECOND=$(echo $SECOND | awk -F "/" '{print $NF}')
 fi
@@ -680,7 +737,7 @@ then
     then
 	ln -s $SECOND_CONT
     else
-	ln -s ../$SECOND_CONT
+	ln -s ${PRESENT_PATH}/$SECOND_CONT
     fi
     SECOND_CONT=$(echo $SECOND_CONT | awk -F "/" '{print $NF}')
 fi
@@ -693,7 +750,7 @@ then
     then
 	ln -s $BAM
     else
-	ln -s ../$BAM
+	ln -s ${PRESENT_PATH}/$BAM
     fi
     BAM=$(echo $BAM | awk -F "/" '{print $NF}')
 fi
@@ -706,7 +763,7 @@ then
     then
 	ln -s $BAM_CONT
     else
-	ln -s ../$BAM_CONT
+	ln -s ${PRESENT_PATH}/$BAM_CONT
     fi
     BAM_CONT=$(echo $BAM_CONT | awk -F "/" '{print $NF}')
 fi
@@ -718,7 +775,7 @@ then
     then
 	ln -s $FILTER_PRE
     else
-	ln -s ../$FILTER_PRE
+	ln -s ${PRESENT_PATH}/$FILTER_PRE
     fi
 fi
 
@@ -730,7 +787,7 @@ then
     then
 	ln -s $FILTER_SUF
     else
-	ln -s ../$FILTER_SUF
+	ln -s ${PRESENT_PATH}/$FILTER_SUF
     fi
 fi
 FILTER=$(echo $FILTER | awk -F "/" '{print $NF}')
@@ -743,7 +800,7 @@ then
     then
 	ln -s $ANNOTATION
     else
-	ln -s ../$ANNOTATION
+	ln -s ${PRESENT_PATH}/$ANNOTATION
     fi
     ANNOTATION=$(echo $ANNOTATION | awk -F "/" '{print $NF}')
 fi
@@ -754,9 +811,23 @@ then
     FC=$(echo $GENOME | head -c 1 )
     if [ $FC != "/" ]
     then
-	GENOME="../${GENOME}"
+	GENOME="${PRESENT_PATH}/${GENOME}"
     fi
 fi
+
+
+if [ ${#KMER_TABLE} != 0 ]
+then
+    FC=$(echo $KMER_TABLE | head -c 1 )
+    if [ $FC == "/" ]
+    then
+        ln -s $KMER_TABLE
+    else
+        ln -s ${PRESENT_PATH}/$KMER_TABLE
+    fi
+    KMER_TABLE=$(echo $KMER_TABLE | awk -F "/" '{print $NF}')
+fi
+
 
 #######################################################################################
 
@@ -840,9 +911,9 @@ if [ ${#MAXK} != 10000 ]
 then
     if [ ${#OPTIONS} != 0 ]
     then
-	OPTIONS="${OPTIONS} -M $MAXK"
+	OPTIONS="${OPTIONS} --max-kmer $MAXK"
     else
-	OPTIONS="-M $MAXK"
+	OPTIONS="--max-kmer $MAXK"
     fi
 fi
 
@@ -907,6 +978,16 @@ then
     fi
 fi
 
+if [ ${#KMER_TABLE} != 0 ]
+then
+    if [ ${#OPTIONS} != 0 ]
+    then
+	OPTIONS="${OPTIONS} --kmer-table ${KMER_TABLE}"
+    else
+	OPTIONS="--kmer-table ${KMER_TABLE}"
+    fi
+fi
+
 if [ ${#STORE_KMC} != 0 ]
 then
     if [ ${#OPTIONS} != 0 ]
@@ -914,6 +995,16 @@ then
 	OPTIONS="${OPTIONS} -E"
     else
 	OPTIONS="-E"
+    fi
+fi
+
+if [ ${#KEEP_ALIGNMENT} != 0 ]
+then
+    if [ ${#OPTIONS} != 0 ]
+    then
+	OPTIONS="${OPTIONS} -M"
+    else
+	OPTIONS="-M"
     fi
 fi
 
@@ -927,11 +1018,9 @@ then
     fi
 fi
 
-cmd="${DIR}etching_filter ${REQUIRED} ${OPTIONS} > logs/ETCHING_FILTER.log 2> logs/ETCHING_FILTER.err"
+cmd="etching_filter ${REQUIRED} ${OPTIONS} > logs/ETCHING_FILTER.log"
 echo $cmd
-eval $cmd
-
-rm -f logs/ETCHING_FILTER.err
+eval $cmd 2> /dev/null
 
 #######################################################################################################################
 
@@ -956,7 +1045,7 @@ then
 	    INPUT=$BAM
 	fi
     fi
-    cmd="${DIR}read_length_calc $INPUT 100000"
+    cmd="read_length_calc $INPUT 100000"
     echo $cmd
     READLENGTH=$(eval $cmd)
     echo "Read length: $READLENGTH"
@@ -967,20 +1056,27 @@ if [ ${#DEPTH} == 0 ]
 then
     if [ $DATATYPE == "W" ]
     then 
-	cmd="${DIR}estimate_coverage sample.hist $READLENGTH $KL"
-	echo $cmd
-	DEPTH=$(eval $cmd)
+	if [ -d sample.hist ]
+	then
+	    cmd="estimate_coverage sample.hist $READLENGTH $KL"
+	    echo $cmd
+	    DEPTH=$(eval $cmd)
+	else
+	    DEPTH=50
+	fi
 	
 	DEPTH="-D $DEPTH"
+    else
+	DEPTH="-D 500"
     fi
 fi
 
-cmd="${DIR}etching_caller -b ${PREFIX}.sort.bam -g $GENOME -o $PREFIX $DEPTH -P $PURITY -O $ORIENT $ALLSPLIT > logs/ETCHING_CALLER.log "
+cmd="etching_caller -b ${PREFIX}.sort.bam -g $GENOME -o $PREFIX $DEPTH -I $INSERTSIZE -P $PURITY -O $ORIENT $ALLSPLIT > logs/ETCHING_CALLER.log "
 echo $cmd
 eval $cmd
 
-#######################################################################################################################
-#############################
+
+######################################################################################################################
 #
 # SORTER
 #
@@ -988,28 +1084,17 @@ echo
 echo "[SORTER]"
 DATE="[$(date)]";echo ${DATE}
 
-cmd="${DIR}etching_sorter -i ${PREFIX}.BND.vcf -o ${PREFIX}.BND -c $CUTOFF $ALGOR $QUALITY_TAG"
-if [ ${#ML_PATH} != 0 ]
-then
-    cmd="${cmd} -m ${ML_PATH}"
-fi
-cmd="$cmd > logs/ETCHING_SORTER.BND.log"
+cmd="etching_sorter -i ${PREFIX}.BND.vcf -o ${PREFIX}.SV -c $CUTOFF -m ${ML_PATH} $ALGOR > logs/ETCHING_SORTER.SV.log"
 echo $cmd
 eval $cmd &
 
-cmd="${DIR}etching_sorter -i ${PREFIX}.SV.vcf -o ${PREFIX}.SV -c $CUTOFF $ALGOR"
-if [ ${#ML_PATH} != 0 ]
-then
-    cmd="${cmd} -m ${ML_PATH}"
-fi
-cmd="$cmd > logs/ETCHING_SORTER.SV.log"
+cmd="etching_sorter -i ${PREFIX}.BND.vcf -o ${PREFIX}.BND -c $CUTOFF -m ${ML_PATH} $ALGOR > logs/ETCHING_SORTER.BND.log"
 echo $cmd
 eval $cmd &
 
 wait
 
 #######################################################################################################################
-#############################
 #
 # FG_IDENTIFIER
 #
@@ -1020,11 +1105,11 @@ then
     echo "[FG_IDENTIFIER]"
     DATE="[$(date)]";echo ${DATE}
     
-    cmd="${DIR}etching_fg_identifier ${PREFIX}.BND.etching_sorter.vcf $ANNOTATION > ${PREFIX}.BND.fusion_gene.txt"
+    cmd="etching_fg_identifier ${PREFIX}.BND.etching_sorter.vcf $ANNOTATION > ${PREFIX}.BND.fusion_gene.txt"
     echo $cmd
     eval $cmd &
 
-    cmd="${DIR}etching_fg_identifier ${PREFIX}.SV.etching_sorter.vcf $ANNOTATION > ${PREFIX}.SV.fusion_gene.txt"
+    cmd="etching_fg_identifier ${PREFIX}.SV.etching_sorter.vcf $ANNOTATION > ${PREFIX}.SV.fusion_gene.txt"
     echo $cmd
     eval $cmd &
     
@@ -1044,7 +1129,7 @@ eval $cmd
 echo
 echo "[RESULTS]"
 
-cmd="cp ${WORKDIR}/${PREFIX}.BND.vcf ${WORKDIR}/${PREFIX}.SV.vcf ${WORKDIR}/${PREFIX}.BND.etching_sorter.vcf ${WORKDIR}/${PREFIX}.SV.etching_sorter.vcf ./"
+cmd="cp ${WORKDIR}/${PREFIX}.BND.unfiltered.vcf ${WORKDIR}/${PREFIX}.SV.unfiltered.vcf ${WORKDIR}/${PREFIX}.BND.etching_sorter.vcf ${WORKDIR}/${PREFIX}.SV.etching_sorter.vcf ./"
 echo $cmd
 eval $cmd
 if [ -f ${WORKDIR}/${PREFIX}.BND.fusion_gene.txt ]
@@ -1064,8 +1149,8 @@ echo
 
 
 echo "[Final results]"
-echo "${PREFIX}.BND.vcf"
-echo "${PREFIX}.SV.vcf"
+echo "${PREFIX}.BND.unfiltered.vcf"
+echo "${PREFIX}.SV.unfiltered.vcf"
 echo "${PREFIX}.BND.etching_sorter.vcf"
 echo "${PREFIX}.SV.etching_sorter.vcf"
 

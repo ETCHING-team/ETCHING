@@ -23,10 +23,9 @@ void usage(){
     << "\t" << "-R         \t" << "Random Forest [default]\n"
     << "\t" << "-X         \t" << "XGBoost\n"
     << "\t" << "-m         \t" << "Path to machine learning model [None]\n"
-    << "\t" << "           \t" << "Use this if you want to specify machine learning model.\n"
-    << "\n"
-    << "I/O option:\n"
-    << "\t" << "-Q         \t" << "Tag SVs with \"PASS\" or \"LOWQUAL\" instead of removing low quality SVs [NONE]\n"
+    // << "\n"
+    // << "I/O option:\n"
+    // << "\t" << "-Q         \t" << "Tag SVs with \"PASS\" or \"LOWQUAL\" instead of removing low quality SVs [NONE]\n"
     << "\n";
 }
 
@@ -98,13 +97,14 @@ int main ( int argc , char ** argv ){
   std::string prefix;
   std::string method;
   std::string path;
-  int tagging=0;
+  // int tagging=0;
 
   double alpha=-1;
 
   std::size_t sz;
 
-  while ( (opt = getopt ( argc, argv, "i:o:c:m:RXQ" ) ) != -1 ){
+  // while ( (opt = getopt ( argc, argv, "i:o:c:m:RXQ" ) ) != -1 ){
+  while ( (opt = getopt ( argc, argv, "i:o:c:m:RX" ) ) != -1 ){
     switch ( opt ) {
     case 'i': infile=optarg; break; // infile name
     case 'o': prefix=optarg; break; // output prefix
@@ -112,7 +112,7 @@ int main ( int argc , char ** argv ){
     case 'm': path=optarg; break; // path to machine learning model
     case 'R': method+="RandomForest"; break; // Random Forest
     case 'X': method+="XGBoost"; break; // XGBoost
-    case 'Q': tagging=1; break; // Tagging SVs instead of ramoving low quality SVs.
+    // case 'Q': tagging=1; break; // Tagging SVs instead of ramoving low quality SVs.
     default: std::cout << "ERROR!!! Check options!!!\n\n" ; usage(); return 0 ; 
     }
   }
@@ -194,7 +194,7 @@ int main ( int argc , char ** argv ){
 
   std::string check_none;
   fin.open(err_fname.c_str());
-  fin >> check_none;
+  while ( fin >> check_none );
   fin.close();
 
   if ( check_none != "None" ){
@@ -203,7 +203,8 @@ int main ( int argc , char ** argv ){
   }
 
   std::cout << "Removing false positives\n";
-  razor ( infile, score_file, outfile, alpha, method, tagging);
+  // razor ( infile, score_file, outfile, alpha, method, tagging);
+  razor ( infile, score_file, prefix, alpha, method);
 
   return 0;
 }

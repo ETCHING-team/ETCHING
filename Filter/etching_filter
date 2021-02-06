@@ -38,27 +38,25 @@ function USAGE {
     #echo -e "            \tdefault to 50 for panel, because it works well"
     echo -e
     echo -e "[Sample]"
-    echo -e "-T  (string)\tW for WGS, P for Panel [W]"
+    #echo -e "-T  (string)\tW for WGS, P for Panel [W]"
     echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from"
-    echo -e "            \tsample sequencing reads [automatic]"
+    echo -e "            \tsample sequencing reads [3]"
     #echo -e "            \tThough ETCHING can calculate optimal cut-off automatically,"
-    echo -e "            \tIf you want to specify it, we recommand 3-7 for WGS data, and"
-    echo -e "            \t5-10 for targeted panel sequencing data."
+    #echo -e "            \tIf you want to specify it, we recommand 3-7 for WGS data, and"
+    #echo -e "            \t5-10 for targeted panel sequencing data."
     echo -e "            \tThe lesser, the more sensitive, and the more, the more specific."
-    echo -e "-M  (int)   \tExclude the k-mers counted more than this [10000]"
-    echo -e "-F          \tFast-bam mode for -b option. This option keeps original alignement."
-    echo -e "            \tNote: If you use this option, the kept alignment result can be"
-    echo -e "            \tdifferent to the alignment result of filtered reads."
+    #echo -e "--max-kmer (int)   \tExclude the k-mers counted more than this [10000]"
+    echo -e "-M          \tUsing pre-mapping result for -b option."
+    echo -e "-F          \tFast-bam mode for -b option. Only clipped reads are used."
+    echo -e "--kmer-table (string)\tUse pre-made sample specific k-mer table."
+    echo -e "                     \tThis option ignores -1/2/bc and -f options"
     echo -e
     echo -e "[Control (matched normal in somatic call)]"
     echo -e "-1c (string)\tFirst fastq file of paried-end"
     echo -e "-2c (string)\tSecond fastq file of paried-end"
     echo -e "-bc (string)\tAligned bam file of paried-end"
-    echo -e
-    echo -e "[K-mer database]"
     echo -e "-f  (string)\tPrefix of KMC3 k-mer database"
-    echo -e "            \tIf you have /path/to/PGK.kmc_pre and /path/to/PGK.kmc_suf,"
-    echo -e "            \tyou can use \"-f /path/to/PGK\""
+    echo -e "            \tUse \"-f /path/to/PGK\" for /path/to/PGK.kmc_pre and /path/to/PGK.kmc_suf"
     echo -e
     echo -e "-h          \tHelp message"
     echo -e
@@ -107,7 +105,11 @@ SAMTOOLS=
 MAPPER=
 STORE_KMC=
 
+FAST_BAM=0
 KEEP_ALIGNMENT=0
+
+
+KMER_TABLE=
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -141,12 +143,19 @@ while [ "$1" != "" ]; do
         -K | --k-mer-freq-cutoff ) shift
 	    CUTOFF=$1
             ;;
-        -M | --max-k-mer-freq ) shift
+        --max-kmer ) shift
 	    MAXK=$1
             ;;
-        -F | --keep-alignment ) shift
+        -F | --fast-bam )
+	    FAST_BAM=1
 	    KEEP_ALIGNMENT=1
             ;;
+        -M | --keep-alignment )
+	    KEEP_ALIGNMENT=1
+            ;;
+	--kmer-table ) shift
+	    KMER_TABLE=$1
+	    ;;
 
 	-1c | --first-control ) shift
 	    FIRST_CONT=$1
@@ -173,7 +182,7 @@ while [ "$1" != "" ]; do
 	    MAPPER=$1
 	    ;;
 
-	-E ) shift
+	-E ) 
 	    STORE_KMC="-E"
 	    ;;
 
@@ -341,6 +350,19 @@ then
     fi
 fi
 
+MATCH_PAIR=match_pair
+CHECK=$(which ${MATCH_PAIR} )
+if [ ${#CHECK} == 0 ]
+then
+    MATCH_PAIR=${DIR}match_pair
+    CHECK=$(which ${MATCH_PAIR} )
+    if [ ${#CHECK} == 0 ]
+    then
+        echo "ERROR!!! match_pair was not found."
+        exit -1
+    fi
+fi
+
 KMC=kmc
 CHECK=$(which $KMC)
 if [ ${#CHECK} == 0 ]
@@ -415,37 +437,41 @@ then
 fi
 
 
-#############################
-#
-# get arguments
-#
-echo
-echo "[kmer_filter]"
-DATE="[$(date)]";echo ${DATE}
-
-if [ ${#CUTOFF} != 0 ]
+if [ ${#KMER_TABLE} == 0 ]
 then
-    CUTOFF="-k $CUTOFF"
-fi
-
-#############################
-#
-# kmer_filter
-#
-echo "[k-mer filtration]"
-cmd="cat filter_fq.list filter_bam.list > filter_seq.list"
-echo $cmd
-eval $cmd
-
-KMC_DIR=$(which ${KMC} | sed 's/\/kmc$//g')
-if [ ${#FILTER} == 0 ]
-then
-    cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -r filter_fa.list -p $PREFIX -t $THREADS -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${KMC_DIR} ${STORE_KMC}"
+    echo
+    echo "[kmer_filter to make sample specific k-mer table]"
+    DATE="[$(date)]";echo ${DATE}
+    
+    if [ ${#CUTOFF} != 0 ]
+    then
+	CUTOFF="-K $CUTOFF"
+    fi
+    
+    #############################
+    #
+    # kmer_filter
+    #
+    
+    echo "[k-mer filtration]"
+    cmd="cat filter_fq.list filter_bam.list > filter_seq.list"
+    echo $cmd
+    eval $cmd
+    
+    KMC_DIR=$(which ${KMC} | sed 's/\/kmc$//g')
+    if [ ${#FILTER} == 0 ]
+    then
+	cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -r filter_fa.list -p $PREFIX -t $THREADS -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${KMC_DIR} ${STORE_KMC}"
+    else
+	cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -r filter_fa.list -a $FILTER -p $PREFIX -t $THREADS -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${KMC_DIR} ${STORE_KMC}"
+    fi
+    echo $cmd
+    eval $cmd
+    KMER_TABLE=${PREFIX}.kmer_table.txt
 else
-    cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -r filter_fa.list -a $FILTER -p $PREFIX -t $THREADS -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${KMC_DIR} ${STORE_KMC}"
+    echo "[Skip kmer_filter and use ${KMER_TABLE}]"
 fi
-echo $cmd
-eval $cmd
+
 
 if [ ! ${FILE_FORMAT} == "bam" ]
 then 
@@ -457,9 +483,9 @@ then
     echo "[read_collector]"
     DATE="[$(date)]";echo ${DATE}
     
-    cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -1 ${FIRST} -2 ${SECOND} -p ${PREFIX} -t ${THREADS} -l ${KMER_SIZE}"
+    cmd="${READ_COLLECTOR} -f $KMER_TABLE -1 ${FIRST} -2 ${SECOND} -p ${PREFIX} -t ${THREADS} -l ${KMER_SIZE}"
     echo $cmd
-    eval $cmd
+    eval $cmd 2> /dev/null
 
     #############################
     #
@@ -507,16 +533,21 @@ else
     #
     # read_collector for bam
     #
-    if [ ${KEEP_ALIGNMENT} -eq 1 ]
+    if [ ${KEEP_ALIGNMENT} == 1 ]
     then
 	echo
-	echo "[Read_collector (fast-bam mode)]"
+	echo "[Read_collector (bam mode) using pre-mapping]"
 	DATE="[$(date)]";echo ${DATE}
 	
 	BAM_INPUT=$(head -n 1 sample.list)
-	cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -b $BAM_INPUT -p ${PREFIX}.SHNM -t $THREADS -l ${KMER_SIZE} "
+	cmd="${READ_COLLECTOR} -f $KMER_TABLE -b $BAM_INPUT -p ${PREFIX}.SHNM -t $THREADS -l ${KMER_SIZE} "
+	if [ ${FAST_BAM} == 1 ]
+	then
+	    cmd=${cmd}" -F"
+	fi
 	echo $cmd
-	eval $cmd
+	eval $cmd 2> /dev/null
+
     else
 	echo
 	echo "[Read_collector (bam mode)]"
@@ -531,49 +562,66 @@ else
 	echo $cmd
 	eval $cmd
 
-	cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -1 ${BAM_PREFIX}_1.fastq -p ${BAM_PREFIX}_1.filtered -t ${HALF} > logs/read_collector_1.log &"
+	cmd="${READ_COLLECTOR} -f $KMER_TABLE -1 ${BAM_PREFIX}_1.fastq -p ${BAM_PREFIX}_1.filtered -t ${HALF} > logs/read_collector_1.log"
 	echo $cmd
-	eval $cmd
-	cmd="${READ_COLLECTOR} -f ${PREFIX}.txt -1 ${BAM_PREFIX}_2.fastq -p ${BAM_PREFIX}_2.filtered -t ${HALF} > logs/read_collector_2.log &"
+	eval $cmd 2> /dev/null &
+	cmd="${READ_COLLECTOR} -f $KMER_TABLE -1 ${BAM_PREFIX}_2.fastq -p ${BAM_PREFIX}_2.filtered -t ${HALF} > logs/read_collector_2.log"
 	echo $cmd
-	eval $cmd
+	eval $cmd 2> /dev/null &
 	wait
 
-	cmd="awk 'NR % 4 == 1 {print}' ${BAM_PREFIX}_1.filtered.fastq ${BAM_PREFIX}_2.filtered.fastq | sort | uniq > ${BAM_PREFIX}.filtered.id"
+	cmd="awk 'NR % 4 == 1' ${BAM_PREFIX}_1.filtered.fastq ${BAM_PREFIX}_2.filtered.fastq | sort | uniq > ${BAM_PREFIX}.filtered.id"
 	echo $cmd
 	eval $cmd
 	
-	cmd="${READ_COLLECTOR} -f ${BAM_PREFIX}.filtered.id -1 ${BAM_PREFIX}_1.fastq -t $HALF -p ${PREFIX}_1 >> logs/read_collector_1.log &"
+	cmd="rm -f ${BAM_PREFIX}_1.filtered.fastq ${BAM_PREFIX}_2.filtered.fastq"
 	echo $cmd
-	eval $cmd
-	cmd="${READ_COLLECTOR} -f ${BAM_PREFIX}.filtered.id -1 ${BAM_PREFIX}_2.fastq -t $HALF -p ${PREFIX}_2 >> logs/read_collector_2.log &"
+	eval $cmd	
+
+	cmd="${READ_COLLECTOR} -f ${BAM_PREFIX}.filtered.id -1 ${BAM_PREFIX}_1.fastq -t $HALF -p ${PREFIX}_1.filtered >> logs/read_collector_1.log"
 	echo $cmd
-	eval $cmd
+	eval $cmd 2> /dev/null &
+	cmd="${READ_COLLECTOR} -f ${BAM_PREFIX}.filtered.id -1 ${BAM_PREFIX}_2.fastq -t $HALF -p ${PREFIX}_2.filtered >> logs/read_collector_2.log"
+	echo $cmd
+	eval $cmd 2> /dev/null &
 	wait
 
 	cmd="rm -f ${BAM_PREFIX}_1.fastq ${BAM_PREFIX}_2.fastq"
 	echo $cmd
 	eval $cmd
 
+	echo "[Remove unmatched reads]"
+	cmd="${MATCH_PAIR} ${PREFIX}_1.filtered.fastq ${PREFIX}_2.filtered.fastq"
+	echo $cmd
+	eval $cmd
+
+	mv ${PREFIX}_1.filtered.fastq_idmatched ${PREFIX}_1.filtered.fastq &
+	mv ${PREFIX}_2.filtered.fastq_idmatched ${PREFIX}_2.filtered.fastq &
+	wait
+
 	#############################
 	#
 	# Sort
 	#
 
-	cmd="sort_fastq_mem_eff ${PREFIX}_1.fastq ${PREFIX}_1.sort.fastq 4 &"
+	cmd="sort_fastq_mem_eff ${PREFIX}_1.filtered.fastq ${PREFIX}_1.sort.fastq 4"
 	echo $cmd
-	eval $cmd
-	cmd="sort_fastq_mem_eff ${PREFIX}_2.fastq ${PREFIX}_2.sort.fastq 4 &"
+	eval $cmd &
+	cmd="sort_fastq_mem_eff ${PREFIX}_2.filtered.fastq ${PREFIX}_2.sort.fastq 4"
 	echo $cmd
-	eval $cmd
+	eval $cmd &
 	wait 
 
-	cmd="mv ${PREFIX}_1.sort.fastq ${PREFIX}_1.fastq &"
+	cmd="rm -f ${PREFIX}_1.filtered.fastq ${PREFIX}_2.filtered.fastq"
 	echo $cmd
 	eval $cmd
-	cmd="mv ${PREFIX}_2.sort.fastq ${PREFIX}_2.fastq &"
+
+	cmd="mv ${PREFIX}_1.sort.fastq ${PREFIX}_1.fastq"
 	echo $cmd
-	eval $cmd
+	eval $cmd &
+	cmd="mv ${PREFIX}_2.sort.fastq ${PREFIX}_2.fastq"
+	echo $cmd
+	eval $cmd &
 	wait
 
 	#############################

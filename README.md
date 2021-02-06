@@ -1,7 +1,7 @@
 ---
 # ETCHING
 
-### Version 1.2.0 (2020.1.19.)
+### Version 1.2.1 (2020.1.20.)
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
@@ -65,7 +65,6 @@ cd etching
 make
 echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
 echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
-echo "export ETCHING_ML_PATH=$PWD/ETCHING_ML_model" >> ~/.bashrc
 ```
 ### From docker image
 
@@ -110,7 +109,6 @@ PGK_20200103.kmc_suf
 
 Here, ```PGK_20200103``` is the name of k-mer set to be used for ETCHING.
 If you have no matched normal data, PGK must be helpful to select tumor specific reads.
-./ㅐㅔ;.,
 
 Alternatively, you can make your own k-mer set as follows:
 
@@ -145,6 +143,11 @@ If you want the list of options, check with this command
 etching -h
 ```
 
+If you need some example,
+```
+etching --example
+```
+
 #### Output
 
 The above command will give you two vcf files:
@@ -172,36 +175,15 @@ OUTPUT.SV.fusion_gene.txt
 
 If you want to run ETCHING step-by-step, follow the steps.
 
-1. Filter
-
-For WGS,
-
 ```
 etching_filter -1 tumor_1.fq -2 tumor_2.fq \
 -1c normal_1.fastq -2c normal_2.fastq \
 -p OUTPUT \
 -t 30 \
 -g genome.fa \
--p OUTPUT \
 -f PGK \
 -m /path/to/ETCHING_ML_model
-
 ```
-
-For panel, us `-T P` option
-
-```
-etching_filter -1 tumor_1.fq -2 tumor_2.fq \
--1c normal_1.fastq -2c normal_2.fastq \
--p OUTPUT \
--t 30 \
--g genome.fa \
--p OUTPUT \
--f PGK \
--m /path/to/ETCHING_ML_model \
- P -A
-```
-
 
 2. Caller
 

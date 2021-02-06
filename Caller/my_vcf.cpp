@@ -634,11 +634,11 @@ void VCF_CLASS::make_header_short(){
 
 
 VCF_CLASS::VCF_CLASS(){
-  etching_version="ETCHING_v1.2.0 (released 2021.1.19.)";
+  // etching_version="ETCHING_v1.2.1 (released 2021.1.20.)";
 }
 
 VCF_CLASS::VCF_CLASS(const std::string infile){
-  etching_version="ETCHING_v1.2.0 (released 2021.1.19.)";
+  // etching_version="ETCHING_v1.2.1 (released 2021.1.20.)";
   read_vcf_file(infile);
 }
 
@@ -749,10 +749,10 @@ void VCF_CLASS::insert ( std::string chr1, int pos1,
   input.sr = sr_val;
   input.svtype = svtype;
   
-  input.qual = 30;
+  // input.qual = 30;
   input.filter = ".";
-
   input.ref = GetNucl(chr1,input.pos1);
+
   if ( strand == "FR" ){
     input.alt = input.ref + "[" + chr2 + ":" + std::to_string(pos2) + "[";
   }
@@ -840,7 +840,7 @@ void VCF_CLASS::get_genome(){
 }
 
 char VCF_CLASS::GetNucl(const std::string & refChr, const std::size_t & refPos){
-  return genome[refChr][refPos-1];
+  return '.';
 }
 
 
@@ -1483,7 +1483,7 @@ void VCF_CLASS::calc_features(const std::string input_bam, const int read_length
     }
   }
 
-  std::cout << "Complete: SR----\n";
+  std::cout << "Complete: SR\n";
 
 
   /////////////////////////////////////////////////////

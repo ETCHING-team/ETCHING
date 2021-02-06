@@ -23,6 +23,7 @@ void read_collector_usage(){
 	    << "\t" << "-t <int>   \t" << "Number of threads [8]\n"
 	    << "\t" << "-l <int>   \t" << "K-mer size (<=32) [31]\n"
 	    << "\t" << "           \t" << "-1 and -2 must be used simultaneously.\n"
+	    << "\t" << "-F         \t" << "Fast-bam mode for -b option\n"
 	    << "\n"
 	    << "Contact:\n\tJang-il Sohn (sohnjangil@gmail.com)\n\tJin-Wu Nam (jwnam@hanyang.ac.kr)\n";
 }
@@ -71,9 +72,10 @@ int main (int argc , char ** argv){
   int num_threads = 8;
   std::string prefix = "filtered_read";
   std::string kmer_table;
+  bool fast_bam = 0 ;
   int kl=31;
 
-  while ( (opt = getopt ( argc, argv, "1:2:b:p:t:l:f:h" ) ) != -1 ){
+  while ( (opt = getopt ( argc, argv, "1:2:b:p:t:l:f:Fh" ) ) != -1 ){
     switch ( opt ) {
     case 'f': kmer_table = optarg; break;
     case '1': input_1 = optarg; break;
@@ -82,6 +84,7 @@ int main (int argc , char ** argv){
     case 'p': prefix = optarg; break;
     case 'l': kl = atoi(optarg); break;
     case 't': num_threads = atoi(optarg); break;
+    case 'F': fast_bam = 1; break;
     case 'h': read_collector_usage(); return 0 ;
     default: std::cout << "\tInvalid option: " << optarg << "\n" ; read_collector_usage(); return 1;
     }
@@ -179,7 +182,7 @@ int main (int argc , char ** argv){
     else{
       std::cout << "Entering ID table mode\n";
       std::string id_table = kmer_table;
-      int check_collector_id_mode = collector_id_mode (id_table, kl, prefix, input_1, input_2, gz_check, num_threads);
+      int check_collector_id_mode = collector_id_mode (id_table, prefix, input_1, input_2, gz_check, num_threads);
       if ( check_collector_id_mode != 0 ){
 	std::cout << "ETCHING-Filter was abnormally finished at the collector function in read_collector\n";
 	return check_collector_id_mode;
@@ -229,7 +232,7 @@ int main (int argc , char ** argv){
     }
     else{
       std::string id_table = kmer_table;
-      int check_collector_id_mode_single = collector_id_mode_single (id_table, kl, prefix, input_1, gz_check, num_threads);
+      int check_collector_id_mode_single = collector_id_mode_single (id_table, prefix, input_1, gz_check, num_threads);
       if ( check_collector_id_mode_single != 0 ){
 	std::cout << "ETCHING-Filter was abnormally finished at the collector function in read_collector\n";
 	return check_collector_id_mode_single;
@@ -241,7 +244,7 @@ int main (int argc , char ** argv){
   // bam mode
   //
   else if ( input_b.size() != 0 ){
-    int check_collector = collector_bam (kmer_table, kl, prefix, input_b, num_threads);
+    int check_collector = collector_bam (kmer_table, kl, prefix, input_b, num_threads, fast_bam);
     if ( check_collector != 0 ){
       std::cout << "ETCHING-Filter was abnormally finished at the collector_bam function in read_collector\n";
       return check_collector;

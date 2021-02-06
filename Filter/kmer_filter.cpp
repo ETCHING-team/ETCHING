@@ -587,18 +587,20 @@ int main ( int argc , char ** argv ){
   //
   // Calculating cut-off
   //
+
+  std::string sample_hist = "sample.hist";
+
+  command = DIR + "kmc_tools transform sample histogram " + sample_hist + " 2>&1";
+  std::cout << command << "\n"; 
+  system(command.c_str() );
+
+
   if ( cutoff <= 0 ){
     std::vector <std::size_t> depth;
     std::vector <std::size_t> freq;
     std::size_t d,f;
     std::size_t local_min;
   
-    std::string sample_hist = "sample.hist";
-
-    command = DIR + "kmc_tools transform sample histogram " + sample_hist + " 2>&1";
-    std::cout << command << "\n"; 
-    system(command.c_str() );
-
     std::ifstream fin(sample_hist.c_str());
     while ( fin >> d >> f ){
       depth.push_back(d);
@@ -643,10 +645,10 @@ int main ( int argc , char ** argv ){
   std::cout << command << "\n" ;
   system(command.c_str() );
   if ( store_kmc == 0 ) {
-    // std::cout << "remove(\"sample.kmc_pre\")\n";
-    // remove("sample.kmc_pre");
-    // std::cout << "remove(\"sample.kmc_suf\")\n";
-    // remove("sample.kmc_suf");
+    std::cout << "remove(\"sample.kmc_pre\")\n";
+    remove("sample.kmc_pre");
+    std::cout << "remove(\"sample.kmc_suf\")\n";
+    remove("sample.kmc_suf");
     std::cout << "remove(\"filter.kmc_pre\")\n";
     remove("filter.kmc_pre");
     std::cout << "remove(\"filter.kmc_suf\")\n";
@@ -658,15 +660,15 @@ int main ( int argc , char ** argv ){
   // Print filter
   //
   //std::cout << "Writing sample-specific k-mers\n";
-  command = DIR + "kmc_dump " + prefix + " " + prefix + ".txt" ;
+  command = DIR + "kmc_dump " + prefix + " " + prefix + ".kmer_table.txt" ;
   std::cout << command << "\n"; 
   system(command.c_str() );
   std::string kmc_pre=prefix+".kmc_pre";
   std::string kmc_suf=prefix+".kmc_suf";
   if ( store_kmc == 0 ) {
-    std::cout << "remove(kmc_pre.c_str())\n";
+    std::cout << "remove(" << kmc_pre.c_str() << ")\n";
     remove(kmc_pre.c_str());
-    std::cout << "remove(kmc_suf.c_str())\n";
+    std::cout << "remove(" << kmc_suf.c_str() << ")\n";
     remove(kmc_suf.c_str());
   }
   

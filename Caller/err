@@ -1,0 +1,2160 @@
+sed: can't read my_vcf.hpp.0: No such file or directory
+my_vcf.cpp:14:1: error: ‘VCF’ does not name a type
+ VCF::VCF(std::string line){
+ ^~~
+my_vcf.cpp:20:6: error: ‘VCF’ has not been declared
+ void VCF::parse_etching(std::string line){
+      ^~~
+my_vcf.cpp:20:30: error: variable or field ‘parse_etching’ declared void
+ void VCF::parse_etching(std::string line){
+                              ^~~~~~
+my_vcf.cpp:20:30: error: ‘string’ is not a member of ‘std’
+my_vcf.cpp:67:6: error: ‘string’ in namespace ‘std’ does not name a type
+ std::string VCF::parse(std::string line){
+      ^~~~~~
+my_vcf.cpp:267:1: error: ‘Feature’ does not name a type
+ Feature VCF::parse_feature(std::string feature_str){
+ ^~~~~~~
+my_vcf.cpp:320:6: error: ‘VCF’ has not been declared
+ void VCF::input_features ( std::string feature_str ){
+      ^~~
+my_vcf.cpp:320:33: error: variable or field ‘input_features’ declared void
+ void VCF::input_features ( std::string feature_str ){
+                                 ^~~~~~
+my_vcf.cpp:320:33: error: ‘string’ is not a member of ‘std’
+my_vcf.cpp:358:6: error: ‘VCF’ has not been declared
+ void VCF::input_features_2 ( std::string feature_str ){
+      ^~~
+my_vcf.cpp:358:35: error: variable or field ‘input_features_2’ declared void
+ void VCF::input_features_2 ( std::string feature_str ){
+                                   ^~~~~~
+my_vcf.cpp:358:35: error: ‘string’ is not a member of ‘std’
+my_vcf.cpp:395:6: error: ‘string’ in namespace ‘std’ does not name a type
+ std::string VCF::cut_str(std::string & input, std::string key){
+      ^~~~~~
+my_vcf.cpp:413:6: error: ‘VCF’ has not been declared
+ void VCF::modify_svtype_info(){
+      ^~~
+my_vcf.cpp: In function ‘void modify_svtype_info()’:
+my_vcf.cpp:414:8: error: ‘size_t’ is not a member of ‘std’
+   std::size_t start,end;
+        ^~~~~~
+my_vcf.cpp:415:8: error: ‘string’ is not a member of ‘std’
+   std::string svt="SVTYPE=";
+        ^~~~~~
+my_vcf.cpp:416:8: error: ‘string’ is not a member of ‘std’
+   std::string front;
+        ^~~~~~
+my_vcf.cpp:417:8: error: ‘string’ is not a member of ‘std’
+   std::string back;
+        ^~~~~~
+my_vcf.cpp:418:8: error: ‘svtype’ was not declared in this scope
+   if ( svtype=="BND"){
+        ^~~~~~
+my_vcf.cpp:418:8: note: suggested alternative: ‘decltype’
+   if ( svtype=="BND"){
+        ^~~~~~
+        decltype
+my_vcf.cpp:419:5: error: ‘start’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+     ^~~~~
+my_vcf.cpp:419:5: note: suggested alternative: ‘short’
+     start = info.find(svt) + svt.size();
+     ^~~~~
+     short
+my_vcf.cpp:419:13: error: ‘info’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+             ^~~~
+my_vcf.cpp:419:13: note: suggested alternative: ‘int’
+     start = info.find(svt) + svt.size();
+             ^~~~
+             int
+my_vcf.cpp:419:23: error: ‘svt’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+                       ^~~
+my_vcf.cpp:420:5: error: ‘end’ was not declared in this scope
+     end = start + 3;
+     ^~~
+my_vcf.cpp:420:5: note: suggested alternative: ‘enum’
+     end = start + 3;
+     ^~~
+     enum
+my_vcf.cpp:421:5: error: ‘front’ was not declared in this scope
+     front = info.substr(0,start);
+     ^~~~~
+my_vcf.cpp:421:5: note: suggested alternative: ‘float’
+     front = info.substr(0,start);
+     ^~~~~
+     float
+my_vcf.cpp:422:5: error: ‘back’ was not declared in this scope
+     back = info.substr(end);
+     ^~~~
+my_vcf.cpp:426:5: error: ‘start’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+     ^~~~~
+my_vcf.cpp:426:5: note: suggested alternative: ‘short’
+     start = info.find(svt) + svt.size();
+     ^~~~~
+     short
+my_vcf.cpp:426:13: error: ‘info’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+             ^~~~
+my_vcf.cpp:426:13: note: suggested alternative: ‘int’
+     start = info.find(svt) + svt.size();
+             ^~~~
+             int
+my_vcf.cpp:426:23: error: ‘svt’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+                       ^~~
+my_vcf.cpp:427:5: error: ‘end’ was not declared in this scope
+     end = start + 3;
+     ^~~
+my_vcf.cpp:427:5: note: suggested alternative: ‘enum’
+     end = start + 3;
+     ^~~
+     enum
+my_vcf.cpp:428:5: error: ‘front’ was not declared in this scope
+     front = info.substr(0,start);
+     ^~~~~
+my_vcf.cpp:428:5: note: suggested alternative: ‘float’
+     front = info.substr(0,start);
+     ^~~~~
+     float
+my_vcf.cpp:429:5: error: ‘back’ was not declared in this scope
+     back = info.substr(end);
+     ^~~~
+my_vcf.cpp:433:5: error: ‘start’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+     ^~~~~
+my_vcf.cpp:433:5: note: suggested alternative: ‘short’
+     start = info.find(svt) + svt.size();
+     ^~~~~
+     short
+my_vcf.cpp:433:13: error: ‘info’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+             ^~~~
+my_vcf.cpp:433:13: note: suggested alternative: ‘int’
+     start = info.find(svt) + svt.size();
+             ^~~~
+             int
+my_vcf.cpp:433:23: error: ‘svt’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+                       ^~~
+my_vcf.cpp:434:5: error: ‘end’ was not declared in this scope
+     end = start + 3;
+     ^~~
+my_vcf.cpp:434:5: note: suggested alternative: ‘enum’
+     end = start + 3;
+     ^~~
+     enum
+my_vcf.cpp:435:5: error: ‘front’ was not declared in this scope
+     front = info.substr(0,start);
+     ^~~~~
+my_vcf.cpp:435:5: note: suggested alternative: ‘float’
+     front = info.substr(0,start);
+     ^~~~~
+     float
+my_vcf.cpp:436:5: error: ‘back’ was not declared in this scope
+     back = info.substr(end);
+     ^~~~
+my_vcf.cpp:440:5: error: ‘start’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+     ^~~~~
+my_vcf.cpp:440:5: note: suggested alternative: ‘short’
+     start = info.find(svt) + svt.size();
+     ^~~~~
+     short
+my_vcf.cpp:440:13: error: ‘info’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+             ^~~~
+my_vcf.cpp:440:13: note: suggested alternative: ‘int’
+     start = info.find(svt) + svt.size();
+             ^~~~
+             int
+my_vcf.cpp:440:23: error: ‘svt’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+                       ^~~
+my_vcf.cpp:441:5: error: ‘end’ was not declared in this scope
+     end = start + 3;
+     ^~~
+my_vcf.cpp:441:5: note: suggested alternative: ‘enum’
+     end = start + 3;
+     ^~~
+     enum
+my_vcf.cpp:442:5: error: ‘front’ was not declared in this scope
+     front = info.substr(0,start);
+     ^~~~~
+my_vcf.cpp:442:5: note: suggested alternative: ‘float’
+     front = info.substr(0,start);
+     ^~~~~
+     float
+my_vcf.cpp:443:5: error: ‘back’ was not declared in this scope
+     back = info.substr(end);
+     ^~~~
+my_vcf.cpp:447:5: error: ‘start’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+     ^~~~~
+my_vcf.cpp:447:5: note: suggested alternative: ‘short’
+     start = info.find(svt) + svt.size();
+     ^~~~~
+     short
+my_vcf.cpp:447:13: error: ‘info’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+             ^~~~
+my_vcf.cpp:447:13: note: suggested alternative: ‘int’
+     start = info.find(svt) + svt.size();
+             ^~~~
+             int
+my_vcf.cpp:447:23: error: ‘svt’ was not declared in this scope
+     start = info.find(svt) + svt.size();
+                       ^~~
+my_vcf.cpp:448:5: error: ‘end’ was not declared in this scope
+     end = start + 3;
+     ^~~
+my_vcf.cpp:448:5: note: suggested alternative: ‘enum’
+     end = start + 3;
+     ^~~
+     enum
+my_vcf.cpp:449:5: error: ‘front’ was not declared in this scope
+     front = info.substr(0,start);
+     ^~~~~
+my_vcf.cpp:449:5: note: suggested alternative: ‘float’
+     front = info.substr(0,start);
+     ^~~~~
+     float
+my_vcf.cpp:450:5: error: ‘back’ was not declared in this scope
+     back = info.substr(end);
+     ^~~~
+my_vcf.cpp: At global scope:
+my_vcf.cpp:456:6: error: ‘VCF’ has not been declared
+ void VCF::make_info(){
+      ^~~
+my_vcf.cpp: In function ‘void make_info()’:
+my_vcf.cpp:457:3: error: ‘info’ was not declared in this scope
+   info.clear();
+   ^~~~
+my_vcf.cpp:457:3: note: suggested alternative: ‘int’
+   info.clear();
+   ^~~~
+   int
+my_vcf.cpp:459:8: error: ‘svtype’ was not declared in this scope
+   if ( svtype.size() != 0 ) info += "SVTYPE=" + svtype + ";";
+        ^~~~~~
+my_vcf.cpp:459:8: note: suggested alternative: ‘decltype’
+   if ( svtype.size() != 0 ) info += "SVTYPE=" + svtype + ";";
+        ^~~~~~
+        decltype
+my_vcf.cpp:460:8: error: ‘chr2’ was not declared in this scope
+   if ( chr2.size() != 0 ) info += "CHR2=" + chr2 + ";";
+        ^~~~
+my_vcf.cpp:460:8: note: suggested alternative: ‘char’
+   if ( chr2.size() != 0 ) info += "CHR2=" + chr2 + ";";
+        ^~~~
+        char
+my_vcf.cpp:461:8: error: ‘pos2’ was not declared in this scope
+   if ( pos2 > 0 ) info += "END=" + std::to_string(pos2) + ";";
+        ^~~~
+my_vcf.cpp:461:41: error: ‘to_string’ is not a member of ‘std’
+   if ( pos2 > 0 ) info += "END=" + std::to_string(pos2) + ";";
+                                         ^~~~~~~~~
+my_vcf.cpp:462:8: error: ‘strand’ was not declared in this scope
+   if ( strand.size() !=0 ) info += "STRAND=" + strand + ";";
+        ^~~~~~
+my_vcf.cpp:462:8: note: suggested alternative: ‘struct’
+   if ( strand.size() !=0 ) info += "STRAND=" + strand + ";";
+        ^~~~~~
+        struct
+my_vcf.cpp:463:8: error: ‘mate_id’ was not declared in this scope
+   if ( mate_id.size() !=0 ) {
+        ^~~~~~~
+my_vcf.cpp:463:8: note: suggested alternative: ‘make_info’
+   if ( mate_id.size() !=0 ) {
+        ^~~~~~~
+        make_info
+my_vcf.cpp:468:8: error: ‘strand’ was not declared in this scope
+   if ( strand == "F" ){
+        ^~~~~~
+my_vcf.cpp:468:8: note: suggested alternative: ‘struct’
+   if ( strand == "F" ){
+        ^~~~~~
+        struct
+my_vcf.cpp:469:26: error: ‘chr1’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-UNKNOWN" + ";";
+                          ^~~~
+my_vcf.cpp:469:26: note: suggested alternative: ‘char’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-UNKNOWN" + ";";
+                          ^~~~
+                          char
+my_vcf.cpp:469:44: error: ‘to_string’ is not a member of ‘std’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-UNKNOWN" + ";";
+                                            ^~~~~~~~~
+my_vcf.cpp:469:54: error: ‘pos1’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-UNKNOWN" + ";";
+                                                      ^~~~
+my_vcf.cpp:472:26: error: ‘chr1’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-UNKNOWN" + ";";
+                          ^~~~
+my_vcf.cpp:472:26: note: suggested alternative: ‘char’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-UNKNOWN" + ";";
+                          ^~~~
+                          char
+my_vcf.cpp:472:44: error: ‘to_string’ is not a member of ‘std’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-UNKNOWN" + ";";
+                                            ^~~~~~~~~
+my_vcf.cpp:472:54: error: ‘pos1’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-UNKNOWN" + ";";
+                                                      ^~~~
+my_vcf.cpp:475:26: error: ‘chr1’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                          ^~~~
+my_vcf.cpp:475:26: note: suggested alternative: ‘char’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                          ^~~~
+                          char
+my_vcf.cpp:475:44: error: ‘to_string’ is not a member of ‘std’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                                            ^~~~~~~~~
+my_vcf.cpp:475:54: error: ‘pos1’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                                                      ^~~~
+my_vcf.cpp:475:71: error: ‘chr2’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                                                                       ^~~~
+my_vcf.cpp:475:71: note: suggested alternative: ‘char’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                                                                       ^~~~
+                                                                       char
+my_vcf.cpp:475:89: error: ‘to_string’ is not a member of ‘std’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                                                                                         ^~~~~~~~~
+my_vcf.cpp:475:99: error: ‘pos2’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                                                                                                   ^~~~
+my_vcf.cpp:478:26: error: ‘chr1’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                          ^~~~
+my_vcf.cpp:478:26: note: suggested alternative: ‘char’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                          ^~~~
+                          char
+my_vcf.cpp:478:44: error: ‘to_string’ is not a member of ‘std’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                                            ^~~~~~~~~
+my_vcf.cpp:478:54: error: ‘pos1’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                                                      ^~~~
+my_vcf.cpp:478:71: error: ‘chr2’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                                                                       ^~~~
+my_vcf.cpp:478:71: note: suggested alternative: ‘char’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                                                                       ^~~~
+                                                                       char
+my_vcf.cpp:478:89: error: ‘to_string’ is not a member of ‘std’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                                                                                         ^~~~~~~~~
+my_vcf.cpp:478:99: error: ‘pos2’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(+)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                                                                                                   ^~~~
+my_vcf.cpp:481:26: error: ‘chr1’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                          ^~~~
+my_vcf.cpp:481:26: note: suggested alternative: ‘char’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                          ^~~~
+                          char
+my_vcf.cpp:481:44: error: ‘to_string’ is not a member of ‘std’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                                            ^~~~~~~~~
+my_vcf.cpp:481:54: error: ‘pos1’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                                                      ^~~~
+my_vcf.cpp:481:71: error: ‘chr2’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                                                                       ^~~~
+my_vcf.cpp:481:71: note: suggested alternative: ‘char’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                                                                       ^~~~
+                                                                       char
+my_vcf.cpp:481:89: error: ‘to_string’ is not a member of ‘std’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                                                                                         ^~~~~~~~~
+my_vcf.cpp:481:99: error: ‘pos2’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(+)" + ";";
+                                                                                                   ^~~~
+my_vcf.cpp:484:26: error: ‘chr1’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                          ^~~~
+my_vcf.cpp:484:26: note: suggested alternative: ‘char’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                          ^~~~
+                          char
+my_vcf.cpp:484:44: error: ‘to_string’ is not a member of ‘std’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                                            ^~~~~~~~~
+my_vcf.cpp:484:54: error: ‘pos1’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                                                      ^~~~
+my_vcf.cpp:484:71: error: ‘chr2’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                                                                       ^~~~
+my_vcf.cpp:484:71: note: suggested alternative: ‘char’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                                                                       ^~~~
+                                                                       char
+my_vcf.cpp:484:89: error: ‘to_string’ is not a member of ‘std’
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                                                                                         ^~~~~~~~~
+my_vcf.cpp:484:99: error: ‘pos2’ was not declared in this scope
+     info +="REPATH="   + chr1 + ":" + std::to_string(pos1) + "(-)-" + chr2 + ":" + std::to_string(pos2) + "(-)" + ";";
+                                                                                                   ^~~~
+my_vcf.cpp:488:8: error: ‘chr1’ was not declared in this scope
+   if ( chr1 == chr2 ){
+        ^~~~
+my_vcf.cpp:488:8: note: suggested alternative: ‘char’
+   if ( chr1 == chr2 ){
+        ^~~~
+        char
+my_vcf.cpp:488:16: error: ‘chr2’ was not declared in this scope
+   if ( chr1 == chr2 ){
+                ^~~~
+my_vcf.cpp:488:16: note: suggested alternative: ‘char’
+   if ( chr1 == chr2 ){
+                ^~~~
+                char
+my_vcf.cpp:489:5: error: ‘svlen’ was not declared in this scope
+     svlen = pos1 - pos2;
+     ^~~~~
+my_vcf.cpp:489:13: error: ‘pos1’ was not declared in this scope
+     svlen = pos1 - pos2;
+             ^~~~
+my_vcf.cpp:489:20: error: ‘pos2’ was not declared in this scope
+     svlen = pos1 - pos2;
+                    ^~~~
+my_vcf.cpp:491:29: error: ‘to_string’ is not a member of ‘std’
+     info += "SVLEN=" + std::to_string(svlen) + ";";
+                             ^~~~~~~~~
+my_vcf.cpp:493:8: error: ‘chr1’ was not declared in this scope
+   if ( chr1 != chr2 && svtype != "SND" ) info += "INTERCHR;";
+        ^~~~
+my_vcf.cpp:493:8: note: suggested alternative: ‘char’
+   if ( chr1 != chr2 && svtype != "SND" ) info += "INTERCHR;";
+        ^~~~
+        char
+my_vcf.cpp:493:16: error: ‘chr2’ was not declared in this scope
+   if ( chr1 != chr2 && svtype != "SND" ) info += "INTERCHR;";
+                ^~~~
+my_vcf.cpp:493:16: note: suggested alternative: ‘char’
+   if ( chr1 != chr2 && svtype != "SND" ) info += "INTERCHR;";
+                ^~~~
+                char
+my_vcf.cpp:493:24: error: ‘svtype’ was not declared in this scope
+   if ( chr1 != chr2 && svtype != "SND" ) info += "INTERCHR;";
+                        ^~~~~~
+my_vcf.cpp:493:24: note: suggested alternative: ‘decltype’
+   if ( chr1 != chr2 && svtype != "SND" ) info += "INTERCHR;";
+                        ^~~~~~
+                        decltype
+my_vcf.cpp:498:3: error: ‘feature_str’ was not declared in this scope
+   feature_str = "CR:SR:PE:MQ:DEPDIF:NXA:TCB:ENTROPY:PURITY:SEQDEP";
+   ^~~~~~~~~~~
+my_vcf.cpp:501:3: error: ‘feature_str1’ was not declared in this scope
+   feature_str1 = std::to_string(cr) ;
+   ^~~~~~~~~~~~
+my_vcf.cpp:501:23: error: ‘to_string’ is not a member of ‘std’
+   feature_str1 = std::to_string(cr) ;
+                       ^~~~~~~~~
+my_vcf.cpp:501:33: error: ‘cr’ was not declared in this scope
+   feature_str1 = std::to_string(cr) ;
+                                 ^~
+my_vcf.cpp:501:33: note: suggested alternative: ‘char’
+   feature_str1 = std::to_string(cr) ;
+                                 ^~
+                                 char
+my_vcf.cpp:502:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str1 += ":" + std::to_string(sr) ;
+                              ^~~~~~~~~
+my_vcf.cpp:502:40: error: ‘sr’ was not declared in this scope
+   feature_str1 += ":" + std::to_string(sr) ;
+                                        ^~
+my_vcf.cpp:503:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str1 += ":" + std::to_string(pe) ;
+                              ^~~~~~~~~
+my_vcf.cpp:503:40: error: ‘pe’ was not declared in this scope
+   feature_str1 += ":" + std::to_string(pe) ;
+                                        ^~
+my_vcf.cpp:504:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str1 += ":" + std::to_string(mq) ; // Mapping quality
+                              ^~~~~~~~~
+my_vcf.cpp:504:40: error: ‘mq’ was not declared in this scope
+   feature_str1 += ":" + std::to_string(mq) ; // Mapping quality
+                                        ^~
+my_vcf.cpp:505:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str1 += ":" + std::to_string(depdif) ;
+                              ^~~~~~~~~
+my_vcf.cpp:505:40: error: ‘depdif’ was not declared in this scope
+   feature_str1 += ":" + std::to_string(depdif) ;
+                                        ^~~~~~
+my_vcf.cpp:506:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str1 += ":" + std::to_string(nxa) ;
+                              ^~~~~~~~~
+my_vcf.cpp:506:40: error: ‘nxa’ was not declared in this scope
+   feature_str1 += ":" + std::to_string(nxa) ;
+                                        ^~~
+my_vcf.cpp:507:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str1 += ":" + std::to_string(tcb) ;
+                              ^~~~~~~~~
+my_vcf.cpp:507:40: error: ‘tcb’ was not declared in this scope
+   feature_str1 += ":" + std::to_string(tcb) ;
+                                        ^~~
+my_vcf.cpp:508:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str1 += ":" + std::to_string(entropy) ;
+                              ^~~~~~~~~
+my_vcf.cpp:508:40: error: ‘entropy’ was not declared in this scope
+   feature_str1 += ":" + std::to_string(entropy) ;
+                                        ^~~~~~~
+my_vcf.cpp:509:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str1 += ":" + std::to_string(purity) ; // Tumor purity
+                              ^~~~~~~~~
+my_vcf.cpp:509:40: error: ‘purity’ was not declared in this scope
+   feature_str1 += ":" + std::to_string(purity) ; // Tumor purity
+                                        ^~~~~~
+my_vcf.cpp:510:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str1 += ":" + std::to_string(seqdep) ; // Sequencing depth
+                              ^~~~~~~~~
+my_vcf.cpp:510:40: error: ‘seqdep’ was not declared in this scope
+   feature_str1 += ":" + std::to_string(seqdep) ; // Sequencing depth
+                                        ^~~~~~
+my_vcf.cpp:512:3: error: ‘feature_str2’ was not declared in this scope
+   feature_str2 = std::to_string(cr2) ;
+   ^~~~~~~~~~~~
+my_vcf.cpp:512:23: error: ‘to_string’ is not a member of ‘std’
+   feature_str2 = std::to_string(cr2) ;
+                       ^~~~~~~~~
+my_vcf.cpp:512:33: error: ‘cr2’ was not declared in this scope
+   feature_str2 = std::to_string(cr2) ;
+                                 ^~~
+my_vcf.cpp:513:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str2 += ":" + std::to_string(sr2) ;
+                              ^~~~~~~~~
+my_vcf.cpp:513:40: error: ‘sr2’ was not declared in this scope
+   feature_str2 += ":" + std::to_string(sr2) ;
+                                        ^~~
+my_vcf.cpp:514:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str2 += ":" + std::to_string(pe2) ;
+                              ^~~~~~~~~
+my_vcf.cpp:514:40: error: ‘pe2’ was not declared in this scope
+   feature_str2 += ":" + std::to_string(pe2) ;
+                                        ^~~
+my_vcf.cpp:515:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str2 += ":" + std::to_string(mq2) ; // Mapping quality
+                              ^~~~~~~~~
+my_vcf.cpp:515:40: error: ‘mq2’ was not declared in this scope
+   feature_str2 += ":" + std::to_string(mq2) ; // Mapping quality
+                                        ^~~
+my_vcf.cpp:516:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str2 += ":" + std::to_string(depdif2) ;
+                              ^~~~~~~~~
+my_vcf.cpp:516:40: error: ‘depdif2’ was not declared in this scope
+   feature_str2 += ":" + std::to_string(depdif2) ;
+                                        ^~~~~~~
+my_vcf.cpp:517:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str2 += ":" + std::to_string(nxa2) ;
+                              ^~~~~~~~~
+my_vcf.cpp:517:40: error: ‘nxa2’ was not declared in this scope
+   feature_str2 += ":" + std::to_string(nxa2) ;
+                                        ^~~~
+my_vcf.cpp:518:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str2 += ":" + std::to_string(tcb2) ;
+                              ^~~~~~~~~
+my_vcf.cpp:518:40: error: ‘tcb2’ was not declared in this scope
+   feature_str2 += ":" + std::to_string(tcb2) ;
+                                        ^~~~
+my_vcf.cpp:519:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str2 += ":" + std::to_string(entropy2) ;
+                              ^~~~~~~~~
+my_vcf.cpp:519:40: error: ‘entropy2’ was not declared in this scope
+   feature_str2 += ":" + std::to_string(entropy2) ;
+                                        ^~~~~~~~
+my_vcf.cpp:520:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str2 += ":" + std::to_string(purity) ; // Tumor purity
+                              ^~~~~~~~~
+my_vcf.cpp:521:30: error: ‘to_string’ is not a member of ‘std’
+   feature_str2 += ":" + std::to_string(seqdep) ; // Sequencing depth
+                              ^~~~~~~~~
+my_vcf.cpp: At global scope:
+my_vcf.cpp:528:6: error: ‘string’ in namespace ‘std’ does not name a type
+ std::string VCF::to_string(){
+      ^~~~~~
+my_vcf.cpp:540:6: error: ‘string’ in namespace ‘std’ does not name a type
+ std::string VCF::to_string_short(){
+      ^~~~~~
+my_vcf.cpp:552:6: error: ‘VCF’ has not been declared
+ void VCF::resize_tool_comp(int Size){
+      ^~~
+my_vcf.cpp: In function ‘void resize_tool_comp(int)’:
+my_vcf.cpp:553:3: error: ‘tool_comp’ was not declared in this scope
+   tool_comp.clear();
+   ^~~~~~~~~
+my_vcf.cpp:553:3: note: suggested alternative: ‘resize_tool_comp’
+   tool_comp.clear();
+   ^~~~~~~~~
+   resize_tool_comp
+my_vcf.cpp: At global scope:
+my_vcf.cpp:558:1: error: ‘VCF’ does not name a type
+ VCF return_mate(VCF input){
+ ^~~
+my_vcf.cpp:581:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::make_header(){
+      ^~~~~~~~~
+my_vcf.cpp: In function ‘void make_header()’:
+my_vcf.cpp:582:3: error: ‘make_header_short’ was not declared in this scope
+   make_header_short();
+   ^~~~~~~~~~~~~~~~~
+my_vcf.cpp:582:3: note: suggested alternative: ‘make_header’
+   make_header_short();
+   ^~~~~~~~~~~~~~~~~
+   make_header
+my_vcf.cpp:583:3: error: ‘metainfo’ was not declared in this scope
+   metainfo = metainfo + "\n"
+   ^~~~~~~~
+my_vcf.cpp:583:3: note: suggested alternative: ‘make_info’
+   metainfo = metainfo + "\n"
+   ^~~~~~~~
+   make_info
+my_vcf.cpp:596:3: error: ‘header’ was not declared in this scope
+   header = header +"\tFORMAT\tFIRST_MATE\tSECOND_MATE";
+   ^~~~~~
+my_vcf.cpp: At global scope:
+my_vcf.cpp:600:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::make_header_short(){
+      ^~~~~~~~~
+my_vcf.cpp: In function ‘void make_header_short()’:
+my_vcf.cpp:601:3: error: ‘metainfo’ was not declared in this scope
+   metainfo = "##fileformat=VCFv4.2\n";
+   ^~~~~~~~
+my_vcf.cpp:601:3: note: suggested alternative: ‘make_info’
+   metainfo = "##fileformat=VCFv4.2\n";
+   ^~~~~~~~
+   make_info
+my_vcf.cpp:603:21: error: ‘currentDate’ was not declared in this scope
+     + "##fileDate="+currentDate()+"\n"
+                     ^~~~~~~~~~~
+my_vcf.cpp:604:21: error: ‘etching_version’ was not declared in this scope
+     + "##source=" + etching_version + "\n"
+                     ^~~~~~~~~~~~~~~
+my_vcf.cpp:605:29: error: ‘reference’ was not declared in this scope
+     + "##reference_genome="+reference+"\n";
+                             ^~~~~~~~~
+my_vcf.cpp:606:20: error: ‘genome_info’ was not declared in this scope
+   for ( auto & i : genome_info ){
+                    ^~~~~~~~~~~
+my_vcf.cpp:606:20: note: suggested alternative: ‘make_info’
+   for ( auto & i : genome_info ){
+                    ^~~~~~~~~~~
+                    make_info
+my_vcf.cpp:607:56: error: ‘to_string’ is not a member of ‘std’
+     metainfo +="##contig=<ID="+i.first+",length="+std::to_string(i.second)+">\n";
+                                                        ^~~~~~~~~
+my_vcf.cpp:630:3: error: ‘header’ was not declared in this scope
+   header
+   ^~~~~~
+my_vcf.cpp: At global scope:
+my_vcf.cpp:636:1: error: ‘VCF_CLASS’ does not name a type
+ VCF_CLASS::VCF_CLASS(){
+ ^~~~~~~~~
+my_vcf.cpp:640:1: error: ‘VCF_CLASS’ does not name a type
+ VCF_CLASS::VCF_CLASS(const std::string infile){
+ ^~~~~~~~~
+my_vcf.cpp:645:1: error: ‘VCF_CLASS’ does not name a type
+ VCF_CLASS::~VCF_CLASS(){
+ ^~~~~~~~~
+my_vcf.cpp:649:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::read_vcf_file(const std::string infile){
+      ^~~~~~~~~
+my_vcf.cpp:649:42: error: ‘string’ in namespace ‘std’ does not name a type
+ void VCF_CLASS::read_vcf_file(const std::string infile){
+                                          ^~~~~~
+my_vcf.cpp: In function ‘void read_vcf_file(int)’:
+my_vcf.cpp:650:8: error: ‘string’ is not a member of ‘std’
+   std::string tmp;
+        ^~~~~~
+my_vcf.cpp:651:3: error: ‘VCF’ was not declared in this scope
+   VCF vcf;
+   ^~~
+my_vcf.cpp:652:8: error: ‘ifstream’ is not a member of ‘std’
+   std::ifstream fin ( infile );
+        ^~~~~~~~
+my_vcf.cpp:653:16: error: ‘getline’ is not a member of ‘std’
+   while ( std::getline ( fin , tmp ) ){
+                ^~~~~~~
+my_vcf.cpp:653:26: error: ‘fin’ was not declared in this scope
+   while ( std::getline ( fin , tmp ) ){
+                          ^~~
+my_vcf.cpp:653:32: error: ‘tmp’ was not declared in this scope
+   while ( std::getline ( fin , tmp ) ){
+                                ^~~
+my_vcf.cpp:655:7: error: ‘metainfo’ was not declared in this scope
+       metainfo += tmp + "\n";
+       ^~~~~~~~
+my_vcf.cpp:655:7: note: suggested alternative: ‘make_info’
+       metainfo += tmp + "\n";
+       ^~~~~~~~
+       make_info
+my_vcf.cpp:658:7: error: ‘header’ was not declared in this scope
+       header = tmp + "\n";
+       ^~~~~~
+my_vcf.cpp:663:3: error: ‘build_id_ref_map’ was not declared in this scope
+   build_id_ref_map(infile);
+   ^~~~~~~~~~~~~~~~
+my_vcf.cpp:666:8: error: ‘metainfo’ was not declared in this scope
+   if ( metainfo.find("##source=ETCHING") != std::string::npos ){
+        ^~~~~~~~
+my_vcf.cpp:666:8: note: suggested alternative: ‘make_info’
+   if ( metainfo.find("##source=ETCHING") != std::string::npos ){
+        ^~~~~~~~
+        make_info
+my_vcf.cpp:666:50: error: ‘std::string’ has not been declared
+   if ( metainfo.find("##source=ETCHING") != std::string::npos ){
+                                                  ^~~~~~
+my_vcf.cpp:667:18: error: ‘getline’ is not a member of ‘std’
+     while ( std::getline ( fin , tmp ) ){
+                  ^~~~~~~
+my_vcf.cpp:667:28: error: ‘fin’ was not declared in this scope
+     while ( std::getline ( fin , tmp ) ){
+                            ^~~
+my_vcf.cpp:667:34: error: ‘tmp’ was not declared in this scope
+     while ( std::getline ( fin , tmp ) ){
+                                  ^~~
+my_vcf.cpp:668:7: error: ‘vcf’ was not declared in this scope
+       vcf.parse_etching(tmp);
+       ^~~
+my_vcf.cpp:669:7: error: ‘insert’ was not declared in this scope
+       insert(vcf);
+       ^~~~~~
+my_vcf.cpp:669:7: note: suggested alternative: ‘int’
+       insert(vcf);
+       ^~~~~~
+       int
+my_vcf.cpp:673:18: error: ‘getline’ is not a member of ‘std’
+     while ( std::getline ( fin , tmp ) ){
+                  ^~~~~~~
+my_vcf.cpp:673:28: error: ‘fin’ was not declared in this scope
+     while ( std::getline ( fin , tmp ) ){
+                            ^~~
+my_vcf.cpp:673:34: error: ‘tmp’ was not declared in this scope
+     while ( std::getline ( fin , tmp ) ){
+                                  ^~~
+my_vcf.cpp:674:7: error: ‘vcf’ was not declared in this scope
+       vcf.parse(tmp);
+       ^~~
+my_vcf.cpp:675:7: error: ‘insert’ was not declared in this scope
+       insert(vcf);
+       ^~~~~~
+my_vcf.cpp:675:7: note: suggested alternative: ‘int’
+       insert(vcf);
+       ^~~~~~
+       int
+my_vcf.cpp:679:3: error: ‘fin’ was not declared in this scope
+   fin.close();
+   ^~~
+my_vcf.cpp: At global scope:
+my_vcf.cpp:683:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::build_id_ref_map(const std::string infile){
+      ^~~~~~~~~
+my_vcf.cpp:683:45: error: ‘string’ in namespace ‘std’ does not name a type
+ void VCF_CLASS::build_id_ref_map(const std::string infile){
+                                             ^~~~~~
+my_vcf.cpp: In function ‘void build_id_ref_map(int)’:
+my_vcf.cpp:684:8: error: ‘ifstream’ is not a member of ‘std’
+   std::ifstream fin ( infile.c_str() );
+        ^~~~~~~~
+my_vcf.cpp:685:8: error: ‘size_t’ is not a member of ‘std’
+   std::size_t found;
+        ^~~~~~
+my_vcf.cpp:686:8: error: ‘string’ is not a member of ‘std’
+   std::string tmp;
+        ^~~~~~
+my_vcf.cpp:687:8: error: ‘string’ is not a member of ‘std’
+   std::string id;
+        ^~~~~~
+my_vcf.cpp:690:14: error: ‘string’ in namespace ‘std’ does not name a type
+   const std::string key="##contig=<ID=";
+              ^~~~~~
+my_vcf.cpp:692:16: error: ‘getline’ is not a member of ‘std’
+   while ( std::getline ( fin , tmp ) ){
+                ^~~~~~~
+my_vcf.cpp:692:26: error: ‘fin’ was not declared in this scope
+   while ( std::getline ( fin , tmp ) ){
+                          ^~~
+my_vcf.cpp:692:32: error: ‘tmp’ was not declared in this scope
+   while ( std::getline ( fin , tmp ) ){
+                                ^~~
+my_vcf.cpp:694:5: error: ‘found’ was not declared in this scope
+     found = tmp.find(key);
+     ^~~~~
+my_vcf.cpp:694:5: note: suggested alternative: ‘count’
+     found = tmp.find(key);
+     ^~~~~
+     count
+my_vcf.cpp:694:22: error: ‘key’ was not declared in this scope
+     found = tmp.find(key);
+                      ^~~
+my_vcf.cpp:695:24: error: ‘std::string’ has not been declared
+     if ( found != std::string::npos ){
+                        ^~~~~~
+my_vcf.cpp:699:7: error: ‘id_ref_map’ was not declared in this scope
+       id_ref_map[tmp]=count;
+       ^~~~~~~~~~
+my_vcf.cpp:699:7: note: suggested alternative: ‘build_id_ref_map’
+       id_ref_map[tmp]=count;
+       ^~~~~~~~~~
+       build_id_ref_map
+my_vcf.cpp:700:7: error: ‘ref_id_map’ was not declared in this scope
+       ref_id_map[count]=tmp;
+       ^~~~~~~~~~
+my_vcf.cpp:705:3: error: ‘fin’ was not declared in this scope
+   fin.close();
+   ^~~
+my_vcf.cpp: At global scope:
+my_vcf.cpp:710:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::clear(){
+      ^~~~~~~~~
+my_vcf.cpp: In function ‘void clear()’:
+my_vcf.cpp:711:3: error: ‘vcf_map’ was not declared in this scope
+   vcf_map.clear();
+   ^~~~~~~
+my_vcf.cpp:712:3: error: ‘genome_info’ was not declared in this scope
+   genome_info.clear();
+   ^~~~~~~~~~~
+my_vcf.cpp:712:3: note: suggested alternative: ‘make_info’
+   genome_info.clear();
+   ^~~~~~~~~~~
+   make_info
+my_vcf.cpp:713:3: error: ‘vcf_file’ was not declared in this scope
+   vcf_file.clear();
+   ^~~~~~~~
+my_vcf.cpp:713:3: note: suggested alternative: ‘read_vcf_file’
+   vcf_file.clear();
+   ^~~~~~~~
+   read_vcf_file
+my_vcf.cpp:714:3: error: ‘reference’ was not declared in this scope
+   reference.clear();
+   ^~~~~~~~~
+my_vcf.cpp:715:3: error: ‘header’ was not declared in this scope
+   header.clear();
+   ^~~~~~
+my_vcf.cpp: At global scope:
+my_vcf.cpp:719:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::insert(VCF vcf){
+      ^~~~~~~~~
+my_vcf.cpp:719:24: error: variable or field ‘insert’ declared void
+ void VCF_CLASS::insert(VCF vcf){
+                        ^~~
+my_vcf.cpp:719:24: error: ‘VCF’ was not declared in this scope
+my_vcf.cpp:733:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::insert ( std::string chr1, int pos1,
+      ^~~~~~~~~
+my_vcf.cpp:733:31: error: variable or field ‘insert’ declared void
+ void VCF_CLASS::insert ( std::string chr1, int pos1,
+                               ^~~~~~
+my_vcf.cpp:733:31: error: ‘string’ is not a member of ‘std’
+my_vcf.cpp:733:44: error: expected primary-expression before ‘int’
+ void VCF_CLASS::insert ( std::string chr1, int pos1,
+                                            ^~~
+my_vcf.cpp:734:10: error: ‘string’ is not a member of ‘std’
+     std::string chr2, int pos2,
+          ^~~~~~
+my_vcf.cpp:734:23: error: expected primary-expression before ‘int’
+     std::string chr2, int pos2,
+                       ^~~
+my_vcf.cpp:735:10: error: ‘string’ is not a member of ‘std’
+     std::string sv_id, std::string mate_id,
+          ^~~~~~
+my_vcf.cpp:735:29: error: ‘string’ is not a member of ‘std’
+     std::string sv_id, std::string mate_id,
+                             ^~~~~~
+my_vcf.cpp:736:10: error: ‘string’ is not a member of ‘std’
+     std::string strand, int sr_val, std::string svtype){
+          ^~~~~~
+my_vcf.cpp:736:25: error: expected primary-expression before ‘int’
+     std::string strand, int sr_val, std::string svtype){
+                         ^~~
+my_vcf.cpp:736:42: error: ‘string’ is not a member of ‘std’
+     std::string strand, int sr_val, std::string svtype){
+                                          ^~~~~~
+my_vcf.cpp:778:1: error: ‘VCF_MAP’ does not name a type
+ VCF_MAP::iterator VCF_CLASS::begin(){return vcf_map.begin();};
+ ^~~~~~~
+my_vcf.cpp:781:1: error: ‘VCF_MAP’ does not name a type
+ VCF_MAP::iterator VCF_CLASS::end(){return vcf_map.end();};
+ ^~~~~~~
+my_vcf.cpp:783:1: error: ‘VCF_MAP’ does not name a type
+ VCF_MAP::iterator VCF_CLASS::find(Position Pos){
+ ^~~~~~~
+my_vcf.cpp:787:6: error: ‘VCF_CLASS’ has not been declared
+ bool VCF_CLASS::check_vcf( std::string chr1, int pos1,
+      ^~~~~~~~~
+my_vcf.cpp:787:33: error: ‘string’ is not a member of ‘std’
+ bool VCF_CLASS::check_vcf( std::string chr1, int pos1,
+                                 ^~~~~~
+my_vcf.cpp:787:46: error: expected primary-expression before ‘int’
+ bool VCF_CLASS::check_vcf( std::string chr1, int pos1,
+                                              ^~~
+my_vcf.cpp:788:12: error: ‘string’ is not a member of ‘std’
+       std::string chr2, int pos2,
+            ^~~~~~
+my_vcf.cpp:788:25: error: expected primary-expression before ‘int’
+       std::string chr2, int pos2,
+                         ^~~
+my_vcf.cpp:789:12: error: ‘string’ is not a member of ‘std’
+       std::string strand ){
+            ^~~~~~
+my_vcf.cpp:789:26: error: expression list treated as compound expression in initializer [-fpermissive]
+       std::string strand ){
+                          ^
+my_vcf.cpp:805:6: error: ‘vector’ in namespace ‘std’ does not name a template type
+ std::vector < VCF > & VCF_CLASS::operator [](Position Pos){
+      ^~~~~~
+my_vcf.cpp:812:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::get_genome(std::string infile){
+      ^~~~~~~~~
+my_vcf.cpp:812:33: error: variable or field ‘get_genome’ declared void
+ void VCF_CLASS::get_genome(std::string infile){
+                                 ^~~~~~
+my_vcf.cpp:812:33: error: ‘string’ is not a member of ‘std’
+my_vcf.cpp:817:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::get_genome(){
+      ^~~~~~~~~
+my_vcf.cpp: In function ‘void get_genome()’:
+my_vcf.cpp:818:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Reading genome: " << reference << "\n";
+        ^~~~
+my_vcf.cpp:818:38: error: ‘reference’ was not declared in this scope
+   std::cout << "Reading genome: " << reference << "\n";
+                                      ^~~~~~~~~
+my_vcf.cpp:819:8: error: ‘ifstream’ is not a member of ‘std’
+   std::ifstream fin(reference.c_str());
+        ^~~~~~~~
+my_vcf.cpp:820:8: error: ‘string’ is not a member of ‘std’
+   std::string id;
+        ^~~~~~
+my_vcf.cpp:821:8: error: ‘string’ is not a member of ‘std’
+   std::string seq;
+        ^~~~~~
+my_vcf.cpp:822:8: error: ‘string’ is not a member of ‘std’
+   std::string tmp;
+        ^~~~~~
+my_vcf.cpp:823:13: error: ‘fin’ was not declared in this scope
+   getline ( fin , tmp );
+             ^~~
+my_vcf.cpp:823:19: error: ‘tmp’ was not declared in this scope
+   getline ( fin , tmp );
+                   ^~~
+my_vcf.cpp:823:3: error: ‘getline’ was not declared in this scope
+   getline ( fin , tmp );
+   ^~~~~~~
+my_vcf.cpp:823:3: note: suggested alternative: ‘get_genome’
+   getline ( fin , tmp );
+   ^~~~~~~
+   get_genome
+my_vcf.cpp:824:3: error: ‘id’ was not declared in this scope
+   id = tmp.substr(1);
+   ^~
+my_vcf.cpp:827:7: error: ‘genome’ was not declared in this scope
+       genome[id]=seq;
+       ^~~~~~
+my_vcf.cpp:827:7: note: suggested alternative: ‘enum’
+       genome[id]=seq;
+       ^~~~~~
+       enum
+my_vcf.cpp:827:18: error: ‘seq’ was not declared in this scope
+       genome[id]=seq;
+                  ^~~
+my_vcf.cpp:828:7: error: ‘genome_info’ was not declared in this scope
+       genome_info.push_back(std::make_pair(id,seq.size()));
+       ^~~~~~~~~~~
+my_vcf.cpp:828:7: note: suggested alternative: ‘make_info’
+       genome_info.push_back(std::make_pair(id,seq.size()));
+       ^~~~~~~~~~~
+       make_info
+my_vcf.cpp:828:34: error: ‘make_pair’ is not a member of ‘std’
+       genome_info.push_back(std::make_pair(id,seq.size()));
+                                  ^~~~~~~~~
+my_vcf.cpp:833:7: error: ‘seq’ was not declared in this scope
+       seq += tmp ;
+       ^~~
+my_vcf.cpp:836:3: error: ‘genome’ was not declared in this scope
+   genome[id]=seq;
+   ^~~~~~
+my_vcf.cpp:836:3: note: suggested alternative: ‘enum’
+   genome[id]=seq;
+   ^~~~~~
+   enum
+my_vcf.cpp:836:14: error: ‘seq’ was not declared in this scope
+   genome[id]=seq;
+              ^~~
+my_vcf.cpp:837:3: error: ‘genome_info’ was not declared in this scope
+   genome_info.push_back(std::make_pair(id,seq.size()));
+   ^~~~~~~~~~~
+my_vcf.cpp:837:3: note: suggested alternative: ‘make_info’
+   genome_info.push_back(std::make_pair(id,seq.size()));
+   ^~~~~~~~~~~
+   make_info
+my_vcf.cpp:837:30: error: ‘make_pair’ is not a member of ‘std’
+   genome_info.push_back(std::make_pair(id,seq.size()));
+                              ^~~~~~~~~
+my_vcf.cpp: At global scope:
+my_vcf.cpp:842:6: error: ‘VCF_CLASS’ has not been declared
+ char VCF_CLASS::GetNucl(const std::string & refChr, const std::size_t & refPos){
+      ^~~~~~~~~
+my_vcf.cpp:842:36: error: ‘string’ in namespace ‘std’ does not name a type
+ char VCF_CLASS::GetNucl(const std::string & refChr, const std::size_t & refPos){
+                                    ^~~~~~
+my_vcf.cpp:842:64: error: ‘size_t’ in namespace ‘std’ does not name a type
+ char VCF_CLASS::GetNucl(const std::string & refChr, const std::size_t & refPos){
+                                                                ^~~~~~
+my_vcf.cpp: In function ‘char GetNucl(const int&, const int&)’:
+my_vcf.cpp:843:10: error: ‘genome’ was not declared in this scope
+   return genome[refChr][refPos-1];
+          ^~~~~~
+my_vcf.cpp:843:10: note: suggested alternative: ‘enum’
+   return genome[refChr][refPos-1];
+          ^~~~~~
+          enum
+my_vcf.cpp: At global scope:
+my_vcf.cpp:849:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::write(){
+      ^~~~~~~~~
+my_vcf.cpp: In function ‘void write()’:
+my_vcf.cpp:850:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << metainfo << "\n";
+        ^~~~
+my_vcf.cpp:850:16: error: ‘metainfo’ was not declared in this scope
+   std::cout << metainfo << "\n";
+                ^~~~~~~~
+my_vcf.cpp:850:16: note: suggested alternative: ‘make_info’
+   std::cout << metainfo << "\n";
+                ^~~~~~~~
+                make_info
+my_vcf.cpp:851:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << header << "\n";
+        ^~~~
+my_vcf.cpp:851:16: error: ‘header’ was not declared in this scope
+   std::cout << header << "\n";
+                ^~~~~~
+my_vcf.cpp:852:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:854:12: error: ‘cout’ is not a member of ‘std’
+       std::cout << j.to_string() << "\n";
+            ^~~~
+my_vcf.cpp: At global scope:
+my_vcf.cpp:860:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::fwrite(std::string outfile){
+      ^~~~~~~~~
+my_vcf.cpp:860:29: error: variable or field ‘fwrite’ declared void
+ void VCF_CLASS::fwrite(std::string outfile){
+                             ^~~~~~
+my_vcf.cpp:860:29: error: ‘string’ is not a member of ‘std’
+my_vcf.cpp:873:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::write_short(){
+      ^~~~~~~~~
+my_vcf.cpp: In function ‘void write_short()’:
+my_vcf.cpp:874:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << metainfo << "\n";
+        ^~~~
+my_vcf.cpp:874:16: error: ‘metainfo’ was not declared in this scope
+   std::cout << metainfo << "\n";
+                ^~~~~~~~
+my_vcf.cpp:874:16: note: suggested alternative: ‘make_info’
+   std::cout << metainfo << "\n";
+                ^~~~~~~~
+                make_info
+my_vcf.cpp:875:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << header << "\n";
+        ^~~~
+my_vcf.cpp:875:16: error: ‘header’ was not declared in this scope
+   std::cout << header << "\n";
+                ^~~~~~
+my_vcf.cpp:876:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:878:12: error: ‘cout’ is not a member of ‘std’
+       std::cout << j.to_string_short() << "\n";
+            ^~~~
+my_vcf.cpp: At global scope:
+my_vcf.cpp:884:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::fwrite_short(std::string outfile){
+      ^~~~~~~~~
+my_vcf.cpp:884:35: error: variable or field ‘fwrite_short’ declared void
+ void VCF_CLASS::fwrite_short(std::string outfile){
+                                   ^~~~~~
+my_vcf.cpp:884:35: error: ‘string’ is not a member of ‘std’
+my_vcf.cpp:899:6: error: ‘size_t’ in namespace ‘std’ does not name a type
+ std::size_t VCF_CLASS::size(){
+      ^~~~~~
+my_vcf.cpp:910:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::add_features_in_id(){
+      ^~~~~~~~~
+my_vcf.cpp: In function ‘void add_features_in_id()’:
+my_vcf.cpp:911:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:914:22: error: ‘to_string’ is not a member of ‘std’
+         +=":" + std::to_string(j.cr)
+                      ^~~~~~~~~
+my_vcf.cpp:915:15: error: ‘to_string’ is not a member of ‘std’
+  + ":" + std::to_string(j.sr)
+               ^~~~~~~~~
+my_vcf.cpp:916:15: error: ‘to_string’ is not a member of ‘std’
+  + ":" + std::to_string(j.pe)
+               ^~~~~~~~~
+my_vcf.cpp:917:22: error: ‘to_string’ is not a member of ‘std’
+         + ":" + std::to_string(j.mq)
+                      ^~~~~~~~~
+my_vcf.cpp:918:22: error: ‘to_string’ is not a member of ‘std’
+         + ":" + std::to_string(j.depdif)
+                      ^~~~~~~~~
+my_vcf.cpp:919:22: error: ‘to_string’ is not a member of ‘std’
+         + ":" + std::to_string(j.nxa)
+                      ^~~~~~~~~
+my_vcf.cpp:920:22: error: ‘to_string’ is not a member of ‘std’
+         + ":" + std::to_string(j.tcb)
+                      ^~~~~~~~~
+my_vcf.cpp:921:22: error: ‘to_string’ is not a member of ‘std’
+         + ":" + std::to_string(j.entropy)
+                      ^~~~~~~~~
+my_vcf.cpp:922:22: error: ‘to_string’ is not a member of ‘std’
+         + ":" + std::to_string(j.purity)
+                      ^~~~~~~~~
+my_vcf.cpp:923:22: error: ‘to_string’ is not a member of ‘std’
+         + ":" + std::to_string(j.seqdep);
+                      ^~~~~~~~~
+my_vcf.cpp: At global scope:
+my_vcf.cpp:933:18: error: variable or field ‘copy_info’ declared void
+ void copy_info ( VCF_CLASS & source, VCF_CLASS & target){
+                  ^~~~~~~~~
+my_vcf.cpp:933:18: error: ‘VCF_CLASS’ was not declared in this scope
+my_vcf.cpp:933:30: error: ‘source’ was not declared in this scope
+ void copy_info ( VCF_CLASS & source, VCF_CLASS & target){
+                              ^~~~~~
+my_vcf.cpp:933:30: note: suggested alternative: ‘double’
+ void copy_info ( VCF_CLASS & source, VCF_CLASS & target){
+                              ^~~~~~
+                              double
+my_vcf.cpp:933:38: error: ‘VCF_CLASS’ was not declared in this scope
+ void copy_info ( VCF_CLASS & source, VCF_CLASS & target){
+                                      ^~~~~~~~~
+my_vcf.cpp:933:50: error: ‘target’ was not declared in this scope
+ void copy_info ( VCF_CLASS & source, VCF_CLASS & target){
+                                                  ^~~~~~
+my_vcf.cpp:941:1: error: ‘VCF_CLASS’ does not name a type
+ VCF_CLASS typing_SV(VCF_CLASS & input){
+ ^~~~~~~~~
+my_vcf.cpp:1034:1: error: ‘VCF_CLASS’ does not name a type
+ VCF_CLASS typing_SV_general(VCF_CLASS & input){
+ ^~~~~~~~~
+my_vcf.cpp:1127:22: error: ‘Position’ was not declared in this scope
+ double return_depdif(Position Pos, std::vector < double > & dep_vec, int Size, double read_length){
+                      ^~~~~~~~
+my_vcf.cpp:1127:41: error: ‘vector’ is not a member of ‘std’
+ double return_depdif(Position Pos, std::vector < double > & dep_vec, int Size, double read_length){
+                                         ^~~~~~
+my_vcf.cpp:1127:50: error: expected primary-expression before ‘double’
+ double return_depdif(Position Pos, std::vector < double > & dep_vec, int Size, double read_length){
+                                                  ^~~~~~
+my_vcf.cpp:1127:70: error: expected primary-expression before ‘int’
+ double return_depdif(Position Pos, std::vector < double > & dep_vec, int Size, double read_length){
+                                                                      ^~~
+my_vcf.cpp:1127:80: error: expected primary-expression before ‘double’
+ double return_depdif(Position Pos, std::vector < double > & dep_vec, int Size, double read_length){
+                                                                                ^~~~~~
+my_vcf.cpp:1127:98: error: expression list treated as compound expression in initializer [-fpermissive]
+ double return_depdif(Position Pos, std::vector < double > & dep_vec, int Size, double read_length){
+                                                                                                  ^
+my_vcf.cpp:1151:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::calc_features(const std::string input_bam, const int read_length, const int insert_size, const int confi_window){
+      ^~~~~~~~~
+my_vcf.cpp:1151:42: error: ‘string’ in namespace ‘std’ does not name a type
+ void VCF_CLASS::calc_features(const std::string input_bam, const int read_length, const int insert_size, const int confi_window){
+                                          ^~~~~~
+my_vcf.cpp: In function ‘void calc_features(int, int, int, int)’:
+my_vcf.cpp:1153:3: error: ‘Position’ was not declared in this scope
+   Position Pos;
+   ^~~~~~~~
+my_vcf.cpp:1154:12: error: expected ‘;’ before ‘Pos1’
+   Position Pos1;
+            ^~~~
+my_vcf.cpp:1155:12: error: expected ‘;’ before ‘Pos2’
+   Position Pos2;
+            ^~~~
+my_vcf.cpp:1156:8: error: ‘string’ is not a member of ‘std’
+   std::string tag;
+        ^~~~~~
+my_vcf.cpp:1158:3: error: ‘BamTools’ has not been declared
+   BamTools::BamReader reader;
+   ^~~~~~~~
+my_vcf.cpp:1159:3: error: ‘BamTools’ has not been declared
+   BamTools::RefVector references;
+   ^~~~~~~~
+my_vcf.cpp:1160:3: error: ‘BamTools’ has not been declared
+   BamTools::BamAlignment al;
+   ^~~~~~~~
+my_vcf.cpp:1161:3: error: ‘BamTools’ has not been declared
+   BamTools::BamAlignment exal;
+   ^~~~~~~~
+my_vcf.cpp:1163:8: error: ‘map’ is not a member of ‘std’
+   std::map < Position,  int > cr_map;
+        ^~~
+my_vcf.cpp:1163:25: error: expected primary-expression before ‘int’
+   std::map < Position,  int > cr_map;
+                         ^~~
+my_vcf.cpp:1164:8: error: ‘map’ is not a member of ‘std’
+   std::map < Position, std::map < Position , int > > sr_map;
+        ^~~
+my_vcf.cpp:1164:29: error: ‘map’ is not a member of ‘std’
+   std::map < Position, std::map < Position , int > > sr_map;
+                             ^~~
+my_vcf.cpp:1164:46: error: expected primary-expression before ‘int’
+   std::map < Position, std::map < Position , int > > sr_map;
+                                              ^~~
+my_vcf.cpp:1165:8: error: ‘map’ is not a member of ‘std’
+   std::map < Position, std::map < Position , int > > pe_map;
+        ^~~
+my_vcf.cpp:1165:29: error: ‘map’ is not a member of ‘std’
+   std::map < Position, std::map < Position , int > > pe_map;
+                             ^~~
+my_vcf.cpp:1165:46: error: expected primary-expression before ‘int’
+   std::map < Position, std::map < Position , int > > pe_map;
+                                              ^~~
+my_vcf.cpp:1166:8: error: ‘map’ is not a member of ‘std’
+   std::map < Position,  int > mq_map; //
+        ^~~
+my_vcf.cpp:1166:25: error: expected primary-expression before ‘int’
+   std::map < Position,  int > mq_map; //
+                         ^~~
+my_vcf.cpp:1167:8: error: ‘map’ is not a member of ‘std’
+   std::map < Position,  int > tcb_map; //
+        ^~~
+my_vcf.cpp:1167:25: error: expected primary-expression before ‘int’
+   std::map < Position,  int > tcb_map; //
+                         ^~~
+my_vcf.cpp:1169:8: error: ‘map’ is not a member of ‘std’
+   std::map < Position,  int > un_map; // for single break end
+        ^~~
+my_vcf.cpp:1169:25: error: expected primary-expression before ‘int’
+   std::map < Position,  int > un_map; // for single break end
+                         ^~~
+my_vcf.cpp:1171:8: error: ‘vector’ is not a member of ‘std’
+   std::vector < double > dep_vec;
+        ^~~~~~
+my_vcf.cpp:1171:17: error: expected primary-expression before ‘double’
+   std::vector < double > dep_vec;
+                 ^~~~~~
+my_vcf.cpp:1173:8: error: ‘map’ is not a member of ‘std’
+   std::map < int , std::set < Position > > ref_pos_map;
+        ^~~
+my_vcf.cpp:1173:14: error: expected primary-expression before ‘int’
+   std::map < int , std::set < Position > > ref_pos_map;
+              ^~~
+my_vcf.cpp:1180:8: error: ‘set’ is not a member of ‘std’
+   std::set < Position > reduced_ref_pos_map;
+        ^~~
+my_vcf.cpp:1180:25: error: ‘reduced_ref_pos_map’ was not declared in this scope
+   std::set < Position > reduced_ref_pos_map;
+                         ^~~~~~~~~~~~~~~~~~~
+my_vcf.cpp:1181:8: error: ‘set’ is not a member of ‘std’
+   std::set < std::string > counted_read_set;
+        ^~~
+my_vcf.cpp:1181:19: error: ‘string’ is not a member of ‘std’
+   std::set < std::string > counted_read_set;
+                   ^~~~~~
+my_vcf.cpp:1181:28: error: ‘counted_read_set’ was not declared in this scope
+   std::set < std::string > counted_read_set;
+                            ^~~~~~~~~~~~~~~~
+my_vcf.cpp:1185:3: error: ‘reader’ was not declared in this scope
+   reader.Open(input_bam);
+   ^~~~~~
+my_vcf.cpp:1189:3: error: ‘references’ was not declared in this scope
+   references = reader.GetReferenceData();
+   ^~~~~~~~~~
+my_vcf.cpp:1192:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1193:5: error: ‘Pos1’ was not declared in this scope
+     Pos1 = i.first;
+     ^~~~
+my_vcf.cpp:1194:5: error: ‘ref_pos_map’ was not declared in this scope
+     ref_pos_map[Pos1.first].insert(Pos1);
+     ^~~~~~~~~~~
+my_vcf.cpp:1218:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1220:7: error: ‘Pos1’ was not declared in this scope
+       Pos1 = i.first;
+       ^~~~
+my_vcf.cpp:1227:35: error: ‘al’ was not declared in this scope
+   while ( reader.GetNextAlignment(al) ){
+                                   ^~
+my_vcf.cpp:1230:21: error: ‘exal’ was not declared in this scope
+     if (al.RefID != exal.RefID && check ){
+                     ^~~~
+my_vcf.cpp:1231:12: error: ‘cout’ is not a member of ‘std’
+       std::cout << ref_id_map[exal.RefID] <<" done\n";
+            ^~~~
+my_vcf.cpp:1231:20: error: ‘ref_id_map’ was not declared in this scope
+       std::cout << ref_id_map[exal.RefID] <<" done\n";
+                    ^~~~~~~~~~
+my_vcf.cpp:1233:24: error: ‘ref_pos_map’ was not declared in this scope
+       for ( auto & i : ref_pos_map[exal.RefID] ){
+                        ^~~~~~~~~~~
+my_vcf.cpp:1234:2: error: ‘Pos’ was not declared in this scope
+  Pos = i;
+  ^~~
+my_vcf.cpp:1235:37: error: ‘dep_vec’ was not declared in this scope
+  double depdif = return_depdif(Pos, dep_vec, Size, read_length);
+                                     ^~~~~~~
+my_vcf.cpp:1235:63: error: ‘return_depdif’ cannot be used as a function
+  double depdif = return_depdif(Pos, dep_vec, Size, read_length);
+                                                               ^
+my_vcf.cpp:1236:21: error: ‘vcf_map’ was not declared in this scope
+  for ( auto & vcf : vcf_map[Pos] ){
+                     ^~~~~~~
+my_vcf.cpp:1239:18: error: ‘id_ref_map’ was not declared in this scope
+      Pos.first = id_ref_map[vcf.chr2];
+                  ^~~~~~~~~~
+my_vcf.cpp:1239:18: note: suggested alternative: ‘build_id_ref_map’
+      Pos.first = id_ref_map[vcf.chr2];
+                  ^~~~~~~~~~
+                  build_id_ref_map
+my_vcf.cpp:1241:65: error: ‘return_depdif’ cannot be used as a function
+      vcf.depdif2 = return_depdif(Pos, dep_vec, Size, read_length);
+                                                                 ^
+my_vcf.cpp:1248:7: error: ‘dep_vec’ was not declared in this scope
+       dep_vec.clear();
+       ^~~~~~~
+my_vcf.cpp:1254:7: error: ‘dep_vec’ was not declared in this scope
+       dep_vec.resize(Size);
+       ^~~~~~~
+my_vcf.cpp:1263:2: error: ‘Pos1’ was not declared in this scope
+  Pos1.first = al.RefID;
+  ^~~~
+my_vcf.cpp:1266:4: error: ‘cr_map’ was not declared in this scope
+    cr_map [ Pos1 ] ++;
+    ^~~~~~
+my_vcf.cpp:1267:4: error: ‘mq_map’ was not declared in this scope
+    mq_map [ Pos1 ] += al.MapQuality ;
+    ^~~~~~
+my_vcf.cpp:1268:4: error: ‘tcb_map’ was not declared in this scope
+    tcb_map [ Pos1 ]+= al.CigarData[0].Length ;
+    ^~~~~~~
+my_vcf.cpp:1272:2: error: ‘Pos1’ was not declared in this scope
+  Pos1.first = al.RefID;
+  ^~~~
+my_vcf.cpp:1275:4: error: ‘cr_map’ was not declared in this scope
+    cr_map [ Pos1 ] ++ ;
+    ^~~~~~
+my_vcf.cpp:1276:4: error: ‘mq_map’ was not declared in this scope
+    mq_map [ Pos1 ] += al.MapQuality ;
+    ^~~~~~
+my_vcf.cpp:1277:4: error: ‘tcb_map’ was not declared in this scope
+    tcb_map [ Pos1 ]+= al.CigarData[al.CigarData.size()-1].Length ;
+    ^~~~~~~
+my_vcf.cpp:1329:5: error: ‘Pos1’ was not declared in this scope
+     Pos1.first = al.RefID;
+     ^~~~
+my_vcf.cpp:1333:5: error: ‘Pos2’ was not declared in this scope
+     Pos2.first = al.MateRefID;
+     ^~~~
+my_vcf.cpp:1343:2: error: ‘pe_map’ was not declared in this scope
+  pe_map[Pos1][Pos2]++;
+  ^~~~~~
+my_vcf.cpp:1350:2: error: ‘pe_map’ was not declared in this scope
+  pe_map[Pos1][Pos2]++;
+  ^~~~~~
+my_vcf.cpp:1364:7: error: ‘dep_vec’ was not declared in this scope
+       dep_vec[i] ++ ;
+       ^~~~~~~
+my_vcf.cpp:1367:5: error: ‘exal’ was not declared in this scope
+     exal = al;
+     ^~~~
+my_vcf.cpp:1371:31: error: ‘exal’ was not declared in this scope
+   int Size = (int) references[exal.RefID].RefLength;
+                               ^~~~
+my_vcf.cpp:1372:20: error: ‘ref_pos_map’ was not declared in this scope
+   for ( auto & i : ref_pos_map[exal.RefID] ){
+                    ^~~~~~~~~~~
+my_vcf.cpp:1373:5: error: ‘Pos’ was not declared in this scope
+     Pos = i;
+     ^~~
+my_vcf.cpp:1374:40: error: ‘dep_vec’ was not declared in this scope
+     double depdif = return_depdif(Pos, dep_vec, Size, read_length);
+                                        ^~~~~~~
+my_vcf.cpp:1374:66: error: ‘return_depdif’ cannot be used as a function
+     double depdif = return_depdif(Pos, dep_vec, Size, read_length);
+                                                                  ^
+my_vcf.cpp:1375:24: error: ‘vcf_map’ was not declared in this scope
+     for ( auto & vcf : vcf_map[Pos] ){
+                        ^~~~~~~
+my_vcf.cpp:1377:19: error: ‘id_ref_map’ was not declared in this scope
+       Pos.first = id_ref_map[vcf.chr2];
+                   ^~~~~~~~~~
+my_vcf.cpp:1377:19: note: suggested alternative: ‘build_id_ref_map’
+       Pos.first = id_ref_map[vcf.chr2];
+                   ^~~~~~~~~~
+                   build_id_ref_map
+my_vcf.cpp:1379:66: error: ‘return_depdif’ cannot be used as a function
+       vcf.depdif2 = return_depdif(Pos, dep_vec, Size, read_length);
+                                                                  ^
+my_vcf.cpp:1382:3: error: ‘dep_vec’ was not declared in this scope
+   dep_vec.clear();
+   ^~~~~~~
+my_vcf.cpp:1384:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Scanning done\n";
+        ^~~~
+my_vcf.cpp:1385:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: DEPDIF\n";
+        ^~~~
+my_vcf.cpp:1390:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1392:5: error: ‘Pos1’ was not declared in this scope
+     Pos1 = i.first;
+     ^~~~
+my_vcf.cpp:1393:14: error: expected ‘;’ before ‘Posa’
+     Position Posa = Pos1;
+              ^~~~
+my_vcf.cpp:1396:2: error: ‘Posa’ was not declared in this scope
+  Posa.second = Pos1.second + k ;
+  ^~~~
+my_vcf.cpp:1397:7: error: ‘cr_map’ was not declared in this scope
+  if ( cr_map.find(Posa) != cr_map.end() ){
+       ^~~~~~
+my_vcf.cpp:1400:7: error: ‘mq_map’ was not declared in this scope
+  if ( mq_map.find(Posa) != mq_map.end() ){
+       ^~~~~~
+my_vcf.cpp:1403:7: error: ‘tcb_map’ was not declared in this scope
+  if ( tcb_map.find(Posa) != tcb_map.end() ){
+       ^~~~~~~
+my_vcf.cpp:1408:2: error: ‘Pos2’ was not declared in this scope
+  Pos2.first = id_ref_map[vcf.chr2];
+  ^~~~
+my_vcf.cpp:1408:15: error: ‘id_ref_map’ was not declared in this scope
+  Pos2.first = id_ref_map[vcf.chr2];
+               ^~~~~~~~~~
+my_vcf.cpp:1408:15: note: suggested alternative: ‘build_id_ref_map’
+  Pos2.first = id_ref_map[vcf.chr2];
+               ^~~~~~~~~~
+               build_id_ref_map
+my_vcf.cpp:1410:11: error: expected ‘;’ before ‘Posb’
+  Position Posb = Pos2;
+           ^~~~
+my_vcf.cpp:1412:4: error: ‘Posb’ was not declared in this scope
+    Posb.second = Pos2.second + k ;
+    ^~~~
+my_vcf.cpp:1413:9: error: ‘cr_map’ was not declared in this scope
+    if ( cr_map.find(Posb) != cr_map.end() ){
+         ^~~~~~
+my_vcf.cpp:1416:9: error: ‘mq_map’ was not declared in this scope
+    if ( mq_map.find(Posb) != mq_map.end() ){
+         ^~~~~~
+my_vcf.cpp:1419:9: error: ‘tcb_map’ was not declared in this scope
+    if ( tcb_map.find(Posb) != tcb_map.end() ){
+         ^~~~~~~
+my_vcf.cpp:1435:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1441:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: CR\n";
+        ^~~~
+my_vcf.cpp:1442:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: MQ\n";
+        ^~~~
+my_vcf.cpp:1443:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: TCB\n";
+        ^~~~
+my_vcf.cpp:1480:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1486:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: SR----\n";
+        ^~~~
+my_vcf.cpp:1491:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1492:5: error: ‘Pos1’ was not declared in this scope
+     Pos1 = i.first;
+     ^~~~
+my_vcf.cpp:1493:14: error: expected ‘;’ before ‘Posa’
+     Position Posa = Pos1;
+              ^~~~
+my_vcf.cpp:1494:5: error: ‘Posa’ was not declared in this scope
+     Posa.second += read_length / 2;
+     ^~~~
+my_vcf.cpp:1497:7: error: ‘Pos2’ was not declared in this scope
+       Pos2.first = id_ref_map[vcf.chr2];
+       ^~~~
+my_vcf.cpp:1497:20: error: ‘id_ref_map’ was not declared in this scope
+       Pos2.first = id_ref_map[vcf.chr2];
+                    ^~~~~~~~~~
+my_vcf.cpp:1497:20: note: suggested alternative: ‘build_id_ref_map’
+       Pos2.first = id_ref_map[vcf.chr2];
+                    ^~~~~~~~~~
+                    build_id_ref_map
+my_vcf.cpp:1499:16: error: expected ‘;’ before ‘Posb’
+       Position Posb = Pos2;
+                ^~~~
+my_vcf.cpp:1500:7: error: ‘Posb’ was not declared in this scope
+       Posb.second += read_length / 2;
+       ^~~~
+my_vcf.cpp:1504:7: error: ‘pe_map’ was not declared in this scope
+  if ( pe_map.find(Posa) != pe_map.end() ){
+       ^~~~~~
+my_vcf.cpp:1515:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1522:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1530:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1536:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: PE \n";
+        ^~~~
+my_vcf.cpp:1541:8: error: ‘map’ is not a member of ‘std’
+   std::map<Position,double> entropy_map;
+        ^~~
+my_vcf.cpp:1541:21: error: expected primary-expression before ‘double’
+   std::map<Position,double> entropy_map;
+                     ^~~~~~
+my_vcf.cpp:1543:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1544:5: error: ‘Pos1’ was not declared in this scope
+     Pos1 = i.first;
+     ^~~~
+my_vcf.cpp:1546:7: error: ‘Pos2’ was not declared in this scope
+       Pos2.first = id_ref_map[vcf.chr2];
+       ^~~~
+my_vcf.cpp:1546:20: error: ‘id_ref_map’ was not declared in this scope
+       Pos2.first = id_ref_map[vcf.chr2];
+                    ^~~~~~~~~~
+my_vcf.cpp:1546:20: note: suggested alternative: ‘build_id_ref_map’
+       Pos2.first = id_ref_map[vcf.chr2];
+                    ^~~~~~~~~~
+                    build_id_ref_map
+my_vcf.cpp:1548:7: error: ‘sr_map’ was not declared in this scope
+       sr_map[Pos1][Pos2]=vcf.sr;
+       ^~~~~~
+my_vcf.cpp:1552:20: error: ‘sr_map’ was not declared in this scope
+   for ( auto & i : sr_map ){
+                    ^~~~~~
+my_vcf.cpp:1554:7: error: ‘entropy_map’ was not declared in this scope
+       entropy_map[i.first] = 0 ;
+       ^~~~~~~~~~~
+my_vcf.cpp:1563:37: error: ‘log’ was not declared in this scope
+  if ( prob > 0 ) entropy = - prob * log ( prob );
+                                     ^~~
+my_vcf.cpp:1563:37: note: suggested alternative: ‘long’
+  if ( prob > 0 ) entropy = - prob * log ( prob );
+                                     ^~~
+                                     long
+my_vcf.cpp:1566:7: error: ‘entropy_map’ was not declared in this scope
+       entropy_map[i.first]=entropy;
+       ^~~~~~~~~~~
+my_vcf.cpp:1566:7: note: suggested alternative: ‘entropy’
+       entropy_map[i.first]=entropy;
+       ^~~~~~~~~~~
+       entropy
+my_vcf.cpp:1571:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1572:5: error: ‘Pos1’ was not declared in this scope
+     Pos1 = i.first;
+     ^~~~
+my_vcf.cpp:1573:14: error: expected ‘;’ before ‘Posa’
+     Position Posa = Pos1;
+              ^~~~
+my_vcf.cpp:1576:2: error: ‘Posa’ was not declared in this scope
+  Posa.second = Pos1.second + k ;
+  ^~~~
+my_vcf.cpp:1577:7: error: ‘entropy_map’ was not declared in this scope
+  if ( entropy_map.find(Posa) != entropy_map.end() ){
+       ^~~~~~~~~~~
+my_vcf.cpp:1582:2: error: ‘Pos2’ was not declared in this scope
+  Pos2.first = id_ref_map[vcf.chr2];
+  ^~~~
+my_vcf.cpp:1582:15: error: ‘id_ref_map’ was not declared in this scope
+  Pos2.first = id_ref_map[vcf.chr2];
+               ^~~~~~~~~~
+my_vcf.cpp:1582:15: note: suggested alternative: ‘build_id_ref_map’
+  Pos2.first = id_ref_map[vcf.chr2];
+               ^~~~~~~~~~
+               build_id_ref_map
+my_vcf.cpp:1584:11: error: expected ‘;’ before ‘Posb’
+  Position Posb = Pos2;
+           ^~~~
+my_vcf.cpp:1586:4: error: ‘Posb’ was not declared in this scope
+    Posb.second = Pos2.second + k ;
+    ^~~~
+my_vcf.cpp:1587:9: error: ‘entropy_map’ was not declared in this scope
+    if ( entropy_map.find(Posb) != entropy_map.end() ){
+         ^~~~~~~~~~~
+my_vcf.cpp:1597:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: ENTROPY\n";
+        ^~~~
+my_vcf.cpp:1603:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1608:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: feature calculation\n";
+        ^~~~
+my_vcf.cpp: At global scope:
+my_vcf.cpp:1617:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::calc_features_general(const std::string input_bam, const int read_length, const int insert_size, const int confi_window){
+      ^~~~~~~~~
+my_vcf.cpp:1617:50: error: ‘string’ in namespace ‘std’ does not name a type
+ void VCF_CLASS::calc_features_general(const std::string input_bam, const int read_length, const int insert_size, const int confi_window){
+                                                  ^~~~~~
+my_vcf.cpp: In function ‘void calc_features_general(int, int, int, int)’:
+my_vcf.cpp:1619:3: error: ‘Position’ was not declared in this scope
+   Position Pos;
+   ^~~~~~~~
+my_vcf.cpp:1620:12: error: expected ‘;’ before ‘Pos1’
+   Position Pos1;
+            ^~~~
+my_vcf.cpp:1621:12: error: expected ‘;’ before ‘Pos2’
+   Position Pos2;
+            ^~~~
+my_vcf.cpp:1622:8: error: ‘string’ is not a member of ‘std’
+   std::string tag;
+        ^~~~~~
+my_vcf.cpp:1624:3: error: ‘BamTools’ has not been declared
+   BamTools::BamReader reader;
+   ^~~~~~~~
+my_vcf.cpp:1625:3: error: ‘BamTools’ has not been declared
+   BamTools::RefVector references;
+   ^~~~~~~~
+my_vcf.cpp:1626:3: error: ‘BamTools’ has not been declared
+   BamTools::BamAlignment al;
+   ^~~~~~~~
+my_vcf.cpp:1627:3: error: ‘BamTools’ has not been declared
+   BamTools::BamAlignment exal;
+   ^~~~~~~~
+my_vcf.cpp:1629:8: error: ‘map’ is not a member of ‘std’
+   std::map < Position,  int > cr_map;
+        ^~~
+my_vcf.cpp:1629:25: error: expected primary-expression before ‘int’
+   std::map < Position,  int > cr_map;
+                         ^~~
+my_vcf.cpp:1630:8: error: ‘map’ is not a member of ‘std’
+   std::map < Position, std::map < Position , int > > sr_map;
+        ^~~
+my_vcf.cpp:1630:29: error: ‘map’ is not a member of ‘std’
+   std::map < Position, std::map < Position , int > > sr_map;
+                             ^~~
+my_vcf.cpp:1630:46: error: expected primary-expression before ‘int’
+   std::map < Position, std::map < Position , int > > sr_map;
+                                              ^~~
+my_vcf.cpp:1631:8: error: ‘map’ is not a member of ‘std’
+   std::map < Position, std::map < Position , int > > pe_map;
+        ^~~
+my_vcf.cpp:1631:29: error: ‘map’ is not a member of ‘std’
+   std::map < Position, std::map < Position , int > > pe_map;
+                             ^~~
+my_vcf.cpp:1631:46: error: expected primary-expression before ‘int’
+   std::map < Position, std::map < Position , int > > pe_map;
+                                              ^~~
+my_vcf.cpp:1632:8: error: ‘map’ is not a member of ‘std’
+   std::map < Position,  int > mq_map; //
+        ^~~
+my_vcf.cpp:1632:25: error: expected primary-expression before ‘int’
+   std::map < Position,  int > mq_map; //
+                         ^~~
+my_vcf.cpp:1633:8: error: ‘map’ is not a member of ‘std’
+   std::map < Position,  int > tcb_map; //
+        ^~~
+my_vcf.cpp:1633:25: error: expected primary-expression before ‘int’
+   std::map < Position,  int > tcb_map; //
+                         ^~~
+my_vcf.cpp:1635:8: error: ‘map’ is not a member of ‘std’
+   std::map < Position,  int > un_map; // for single break end
+        ^~~
+my_vcf.cpp:1635:25: error: expected primary-expression before ‘int’
+   std::map < Position,  int > un_map; // for single break end
+                         ^~~
+my_vcf.cpp:1637:8: error: ‘vector’ is not a member of ‘std’
+   std::vector < double > dep_vec;
+        ^~~~~~
+my_vcf.cpp:1637:17: error: expected primary-expression before ‘double’
+   std::vector < double > dep_vec;
+                 ^~~~~~
+my_vcf.cpp:1639:8: error: ‘map’ is not a member of ‘std’
+   std::map < int , std::set < Position > > ref_pos_map;
+        ^~~
+my_vcf.cpp:1639:14: error: expected primary-expression before ‘int’
+   std::map < int , std::set < Position > > ref_pos_map;
+              ^~~
+my_vcf.cpp:1647:8: error: ‘set’ is not a member of ‘std’
+   std::set < Position > reduced_ref_pos_map;
+        ^~~
+my_vcf.cpp:1647:25: error: ‘reduced_ref_pos_map’ was not declared in this scope
+   std::set < Position > reduced_ref_pos_map;
+                         ^~~~~~~~~~~~~~~~~~~
+my_vcf.cpp:1648:8: error: ‘set’ is not a member of ‘std’
+   std::set < std::string > counted_read_set;
+        ^~~
+my_vcf.cpp:1648:19: error: ‘string’ is not a member of ‘std’
+   std::set < std::string > counted_read_set;
+                   ^~~~~~
+my_vcf.cpp:1648:28: error: ‘counted_read_set’ was not declared in this scope
+   std::set < std::string > counted_read_set;
+                            ^~~~~~~~~~~~~~~~
+my_vcf.cpp:1652:3: error: ‘reader’ was not declared in this scope
+   reader.Open(input_bam);
+   ^~~~~~
+my_vcf.cpp:1656:3: error: ‘references’ was not declared in this scope
+   references = reader.GetReferenceData();
+   ^~~~~~~~~~
+my_vcf.cpp:1659:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1660:5: error: ‘Pos1’ was not declared in this scope
+     Pos1 = i.first;
+     ^~~~
+my_vcf.cpp:1661:5: error: ‘ref_pos_map’ was not declared in this scope
+     ref_pos_map[Pos1.first].insert(Pos1);
+     ^~~~~~~~~~~
+my_vcf.cpp:1684:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1686:7: error: ‘Pos1’ was not declared in this scope
+       Pos1 = i.first;
+       ^~~~
+my_vcf.cpp:1694:35: error: ‘al’ was not declared in this scope
+   while ( reader.GetNextAlignment(al) ){
+                                   ^~
+my_vcf.cpp:1697:21: error: ‘exal’ was not declared in this scope
+     if (al.RefID != exal.RefID && check ){
+                     ^~~~
+my_vcf.cpp:1698:12: error: ‘cout’ is not a member of ‘std’
+       std::cout << ref_id_map[exal.RefID] <<" done\n";
+            ^~~~
+my_vcf.cpp:1698:20: error: ‘ref_id_map’ was not declared in this scope
+       std::cout << ref_id_map[exal.RefID] <<" done\n";
+                    ^~~~~~~~~~
+my_vcf.cpp:1700:24: error: ‘ref_pos_map’ was not declared in this scope
+       for ( auto & i : ref_pos_map[exal.RefID] ){
+                        ^~~~~~~~~~~
+my_vcf.cpp:1701:2: error: ‘Pos’ was not declared in this scope
+  Pos = i;
+  ^~~
+my_vcf.cpp:1702:37: error: ‘dep_vec’ was not declared in this scope
+  double depdif = return_depdif(Pos, dep_vec, Size, read_length);
+                                     ^~~~~~~
+my_vcf.cpp:1702:63: error: ‘return_depdif’ cannot be used as a function
+  double depdif = return_depdif(Pos, dep_vec, Size, read_length);
+                                                               ^
+my_vcf.cpp:1703:21: error: ‘vcf_map’ was not declared in this scope
+  for ( auto & vcf : vcf_map[Pos] ){
+                     ^~~~~~~
+my_vcf.cpp:1706:18: error: ‘id_ref_map’ was not declared in this scope
+      Pos.first = id_ref_map[vcf.chr2];
+                  ^~~~~~~~~~
+my_vcf.cpp:1706:18: note: suggested alternative: ‘build_id_ref_map’
+      Pos.first = id_ref_map[vcf.chr2];
+                  ^~~~~~~~~~
+                  build_id_ref_map
+my_vcf.cpp:1708:65: error: ‘return_depdif’ cannot be used as a function
+      vcf.depdif2 = return_depdif(Pos, dep_vec, Size, read_length);
+                                                                 ^
+my_vcf.cpp:1715:7: error: ‘dep_vec’ was not declared in this scope
+       dep_vec.clear();
+       ^~~~~~~
+my_vcf.cpp:1721:7: error: ‘dep_vec’ was not declared in this scope
+       dep_vec.resize(Size);
+       ^~~~~~~
+my_vcf.cpp:1730:2: error: ‘Pos1’ was not declared in this scope
+  Pos1.first = al.RefID;
+  ^~~~
+my_vcf.cpp:1733:4: error: ‘cr_map’ was not declared in this scope
+    cr_map [ Pos1 ] ++;
+    ^~~~~~
+my_vcf.cpp:1734:4: error: ‘mq_map’ was not declared in this scope
+    mq_map [ Pos1 ] += al.MapQuality ;
+    ^~~~~~
+my_vcf.cpp:1735:4: error: ‘tcb_map’ was not declared in this scope
+    tcb_map [ Pos1 ]+= al.CigarData[0].Length ;
+    ^~~~~~~
+my_vcf.cpp:1739:2: error: ‘Pos1’ was not declared in this scope
+  Pos1.first = al.RefID;
+  ^~~~
+my_vcf.cpp:1742:4: error: ‘cr_map’ was not declared in this scope
+    cr_map [ Pos1 ] ++ ;
+    ^~~~~~
+my_vcf.cpp:1743:4: error: ‘mq_map’ was not declared in this scope
+    mq_map [ Pos1 ] += al.MapQuality ;
+    ^~~~~~
+my_vcf.cpp:1744:4: error: ‘tcb_map’ was not declared in this scope
+    tcb_map [ Pos1 ]+= al.CigarData[al.CigarData.size()-1].Length ;
+    ^~~~~~~
+my_vcf.cpp:1751:10: error: ‘string’ is not a member of ‘std’
+     std::string Tag;
+          ^~~~~~
+my_vcf.cpp:1752:25: error: ‘string’ is not a member of ‘std’
+     if ( al.GetTag<std::string>("SA",Tag) ){
+                         ^~~~~~
+my_vcf.cpp:1752:38: error: ‘Tag’ was not declared in this scope
+     if ( al.GetTag<std::string>("SA",Tag) ){
+                                      ^~~
+my_vcf.cpp:1753:12: error: ‘vector’ is not a member of ‘std’
+       std::vector < std::string > tag_vec;
+            ^~~~~~
+my_vcf.cpp:1753:26: error: ‘string’ is not a member of ‘std’
+       std::vector < std::string > tag_vec;
+                          ^~~~~~
+my_vcf.cpp:1753:35: error: ‘tag_vec’ was not declared in this scope
+       std::vector < std::string > tag_vec;
+                                   ^~~~~~~
+my_vcf.cpp:1755:7: error: ‘string’ is not a member of ‘std’
+  std::string tmp = parse_SA_tag(Tag);
+       ^~~~~~
+my_vcf.cpp:1756:21: error: ‘tmp’ was not declared in this scope
+  tag_vec.push_back( tmp );
+                     ^~~
+my_vcf.cpp:1758:24: error: unable to deduce ‘auto&&’ from ‘tag_vec’
+       for ( auto tag : tag_vec){
+                        ^~~~~~~
+my_vcf.cpp:1761:6: error: ‘Pos1’ was not declared in this scope
+      Pos1.first = al.RefID ;
+      ^~~~
+my_vcf.cpp:1763:6: error: ‘Pos2’ was not declared in this scope
+      Pos2 = find_split(tag,id_ref_map);
+      ^~~~
+my_vcf.cpp:1763:28: error: ‘id_ref_map’ was not declared in this scope
+      Pos2 = find_split(tag,id_ref_map);
+                            ^~~~~~~~~~
+my_vcf.cpp:1763:28: note: suggested alternative: ‘build_id_ref_map’
+      Pos2 = find_split(tag,id_ref_map);
+                            ^~~~~~~~~~
+                            build_id_ref_map
+my_vcf.cpp:1763:13: error: ‘find_split’ was not declared in this scope
+      Pos2 = find_split(tag,id_ref_map);
+             ^~~~~~~~~~
+my_vcf.cpp:1765:8: error: ‘sr_map’ was not declared in this scope
+        sr_map[Pos1][Pos2]++;
+        ^~~~~~
+my_vcf.cpp:1769:6: error: ‘Pos1’ was not declared in this scope
+      Pos1.first = al.RefID ;
+      ^~~~
+my_vcf.cpp:1771:6: error: ‘Pos2’ was not declared in this scope
+      Pos2 = find_split(tag,id_ref_map);
+      ^~~~
+my_vcf.cpp:1771:28: error: ‘id_ref_map’ was not declared in this scope
+      Pos2 = find_split(tag,id_ref_map);
+                            ^~~~~~~~~~
+my_vcf.cpp:1771:28: note: suggested alternative: ‘build_id_ref_map’
+      Pos2 = find_split(tag,id_ref_map);
+                            ^~~~~~~~~~
+                            build_id_ref_map
+my_vcf.cpp:1771:13: error: ‘find_split’ was not declared in this scope
+      Pos2 = find_split(tag,id_ref_map);
+             ^~~~~~~~~~
+my_vcf.cpp:1773:8: error: ‘sr_map’ was not declared in this scope
+        sr_map[Pos1][Pos2]++;
+        ^~~~~~
+my_vcf.cpp:1783:4: error: ‘Pos1’ was not declared in this scope
+    Pos1.first = al.RefID ;
+    ^~~~
+my_vcf.cpp:1785:4: error: ‘un_map’ was not declared in this scope
+    un_map[Pos1] ++;
+    ^~~~~~
+my_vcf.cpp:1788:4: error: ‘Pos1’ was not declared in this scope
+    Pos1.first = al.RefID ;
+    ^~~~
+my_vcf.cpp:1790:4: error: ‘un_map’ was not declared in this scope
+    un_map[Pos1] ++;
+    ^~~~~~
+my_vcf.cpp:1797:5: error: ‘Pos1’ was not declared in this scope
+     Pos1.first = al.RefID;
+     ^~~~
+my_vcf.cpp:1801:5: error: ‘Pos2’ was not declared in this scope
+     Pos2.first = al.MateRefID;
+     ^~~~
+my_vcf.cpp:1811:2: error: ‘pe_map’ was not declared in this scope
+  pe_map[Pos1][Pos2]++;
+  ^~~~~~
+my_vcf.cpp:1818:2: error: ‘pe_map’ was not declared in this scope
+  pe_map[Pos1][Pos2]++;
+  ^~~~~~
+my_vcf.cpp:1831:7: error: ‘dep_vec’ was not declared in this scope
+       dep_vec[i] ++ ;
+       ^~~~~~~
+my_vcf.cpp:1834:5: error: ‘exal’ was not declared in this scope
+     exal = al;
+     ^~~~
+my_vcf.cpp:1838:31: error: ‘exal’ was not declared in this scope
+   int Size = (int) references[exal.RefID].RefLength;
+                               ^~~~
+my_vcf.cpp:1839:20: error: ‘ref_pos_map’ was not declared in this scope
+   for ( auto & i : ref_pos_map[exal.RefID] ){
+                    ^~~~~~~~~~~
+my_vcf.cpp:1840:5: error: ‘Pos’ was not declared in this scope
+     Pos = i;
+     ^~~
+my_vcf.cpp:1841:40: error: ‘dep_vec’ was not declared in this scope
+     double depdif = return_depdif(Pos, dep_vec, Size, read_length);
+                                        ^~~~~~~
+my_vcf.cpp:1841:66: error: ‘return_depdif’ cannot be used as a function
+     double depdif = return_depdif(Pos, dep_vec, Size, read_length);
+                                                                  ^
+my_vcf.cpp:1842:24: error: ‘vcf_map’ was not declared in this scope
+     for ( auto & vcf : vcf_map[Pos] ){
+                        ^~~~~~~
+my_vcf.cpp:1844:19: error: ‘id_ref_map’ was not declared in this scope
+       Pos.first = id_ref_map[vcf.chr2];
+                   ^~~~~~~~~~
+my_vcf.cpp:1844:19: note: suggested alternative: ‘build_id_ref_map’
+       Pos.first = id_ref_map[vcf.chr2];
+                   ^~~~~~~~~~
+                   build_id_ref_map
+my_vcf.cpp:1846:66: error: ‘return_depdif’ cannot be used as a function
+       vcf.depdif2 = return_depdif(Pos, dep_vec, Size, read_length);
+                                                                  ^
+my_vcf.cpp:1849:3: error: ‘dep_vec’ was not declared in this scope
+   dep_vec.clear();
+   ^~~~~~~
+my_vcf.cpp:1851:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Scanning done\n";
+        ^~~~
+my_vcf.cpp:1852:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: DEPDIF\n";
+        ^~~~
+my_vcf.cpp:1857:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1859:5: error: ‘Pos1’ was not declared in this scope
+     Pos1 = i.first;
+     ^~~~
+my_vcf.cpp:1860:14: error: expected ‘;’ before ‘Posa’
+     Position Posa = Pos1;
+              ^~~~
+my_vcf.cpp:1863:2: error: ‘Posa’ was not declared in this scope
+  Posa.second = Pos1.second + k ;
+  ^~~~
+my_vcf.cpp:1864:7: error: ‘cr_map’ was not declared in this scope
+  if ( cr_map.find(Posa) != cr_map.end() ){
+       ^~~~~~
+my_vcf.cpp:1866:14: error: ‘mq_map’ was not declared in this scope
+    vcf.mq += mq_map [Posa];
+              ^~~~~~
+my_vcf.cpp:1867:14: error: ‘tcb_map’ was not declared in this scope
+    vcf.tcb+= tcb_map[Posa];
+              ^~~~~~~
+my_vcf.cpp:1871:2: error: ‘Pos2’ was not declared in this scope
+  Pos2.first = id_ref_map[vcf.chr2];
+  ^~~~
+my_vcf.cpp:1871:15: error: ‘id_ref_map’ was not declared in this scope
+  Pos2.first = id_ref_map[vcf.chr2];
+               ^~~~~~~~~~
+my_vcf.cpp:1871:15: note: suggested alternative: ‘build_id_ref_map’
+  Pos2.first = id_ref_map[vcf.chr2];
+               ^~~~~~~~~~
+               build_id_ref_map
+my_vcf.cpp:1873:11: error: expected ‘;’ before ‘Posb’
+  Position Posb = Pos2;
+           ^~~~
+my_vcf.cpp:1875:4: error: ‘Posb’ was not declared in this scope
+    Posb.second = Pos2.second + k ;
+    ^~~~
+my_vcf.cpp:1876:9: error: ‘cr_map’ was not declared in this scope
+    if ( cr_map.find(Posb) != cr_map.end() ){
+         ^~~~~~
+my_vcf.cpp:1878:17: error: ‘mq_map’ was not declared in this scope
+      vcf.mq2 += mq_map [Posb];
+                 ^~~~~~
+my_vcf.cpp:1879:17: error: ‘tcb_map’ was not declared in this scope
+      vcf.tcb2+= tcb_map[Posb];
+                 ^~~~~~~
+my_vcf.cpp:1894:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1900:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: CR\n";
+        ^~~~
+my_vcf.cpp:1901:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: MQ\n";
+        ^~~~
+my_vcf.cpp:1902:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: TCB\n";
+        ^~~~
+my_vcf.cpp:1907:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1908:5: error: ‘Pos1’ was not declared in this scope
+     Pos1 = i.first;
+     ^~~~
+my_vcf.cpp:1909:14: error: expected ‘;’ before ‘Posa’
+     Position Posa = Pos1;
+              ^~~~
+my_vcf.cpp:1912:2: error: ‘Pos2’ was not declared in this scope
+  Pos2.first = id_ref_map[vcf.chr2];
+  ^~~~
+my_vcf.cpp:1912:15: error: ‘id_ref_map’ was not declared in this scope
+  Pos2.first = id_ref_map[vcf.chr2];
+               ^~~~~~~~~~
+my_vcf.cpp:1912:15: note: suggested alternative: ‘build_id_ref_map’
+  Pos2.first = id_ref_map[vcf.chr2];
+               ^~~~~~~~~~
+               build_id_ref_map
+my_vcf.cpp:1914:11: error: expected ‘;’ before ‘Posb’
+  Position Posb = Pos2;
+           ^~~~
+my_vcf.cpp:1916:4: error: ‘Posa’ was not declared in this scope
+    Posa.second = Pos1.second + k ;
+    ^~~~
+my_vcf.cpp:1917:9: error: ‘sr_map’ was not declared in this scope
+    if ( sr_map.find(Posa) != sr_map.end() ){
+         ^~~~~~
+my_vcf.cpp:1919:8: error: ‘Posb’ was not declared in this scope
+        Posb.second = Pos2.second + l ;
+        ^~~~
+my_vcf.cpp:1929:4: error: ‘Posa’ was not declared in this scope
+    Posa.second = Pos1.second + k ;
+    ^~~~
+my_vcf.cpp:1930:9: error: ‘un_map’ was not declared in this scope
+    if ( un_map.find(Posa) != un_map.end() ){
+         ^~~~~~
+my_vcf.cpp:1939:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1945:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: SR\n";
+        ^~~~
+my_vcf.cpp:1950:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1951:5: error: ‘Pos1’ was not declared in this scope
+     Pos1 = i.first;
+     ^~~~
+my_vcf.cpp:1952:14: error: expected ‘;’ before ‘Posa’
+     Position Posa = Pos1;
+              ^~~~
+my_vcf.cpp:1953:5: error: ‘Posa’ was not declared in this scope
+     Posa.second += read_length / 2;
+     ^~~~
+my_vcf.cpp:1956:7: error: ‘Pos2’ was not declared in this scope
+       Pos2.first = id_ref_map[vcf.chr2];
+       ^~~~
+my_vcf.cpp:1956:20: error: ‘id_ref_map’ was not declared in this scope
+       Pos2.first = id_ref_map[vcf.chr2];
+                    ^~~~~~~~~~
+my_vcf.cpp:1956:20: note: suggested alternative: ‘build_id_ref_map’
+       Pos2.first = id_ref_map[vcf.chr2];
+                    ^~~~~~~~~~
+                    build_id_ref_map
+my_vcf.cpp:1958:16: error: expected ‘;’ before ‘Posb’
+       Position Posb = Pos2;
+                ^~~~
+my_vcf.cpp:1959:7: error: ‘Posb’ was not declared in this scope
+       Posb.second += read_length / 2;
+       ^~~~
+my_vcf.cpp:1963:7: error: ‘pe_map’ was not declared in this scope
+  if ( pe_map.find(Posa) != pe_map.end() ){
+       ^~~~~~
+my_vcf.cpp:1974:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1981:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1989:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:1995:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: PE \n";
+        ^~~~
+my_vcf.cpp:2000:8: error: ‘map’ is not a member of ‘std’
+   std::map<Position,double> entropy_map;
+        ^~~
+my_vcf.cpp:2000:21: error: expected primary-expression before ‘double’
+   std::map<Position,double> entropy_map;
+                     ^~~~~~
+my_vcf.cpp:2001:20: error: ‘sr_map’ was not declared in this scope
+   for ( auto & i : sr_map ){
+                    ^~~~~~
+my_vcf.cpp:2003:7: error: ‘entropy_map’ was not declared in this scope
+       entropy_map[i.first] = 0 ;
+       ^~~~~~~~~~~
+my_vcf.cpp:2012:37: error: ‘log’ was not declared in this scope
+  if ( prob > 0 ) entropy = - prob * log ( prob );
+                                     ^~~
+my_vcf.cpp:2012:37: note: suggested alternative: ‘long’
+  if ( prob > 0 ) entropy = - prob * log ( prob );
+                                     ^~~
+                                     long
+my_vcf.cpp:2015:7: error: ‘entropy_map’ was not declared in this scope
+       entropy_map[i.first]=entropy;
+       ^~~~~~~~~~~
+my_vcf.cpp:2015:7: note: suggested alternative: ‘entropy’
+       entropy_map[i.first]=entropy;
+       ^~~~~~~~~~~
+       entropy
+my_vcf.cpp:2020:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:2021:5: error: ‘Pos1’ was not declared in this scope
+     Pos1 = i.first;
+     ^~~~
+my_vcf.cpp:2022:14: error: expected ‘;’ before ‘Posa’
+     Position Posa = Pos1;
+              ^~~~
+my_vcf.cpp:2025:2: error: ‘Posa’ was not declared in this scope
+  Posa.second = Pos1.second + k ;
+  ^~~~
+my_vcf.cpp:2026:7: error: ‘entropy_map’ was not declared in this scope
+  if ( entropy_map.find(Posa) != entropy_map.end() ){
+       ^~~~~~~~~~~
+my_vcf.cpp:2031:2: error: ‘Pos2’ was not declared in this scope
+  Pos2.first = id_ref_map[vcf.chr2];
+  ^~~~
+my_vcf.cpp:2031:15: error: ‘id_ref_map’ was not declared in this scope
+  Pos2.first = id_ref_map[vcf.chr2];
+               ^~~~~~~~~~
+my_vcf.cpp:2031:15: note: suggested alternative: ‘build_id_ref_map’
+  Pos2.first = id_ref_map[vcf.chr2];
+               ^~~~~~~~~~
+               build_id_ref_map
+my_vcf.cpp:2033:11: error: expected ‘;’ before ‘Posb’
+  Position Posb = Pos2;
+           ^~~~
+my_vcf.cpp:2035:4: error: ‘Posb’ was not declared in this scope
+    Posb.second = Pos2.second + k ;
+    ^~~~
+my_vcf.cpp:2036:9: error: ‘entropy_map’ was not declared in this scope
+    if ( entropy_map.find(Posb) != entropy_map.end() ){
+         ^~~~~~~~~~~
+my_vcf.cpp:2046:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: ENTROPY\n";
+        ^~~~
+my_vcf.cpp:2052:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+my_vcf.cpp:2057:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "Complete: feature calculation\n";
+        ^~~~
+my_vcf.cpp: At global scope:
+my_vcf.cpp:2067:6: error: ‘VCF_CLASS’ has not been declared
+ void VCF_CLASS::make_info(){
+      ^~~~~~~~~
+my_vcf.cpp: In function ‘void make_info()’:
+my_vcf.cpp:2067:6: error: redefinition of ‘void make_info()’
+my_vcf.cpp:456:6: note: ‘void make_info()’ previously defined here
+ void VCF::make_info(){
+      ^~~
+my_vcf.cpp:2068:20: error: ‘vcf_map’ was not declared in this scope
+   for ( auto & i : vcf_map ){
+                    ^~~~~~~
+make: *** [my_vcf.lo] Error 1

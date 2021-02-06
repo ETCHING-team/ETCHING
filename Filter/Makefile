@@ -1,4 +1,4 @@
-default: ../lib/libetching_filter.so gzstream read_collector kmer_filter fastq_check read_length_calc sort_fastq_mem_eff
+default: ../lib/libetching_filter.so gzstream read_collector kmer_filter fastq_check read_length_calc sort_fastq_mem_eff match_pair
 	chmod a+x etching_filter
 
 all: default
@@ -10,17 +10,19 @@ fastq_check: fastq_check.cpp ../lib/libetching_filter.so
 	g++ -Wall -g -std=c++11 -pthread -Igzstream fastq_check.cpp ../lib/zlib/*.lo -L../lib -letching_filter -o fastq_check
 
 read_length_calc: read_length_calc.cpp ../lib/libetching_filter.so 
-	g++ -Wall -g -std=c++11 -pthread -Igzstream -I../lib/bamtools -L../lib -letching_filter ../lib/bamtools/api/internal/*/*o ../lib/bamtools/api/*o ../lib/zlib/*.lo read_length_calc.cpp -o read_length_calc
+	g++ -Wall -g -std=c++11 -pthread -Igzstream -I../lib/bamtools read_length_calc.cpp -L../lib -letching_filter ../lib/bamtools/api/internal/*/*o ../lib/bamtools/api/*o ../lib/zlib/*.lo -o read_length_calc
 
 read_collector: read_collector.cpp ../lib/libetching_filter.so 
 	g++ -Wall -g -std=c++11 -fPIC -c read_collector.cpp -o read_collector.lo -L../lib -letching_filter -I gzstream -pthread
 	g++ -Wall -g -std=c++11 ../lib/bamtools/api/internal/*/*o ../lib/bamtools/api/*o read_collector.lo ../lib/zlib/*.lo -L../lib -letching_filter -pthread -o read_collector
 sort_fastq_mem_eff: sort_fastq_mem_eff.cpp
 	g++ -Wall -g -std=c++11 sort_fastq_mem_eff.cpp -o sort_fastq_mem_eff
+match_pair: match_pair.cpp
+	g++ -Wall -g -std=c++11 match_pair.cpp -o match_pair
 
 
 clean:
-	rm -f read_collector kmer_filter fastq_check read_length_calc sort_fastq_mem_eff
+	rm -f read_collector kmer_filter fastq_check read_length_calc sort_fastq_mem_eff match_pair
 
 cleanlibrary: 
 	rm -f ../lib/libetching_filter.so

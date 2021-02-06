@@ -22,6 +22,7 @@ std::string return_svtype(std::string info);
 std::string cut_str(std::string & input, std::string key);
 Feature parse_feature ( std::string format , std::string format1);
 void calc_feature ( std::string infile, std::string outfile );
-void razor ( std::string infile, std::string score_file, std::string outfile, double cutoff, std::string method, int tagging);
+//void razor ( std::string infile, std::string score_file, std::string outfile, double cutoff, std::string method, int tagging);
+void razor ( std::string infile, std::string score_file, std::string outfile, double cutoff, std::string method);
 
 #endif

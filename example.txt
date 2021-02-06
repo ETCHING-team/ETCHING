@@ -1,0 +1,29 @@
+ETCHING examples)
+
+Fastq input files: tumor_1/2.fq, normal_1/2.fq
+Pre-made PGK (kmc database file): PGK.kmc_pre, PGK.kmc_suf
+Thread 30
+$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -f PGK -p OUTPUT_prefix -t 30
+
+Bam input files
+$ etching -b tumor.bam -F -bc normal.bam -f PGK -p OUTPUT_prefix -t 30
+
+You can use a bam file for tumor sample
+$ etching -b tumor.bam 1c normal_1.fq -2c normal_2.fq -p OUTPUT_prefix -t 30
+
+You can use a bam file for normal sample
+$ etching -1 tumor_1.fq -2 tumor_2.fq -bc normal.bam -p OUTPUT_prefix -t 30
+
+If you want to use pre-made k-mer table (31-mer only), use --kmer-table option
+$ etching -1 tumor_1.fq -2 tumor_2.fq -p OUTPUT_prefix -t 30 --kmer-table tumor_specific_kmer_table.txt
+
+k-mer table must be like:
+AACCTAACCTAACCTAACCTAACCTAACCTG 14
+AACCTAACCTAACCTAACCTAACCTAACCAA 12
+AACCTAACCTAACCTAACCTAACCTAACCAC 4
+
+[Contact]
+Please report bugs to
+	Jang-il Sohn (sohnjangil@gmail.com)
+	Jin-Wu Nam (jwnam@hanyang.ac.kr)
+
