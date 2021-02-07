@@ -64,8 +64,9 @@ function USAGE {
     echo -e "            \tuse \"-f /path/to/PGK\" for /path/to/PGK.kmc_pre and /path/to/PGK.kmc_suf"
     echo -e 
     #echo -e "Initial SV call"
-    #echo -e "-A          \tUse all split-reads"
-    #echo -e "            \tThis option increases recall. However, lots of false-positives also can be generated."
+    echo -e "-A          \tUse all split-reads"
+    echo -e "            \tThis option increases recall. However, lots of false-positives also can be generated."
+    echo -e "            \tUse this option to detect low allele frequency SVs, or for SVs <1000bp."
     #echo -e 
     echo -e "FP SV removing"
     #echo -e "-R          \tRandom Forest in scoring [default]"
@@ -160,7 +161,7 @@ FILTER=
 
 KMER_TABLE=
 
-ALLSPLIT="-A"
+ALLSPLIT=
 DEPTH=
 
 ALGOR=
