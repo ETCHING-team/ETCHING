@@ -1084,7 +1084,7 @@ echo
 echo "[SORTER]"
 DATE="[$(date)]";echo ${DATE}
 
-cmd="etching_sorter -i ${PREFIX}.BND.vcf -o ${PREFIX}.SV -c $CUTOFF -m ${ML_PATH} $ALGOR > logs/ETCHING_SORTER.SV.log"
+cmd="etching_sorter -i ${PREFIX}.SV.vcf -o ${PREFIX}.SV -c $CUTOFF -m ${ML_PATH} $ALGOR > logs/ETCHING_SORTER.SV.log"
 echo $cmd
 eval $cmd &
 
