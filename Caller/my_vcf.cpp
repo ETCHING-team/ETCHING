@@ -840,7 +840,7 @@ void VCF_CLASS::get_genome(){
 }
 
 char VCF_CLASS::GetNucl(const std::string & refChr, const std::size_t & refPos){
-  return '.';
+  return genome[refChr][refPos-1];
 }
 
 
