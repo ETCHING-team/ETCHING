@@ -492,13 +492,13 @@ then
     # Sort
     #
 
-    sort_fastq_mem_eff ${PREFIX}_1.fastq ${PREFIX}_1.sort.fastq 4 &
-    sort_fastq_mem_eff ${PREFIX}_2.fastq ${PREFIX}_2.sort.fastq 4 &
-    wait 
+    #sort_fastq_mem_eff ${PREFIX}_1.fastq ${PREFIX}_1.sort.fastq 4 &
+    #sort_fastq_mem_eff ${PREFIX}_2.fastq ${PREFIX}_2.sort.fastq 4 &
+    #wait 
 
-    mv ${PREFIX}_1.sort.fastq ${PREFIX}_1.fastq &
-    mv ${PREFIX}_2.sort.fastq ${PREFIX}_2.fastq &
-    wait
+    #mv ${PREFIX}_1.sort.fastq ${PREFIX}_1.fastq &
+    #mv ${PREFIX}_2.sort.fastq ${PREFIX}_2.fastq &
+    #wait
 
 
     #############################
