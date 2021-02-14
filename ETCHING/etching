@@ -42,9 +42,9 @@ function USAGE {
     echo -e "-M          \tUsing pre-alignment result for -b option"
     echo -e
     echo -e "Samples"
-    #echo -e "-T  (string)\tW for WGS, P for Panel [W]"
+    echo -e "-T  (string)\tW for WGS, P for Panel [W]"
     #echo -e "-P  (double)\tTumor purity in somatic call (0-1) [0.75]. Note: Set 1 for germline call."
-    echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from sample sequencing reads [3]"
+    cho -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from sample sequencing reads [3]"
     #echo -e "            \tif you want to specify it, we recommand 3-7 for WGS data, and 5-10 for targeted panel sequencing data."
     #echo -e "--max-kmer  (int)   \tExclude the k-mers counted more than this [10000]."
     echo -e "-I  (int)   \tInsert-size [500]"
@@ -99,6 +99,9 @@ function EXAMPLE {
     echo -e "Thread 30"
     echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -f PGK -p OUTPUT_prefix -t 30"
     echo -e 
+    echo -e "Panel data"
+    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -f PGK -p OUTPUT_prefix -t 30 -T P"
+    echo -e
     echo -e "Bam input files"
     echo -e "\$ etching -b tumor.bam -F -bc normal.bam -f PGK -p OUTPUT_prefix -t 30"
     echo -e
@@ -148,7 +151,7 @@ FAST_BAM=
 
 DATATYPE=W
 PURITY=0.75
-KMERCUTOFF=3
+KMERCUTOFF=
 MAXK=10000
 INSERTSIZE=500
 READLENGTH=
