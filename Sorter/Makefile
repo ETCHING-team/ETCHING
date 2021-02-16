@@ -11,7 +11,7 @@ cut_by_score: cut_by_score.c++
 
 
 clean:
-	rm -f etching_sorter
+	rm -f etching_sorter cut_by_score
 
 cleanlibrary: 
 	rm -f ../lib/libetching_sorter.so

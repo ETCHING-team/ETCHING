@@ -66,7 +66,7 @@ std::string python_module_check(std::string prefix, std::string method){
 
   for ( std::size_t i = 0 ; i < pm.size() ; i ++ ){
     std::string fname = prefix + "python_module_check";
-    std::string command = "python -c '" + pm[i] + "' 2>&1 | wc -l > " + fname;
+    std::string command = "python3 -c '" + pm[i] + "' 2>&1 | wc -l > " + fname;
     system ( command.c_str() );
     std::ifstream fin ( fname.c_str() );
     int count;
@@ -161,7 +161,12 @@ int main ( int argc , char ** argv ){
     std::cout << "ERROR!!! You need python3.\n";
     return 0;
   }
-  python_module_check(prefix,method);
+  
+  std::string module_check=python_module_check(prefix,method);
+  if ( module_check != "0" ){
+    std::cout << "Python module fail: " << module_check << "\n";
+    return -1;
+  }
 
 
 
@@ -189,7 +194,7 @@ int main ( int argc , char ** argv ){
 
   std::cout << "Scoring_command:\t";
   //command = "OMP_NUM_THREADS=4 python3 scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
-  command = "python scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
+  command = "python3 scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
   echo="echo \"" + command + "\"";
 
   system ( echo.c_str() );

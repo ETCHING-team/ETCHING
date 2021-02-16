@@ -1,7 +1,7 @@
 ---
 # ETCHING
 
-### Version 1.2.1 (2020.1.20.)
+### Version 1.2.2 (2020.2.16.)
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
@@ -44,13 +44,13 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
 pip3 install pandas numpy scikit-learn skranger xgboost
 ```
 
-* BWA (https://github.com/lh3/bwa.git) or alternatively Minimap2 (https://github.com/lh3/minimap2.git)
+* BWA (https://github.com/lh3/bwa.git) 
  
 * samtools (http://www.htslib.org/)
 
-You can install ETCHING even if you did not install the python packages, but ETCHING-Sorter is not working properly.
+You can install ETCHING even if you did not install the python packages, but ETCHING-Sorter will not be working properly.
 
-##### We tested this version on CentOS 7.4.1708 with g++ >4.7 and python-3.6.10.
+##### We tested this version on CentOS 7.4.1708 (with g++ >4.7 and python-3.6.10) and on Ubuntu 20.04.
 
 
 ## Installation
@@ -71,8 +71,8 @@ echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
 Download the docker image from our web (http://big.hanyang.ac.kr/ETCHING/download.html)
 And load ETCHING docker image
 ```
-wget http://big.hanyang.ac.kr/ETCHING/etching_docker_v1.1.3.tar
-docker load -i etching_v1.1.3.tar
+wget http://big.hanyang.ac.kr/ETCHING/etching_docker_v1.2.2.tar
+docker load -i etching_v1.2.2.tar
 ```
 
 Check if the docker image is loaded properly
@@ -85,7 +85,7 @@ Output should be like below
 
 |REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
 |:---|:---|:---|:---|:---|
-|etching|1.1.3|16647cac9a99|40 hours ago|3.5GB|
+|etching|1.2.2|16647cac9a99|40 hours ago|3.5GB|
 
 
 ### Pan-Genome k-mer set
@@ -120,7 +120,7 @@ Keep the order and ```-k31```, ```-ci1```, and ```-fa``` options. The ```genome_
 reference genomes' list, which must be separated line-by-line. Use any name you prefer for ```your_kmer_db```. 
 If you use the same same, you will see ```your_kmer_db.pre``` and ```your_kmer_db.suf``` in the directory.
 
-## Usage
+## Demo
 
 After installation, you can download and run demo
 
@@ -128,13 +128,12 @@ After installation, you can download and run demo
 wget http://big.hanyang.ac.kr/ETCHING/DEMO.tar.gz
 tar zxvf DEMO.tar.gz
 cd DEMO
-etching -1 tumor_data/tumor1.fq -2 tumor_data/tumor2.fq \
--1c normal_data/normal1.fastq -2c normal_data/normal2.fastq \
--g small_genome/small_genome.fa \
--a small_genome/small_genome.gtf \
+etching -1 tumor_1.fq -2 tumor_2.fq \
+-1c normal_1.fastq -2c normal_2.fastq \
+-g small_genome.fa \
+-a small_genome.gtf \
 -p OUTPUT \
--f kmer_set/demo \
--m /path/to/ETCHING_ML_model
+-f demo_PGK
 ```
 
 If you want the list of options, check with this command
@@ -180,15 +179,14 @@ etching_filter -1 tumor_1.fq -2 tumor_2.fq \
 -1c normal_1.fastq -2c normal_2.fastq \
 -p OUTPUT \
 -t 30 \
--g genome.fa \
--f PGK \
--m /path/to/ETCHING_ML_model
+-g small_genome.fa \
+-f demo_PGK
 ```
 
 2. Caller
 
 ```
-etching_caller -b filtered_read.sort.bam -g genome.fa -o OUTPUT
+etching_caller -b filtered_read.sort.bam -g small_genome.fa -o OUTPUT
 ```
 
 This command returns two output, ```OUTPUT.BND.vcf``` and ```OUTPUT.SV.vcf```.
@@ -196,8 +194,8 @@ This command returns two output, ```OUTPUT.BND.vcf``` and ```OUTPUT.SV.vcf```.
 3. Sorter
 
 ```
-etching_sorter -i OUTPUT.BND.vcf -o OUTPUT.BND
-etching_sorter -i OUTPUT.SV.vcf -o OUTPUT.SV
+etching_sorter -i OUTPUT.BND.vcf -o OUTPUT.BND -m /path/to/ETCHING_ML_model
+etching_sorter -i OUTPUT.SV.vcf -o OUTPUT.SV -m /path/to/ETCHING_ML_model
 ```
 
 4. FG_identifiter
@@ -212,7 +210,7 @@ etching_fg_identifier output.SV.etching_sorter.vcf hg19.annot.gtf > output.SV.FG
 In case of using ETCHING docker image,
 
 ```
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.1.3 etching -i demo.conf
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.2.2 etching -i demo.conf
 ```
 Mount your directory containing all required files, such as PGK, reference fasta, sample and normal 
 fastq  to '/work/' directory in the docker container. The mount point on docker '/work/' should not be
@@ -224,7 +222,7 @@ be either 'sample.fq' or '/work/sample.fq'.
 
 Alternatively, you can run ETCHING inside docker container
 ```
-docker run -i -t --rm -v /local/path/to/example/directory/:/work/ etching:1.1.3 /bin/bash
+docker run -i -t --rm -v /local/path/to/example/directory/:/work/ etching:1.2.2 /bin/bash
 etching -i example.conf
 ```
 The ETCHING binary and ML models are located on '/etching/'
