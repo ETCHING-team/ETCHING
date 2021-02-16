@@ -71,7 +71,7 @@ void sort_and_write_fastq ( std::string infile , std::string outfile ){
 
 
 void split_file ( std::string infile , std::vector < std::string > fname_vec, int64_t fsize ){
-  std::hash<std::string> hashing;
+  // std::hash<std::string> hashing;
   std::ifstream fin;
   std::string id;
   std::string seq;
@@ -93,8 +93,8 @@ void split_file ( std::string infile , std::vector < std::string > fname_vec, in
     if ( id.substr(id.size()-2) == "/1" || id.substr(id.size()-2) == "/2"){
       id = id.substr(0,id.size()-2);
     }
-    std::size_t hval = hashing ( id );
-    // std::size_t hval = adler32 ( id );
+    // std::size_t hval = hashing ( id );
+    std::size_t hval = adler32 ( id );
     std::size_t fnumber = hval % fsize;
     fout[fnumber] << id << "\n" << seq << "\n+\n" << qual << "\n";
   }

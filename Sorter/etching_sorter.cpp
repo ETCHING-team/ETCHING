@@ -16,13 +16,11 @@ void usage(){
     << "\t" << "-i (string)\t" << "input vcf file (required)\n"
     << "\t" << "-o (string)\t" << "Prefix of output vcf file (required)\n"
     << "\n"
-    << "Cut-off option:\n"
+    << "Options:\n"
     << "\t" << "-c (double)\t" << "Cut-off parameter [0.4]\n"
-    << "\n"
-    << "Algorithm option:\n"
     << "\t" << "-R         \t" << "Random Forest [default]\n"
     << "\t" << "-X         \t" << "XGBoost\n"
-    << "\t" << "-m         \t" << "Path to machine learning model [None]\n"
+    << "\t" << "-m         \t" << "Path to machine learning mode\n"
     // << "\n"
     // << "I/O option:\n"
     // << "\t" << "-Q         \t" << "Tag SVs with \"PASS\" or \"LOWQUAL\" instead of removing low quality SVs [NONE]\n"
@@ -97,6 +95,9 @@ int main ( int argc , char ** argv ){
   std::string prefix;
   std::string method;
   std::string path;
+
+  int num_threads(8);
+
   // int tagging=0;
 
   double alpha=-1;
@@ -104,7 +105,7 @@ int main ( int argc , char ** argv ){
   std::size_t sz;
 
   // while ( (opt = getopt ( argc, argv, "i:o:c:m:RXQ" ) ) != -1 ){
-  while ( (opt = getopt ( argc, argv, "i:o:c:m:RX" ) ) != -1 ){
+  while ( (opt = getopt ( argc, argv, "i:o:c:m:t:RX" ) ) != -1 ){
     switch ( opt ) {
     case 'i': infile=optarg; break; // infile name
     case 'o': prefix=optarg; break; // output prefix
@@ -112,6 +113,7 @@ int main ( int argc , char ** argv ){
     case 'm': path=optarg; break; // path to machine learning model
     case 'R': method+="RandomForest"; break; // Random Forest
     case 'X': method+="XGBoost"; break; // XGBoost
+    case 't': num_threads=atoi(optarg); break; // XGBoost
     // case 'Q': tagging=1; break; // Tagging SVs instead of ramoving low quality SVs.
     default: std::cout << "ERROR!!! Check options!!!\n\n" ; usage(); return 0 ; 
     }
@@ -186,7 +188,8 @@ int main ( int argc , char ** argv ){
   calc_feature(infile,feature_file);
 
   std::cout << "Scoring_command:\t";
-  command = "scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
+  //command = "OMP_NUM_THREADS=4 python3 scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
+  command = "python scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
   echo="echo \"" + command + "\"";
 
   system ( echo.c_str() );

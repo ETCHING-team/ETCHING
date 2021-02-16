@@ -44,7 +44,8 @@ function USAGE {
     echo -e "Samples"
     echo -e "-T  (string)\tW for WGS, P for Panel [W]"
     #echo -e "-P  (double)\tTumor purity in somatic call (0-1) [0.75]. Note: Set 1 for germline call."
-    cho -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from sample sequencing reads [3]"
+    echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from sample sequencing reads [automatic]"
+    echo -e "            \tSet to 3 for low allele frequency SVs especially for subclonal evolution."
     #echo -e "            \tif you want to specify it, we recommand 3-7 for WGS data, and 5-10 for targeted panel sequencing data."
     #echo -e "--max-kmer  (int)   \tExclude the k-mers counted more than this [10000]."
     echo -e "-I  (int)   \tInsert-size [500]"
@@ -64,9 +65,9 @@ function USAGE {
     echo -e "            \tuse \"-f /path/to/PGK\" for /path/to/PGK.kmc_pre and /path/to/PGK.kmc_suf"
     echo -e 
     #echo -e "Initial SV call"
-    echo -e "-A          \tUse all split-reads"
-    echo -e "            \tThis option increases recall. However, lots of false-positives also can be generated."
-    echo -e "            \tUse this option to detect low allele frequency SVs, or for SVs <1000bp."
+    #echo -e "-A          \tUse all split-reads"
+    #echo -e "            \tThis option increases recall. However, lots of false-positives also can be generated."
+    #echo -e "            \tUse this option to detect low allele frequency SVs, or for SVs <1000bp."
     #echo -e 
     echo -e "FP SV removing"
     #echo -e "-R          \tRandom Forest in scoring [default]"
@@ -99,9 +100,8 @@ function EXAMPLE {
     echo -e "Thread 30"
     echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -f PGK -p OUTPUT_prefix -t 30"
     echo -e 
-    echo -e "Panel data"
-    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -f PGK -p OUTPUT_prefix -t 30 -T P"
-    echo -e
+    echo -e "----------------------------------------------------------------------------------------------------------"
+    echo -e 
     echo -e "Bam input files"
     echo -e "\$ etching -b tumor.bam -F -bc normal.bam -f PGK -p OUTPUT_prefix -t 30"
     echo -e
@@ -111,6 +111,8 @@ function EXAMPLE {
     echo -e "You can use a bam file for normal sample"
     echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -bc normal.bam -p OUTPUT_prefix -t 30"
     echo -e
+    echo -e "----------------------------------------------------------------------------------------------------------"
+    echo -e 
     echo -e "If you want to use pre-made k-mer table (31-mer only), use --kmer-table option"
     echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -p OUTPUT_prefix -t 30 --kmer-table tumor_specific_kmer_table.txt"
     echo -e 
@@ -118,6 +120,13 @@ function EXAMPLE {
     echo -e "AACCTAACCTAACCTAACCTAACCTAACCTG 14"
     echo -e "AACCTAACCTAACCTAACCTAACCTAACCAA 12"
     echo -e "AACCTAACCTAACCTAACCTAACCTAACCAC 4"
+    echo -e 
+    echo -e "----------------------------------------------------------------------------------------------------------"
+    echo -e 
+    echo -e "Panel data: -T P"
+    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -f PGK -p OUTPUT_prefix -t 30 -T P"
+    echo -e
+    echo -e "----------------------------------------------------------------------------------------------------------"
     echo -e 
     echo -e "[Contact]"
     echo -e "Please report bugs to"
@@ -164,7 +173,7 @@ FILTER=
 
 KMER_TABLE=
 
-ALLSPLIT=
+ALLSPLIT="-A"
 DEPTH=
 
 ALGOR=
