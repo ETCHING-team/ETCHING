@@ -163,7 +163,7 @@ int main ( int argc , char ** argv ){
   }
   
   std::string module_check=python_module_check(prefix,method);
-  if ( module_check != "0" ){
+  if ( module_check.size() != 0 ){
     std::cout << "Python module fail: " << module_check << "\n";
     return -1;
   }
@@ -194,7 +194,7 @@ int main ( int argc , char ** argv ){
 
   std::cout << "Scoring_command:\t";
   //command = "OMP_NUM_THREADS=4 python3 scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
-  command = "python3 scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
+  command = "scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
   echo="echo \"" + command + "\"";
 
   system ( echo.c_str() );
