@@ -11,6 +11,6 @@ done
 
 for i in {1..10}
 do
-    echo "gzip -dc etching_xgb_${i}.sav.gz > etching_xgb_${i}.sav"
-    gzip -dc etching_xgb_${i}.sav.gz > etching_xgb_${i}.sav 
+    echo "gzip -dc etching_xgb_1.2.0_${i}.sav.gz > etching_xgb_1.2.0_${i}.sav"
+    gzip -dc etching_xgb_1.2.0_${i}.sav.gz > etching_xgb_1.2.0_${i}.sav 
 done

@@ -576,10 +576,14 @@ cd $ML_PATH
 ML_PATH=$PWD
 cd - > /dev/null
 
-TMP="rf_${MODEL_VERSION}"
 if [ $ALGOR == "-X" ]
 then
-    TMP="xgb"
+    TMP="rf_${MODEL_VERSION}"
+fi
+
+if [ $ALGOR == "-X" ]
+then
+    TMP="xgb_${MODEL_VERSION}"
 fi
 
 
