@@ -149,15 +149,23 @@ etching --example
 
 #### Output
 
-The above command will give you two vcf files:
+The above command will give you four vcf files:
 
 ```
 OUTPUT.BND.etching_sorter.vcf
+OUTPUT.BND.unfiltered.vcf
 OUTPUT.SV.etching_sorter.vcf
+OUTPUT.SV.unfiltered.vcf
 ```
 
 In OUTPUT.BND.etching_sorter.vcf, all vcf lines are recoded in breakend (BND) level.
 In OUTPUT.SV.etching_sorter.vcf, you will see SV typs, such as DEL, DUP, INV, or TRA. 
+
+If you want to apply different cutoff for SV-score, use `cut_by_score`. For instance, if yoy want 0.2 as cutoff, do like this
+```
+cut_by_score OUTPUT.SV.unfiltered.vcf 0.2 > OUTPUT.SV.filtered.vcf
+```
+The greater (or lesser) cutoff, the more specfic (or sensitive). Cutoff range is from 0 to 1, and default is 0.4.
 
 #### Fusion-gene
 
