@@ -545,6 +545,7 @@ fi
 DIR=$(echo $0 | sed 's/etching$//g')
 cd $DIR
 PATH=$PWD:$PATH
+DIR=$PWD
 cd - > /dev/null
 
 PRESENT_PATH=$PWD
@@ -570,13 +571,14 @@ then
     ML_PATH=$PWD
     cd $PRESENT_PATH
 else
-    ML_PATH=$ETCHING_ML_PATH
+    #ML_PATH=$ETCHING_ML_PATH
+    ML_PATH=${DIR}/ETCHING_ML_model
 fi
 cd $ML_PATH
 ML_PATH=$PWD
 cd - > /dev/null
 
-if [ $ALGOR == "-X" ]
+if [ $ALGOR == "-R" ]
 then
     TMP="rf_${MODEL_VERSION}"
 fi
@@ -585,7 +587,6 @@ if [ $ALGOR == "-X" ]
 then
     TMP="xgb_${MODEL_VERSION}"
 fi
-
 
 for i in {1..10}
 do
@@ -596,7 +597,7 @@ do
 	    gzip -dc ${ML_PATH}/etching_${TMP}_${i}.sav.gz > ${ML_PATH}/etching_${TMP}_${i}.sav
 	else
 	    echo "ERROR!!!"
-	    echo "No model files in ${CHECK_PATH}"
+	    echo "No model files in ${ML_PATH}"
 	    echo "-------------------------------"
 	    exit -1
 	fi
