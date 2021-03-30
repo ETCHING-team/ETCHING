@@ -1,7 +1,7 @@
 ---
 # ETCHING
 
-### Version 1.2.2 (2020.2.16.)
+### Version 1.3.0 (2020.3.25.)
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
@@ -21,7 +21,6 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
     * [From source code](#from-source-code)
     * [Pan-Genome k-mer set](#pan-genome-k-mer-set)
   * [Usage](#usage)
-    * [Example of a config file](#example-of-a-config-file)
     * [Pan-genome k-mer - PGK](#pan-genome-k-mer---pgk)
     * [Example execution](#example-execution)
     * [Step-by-step execution](#step-by-step-execution)
@@ -71,8 +70,8 @@ echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
 Download the docker image from our web (http://big.hanyang.ac.kr/ETCHING/download.html)
 And load ETCHING docker image
 ```
-wget http://big.hanyang.ac.kr/ETCHING/etching_docker_v1.2.2.tar
-docker load -i etching_v1.2.2.tar
+wget http://big.hanyang.ac.kr/ETCHING/etching_docker_v1.3.0.tar
+docker load -i etching_v1.3.0.tar
 ```
 
 Check if the docker image is loaded properly
@@ -85,7 +84,7 @@ Output should be like below
 
 |REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
 |:---|:---|:---|:---|:---|
-|etching|1.2.2|16647cac9a99|40 hours ago|3.5GB|
+|etching|1.3.0|16647cac9a99|40 hours ago|3.5GB|
 
 
 ### Pan-Genome k-mer set
@@ -132,7 +131,7 @@ etching -1 tumor_1.fq -2 tumor_2.fq \
 -1c normal_1.fastq -2c normal_2.fastq \
 -g small_genome.fa \
 -a small_genome.gtf \
--p OUTPUT \
+-o OUTPUT \
 -f demo_PGK
 ```
 
@@ -185,7 +184,7 @@ If you want to run ETCHING step-by-step, follow the steps.
 ```
 etching_filter -1 tumor_1.fq -2 tumor_2.fq \
 -1c normal_1.fastq -2c normal_2.fastq \
--p OUTPUT \
+-o OUTPUT \
 -t 30 \
 -g small_genome.fa \
 -f demo_PGK
@@ -218,11 +217,11 @@ etching_fg_identifier output.SV.etching_sorter.vcf hg19.annot.gtf > output.SV.FG
 In case of using ETCHING docker image,
 
 ```
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.2.2 etching -i demo.conf
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.0 etching [options]
 ```
 Mount your directory containing all required files, such as PGK, reference fasta, sample and normal 
 fastq  to '/work/' directory in the docker container. The mount point on docker '/work/' should not be
-changed. Note that file paths in a configure file should point the mounted files in the docker container. 
+changed. 
 So path should be either relative path starting from your mount point or absolute path starting from 
 '/work/' directory. To say, if you have the data path '/path/to/mounted/directory/sample.fq', and mounted
 '/path/to/mounted/directory' to '/work/' on docker container, then the file path on configure file should
@@ -230,8 +229,8 @@ be either 'sample.fq' or '/work/sample.fq'.
 
 Alternatively, you can run ETCHING inside docker container
 ```
-docker run -i -t --rm -v /local/path/to/example/directory/:/work/ etching:1.2.2 /bin/bash
-etching -i example.conf
+docker run -i -t --rm -v /local/path/to/example/directory/:/work/ etching:1.3.0 /bin/bash
+etching [options]
 ```
 The ETCHING binary and ML models are located on '/etching/'
 
