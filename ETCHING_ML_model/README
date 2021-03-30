@@ -1,13 +1,10 @@
-etching_rf_1.2.0
-	Random forest
-	ETCHING-v1.2.0 later
+Random forest
+etching_rf_1.3.0
 
-etching_xgb_1.2.0
-	Extreme gradient boosting
-	ETCHING-v1.2.0 later
+Extreme gradient boosting
+etching_xgb_1.3.0
 
-
-Feb 17, 2021
+Mar 29, 2021
 
 Jang-il Sohn
 Hanyang University

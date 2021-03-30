@@ -32,32 +32,37 @@ int main ( int argc , char ** argv ){
     std::stringstream line_ss ( line );
     std::string info;
 
+    double score;
+
     for ( std::size_t i = 0 ; i < 8 ; i ++ ){
-      line_ss >> info ;
-    }
-
-    std::stringstream info_ss ( info );
-    bool check ( 0 );
-    std::string info_elem;
-  
-    while ( std::getline ( info_ss , info_elem , ';') ){
-
-      std::stringstream key_ss ( info_elem ); 
-      std::string key;
-      std::string value;
-
-      std::getline ( key_ss , key , '=' );
-
-      if ( key == score_key ){
-	std::getline ( key_ss , value , '=' );
-	double score = std::stod ( value , &sz );
-	if ( score >= cutoff ){
-	  check = 1;
-	}
-	break;
+      if ( i == 5 ){
+	line_ss >> score;
+      }
+      else{
+	line_ss >> info ;
       }
     }
-    if ( check ){
+    
+    if ( line.find(score_key) != std::string::npos ){
+      std::stringstream info_ss ( info );
+      std::string info_elem;
+      while ( std::getline ( info_ss , info_elem , ';') ){
+
+	std::stringstream key_ss ( info_elem ); 
+	std::string key;
+	std::string value;
+      
+	std::getline ( key_ss , key , '=' );
+	
+	if ( key == score_key ){
+	  std::getline ( key_ss , value , '=' );
+	  score = std::stod ( value , &sz );
+	  break;
+	}
+      }
+    }
+    
+    if ( score >= cutoff ){
       std::string lowqual = "LOWQUAL";
       std::size_t found = line.find ( lowqual );
       if ( found != std::string::npos ){

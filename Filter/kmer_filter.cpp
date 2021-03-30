@@ -32,7 +32,7 @@ void filter_usage(){
 	    << "\t" << "-a <string>\t" << "Existing filter to add. If you input PGK, you must have PGK.kmc_pre and PGK.kmc_suf.\n"
 	    << "\n"
 	    << "Options:\n"
-	    << "\t" << "-p <string>\t" << "Output file name [filtered_kmer]\n"
+	    << "\t" << "-o <string>\t" << "Output file name (-p is same) [filtered_kmer]\n"
 	    << "\t" << "-l <string>\t" << "k-mer size [31]\n"
 	    << "\t" << "-K <int>   \t" << "k-mer histogram cut-off for remove sequencing error [automatically calculated].\n"
 	    << "\t" << "-M <int>   \t" << "Maximum k-mer frequency to be counted [10000].\n"
@@ -86,13 +86,14 @@ int main ( int argc , char ** argv ){
 
   std::string DIR;
 
-  bool store_kmc = 0 ;
+  // bool store_kmc = 0 ;
 
   int64_t opt = 0;
-  while ((opt = getopt ( argc , argv , "i:p:c:r:a:m:t:T:K:M:l:D:Eh") ) != -1 ){
+  while ((opt = getopt ( argc , argv , "i:p:o:c:r:a:m:t:T:K:M:l:D:h") ) != -1 ){
     switch(opt){
     case 'i': infile_list = optarg; break;
     case 'p': prefix = optarg; break;
+    case 'o': prefix = optarg; break;
     case 'c': control_list_file = optarg; break;
     case 'r': reference_list_file = optarg; break;
     case 'a': existing = optarg; break;
@@ -103,7 +104,7 @@ int main ( int argc , char ** argv ){
     case 'M': maxkfreq = atoi ( optarg ); break;
     case 'l': kl = atoi (optarg ); break;
     case 'D': DIR = optarg ; break;
-    case 'E': store_kmc = 1; break;
+    // case 'E': store_kmc = 1; break;
     case 'h': filter_usage() ; return 0;
     default: std::cout << "ERROR!!! Invalid option: " << optarg << "\n" ; return -1;
     }
@@ -329,16 +330,16 @@ int main ( int argc , char ** argv ){
 	command = DIR + "kmc_tools simple control_filter_fastq control_filter_bam union control_filter 2>&1";
 	std::cout << command << "\n" ; 
 	system(command.c_str());
-	if ( store_kmc == 0 ) {
-	  std::cout << "remove(\"control_filter_fastq.kmc_pre\")\n";
-	  remove("control_filter_fastq.kmc_pre");
-	  std::cout << "remove(\"control_filter_fastq.kmc_suf\")\n";
-	  remove("control_filter_fastq.kmc_suf");
-	  std::cout << "remove(\"control_filter_bam.kmc_pre\")\n";
-	  remove("control_filter_bam.kmc_pre");
-	  std::cout << "remove(\"control_filter_bam.kmc_suf\")\n";
-	  remove("control_filter_bam.kmc_suf");
-	}
+	// if ( store_kmc == 0 ) {
+	//   std::cout << "remove(\"control_filter_fastq.kmc_pre\")\n";
+	//   remove("control_filter_fastq.kmc_pre");
+	//   std::cout << "remove(\"control_filter_fastq.kmc_suf\")\n";
+	//   remove("control_filter_fastq.kmc_suf");
+	//   std::cout << "remove(\"control_filter_bam.kmc_pre\")\n";
+	//   remove("control_filter_bam.kmc_pre");
+	//   std::cout << "remove(\"control_filter_bam.kmc_suf\")\n";
+	//   remove("control_filter_bam.kmc_suf");
+	// }
       }
     }
 
@@ -369,51 +370,51 @@ int main ( int argc , char ** argv ){
       std::cout << command << "\n";
       
       system(command.c_str() );
-      if ( store_kmc == 0 ) {
-	std::cout << "remove(\"control_filter.kmc_pre\")\n";
-	remove("control_filter.kmc_pre");
-	std::cout << "remove(\"control_filter.kmc_suf\")\n";
-	remove("control_filter.kmc_suf");
-      }
+      // if ( store_kmc == 0 ) {
+      // 	std::cout << "remove(\"control_filter.kmc_pre\")\n";
+      // 	remove("control_filter.kmc_pre");
+      // 	std::cout << "remove(\"control_filter.kmc_suf\")\n";
+      // 	remove("control_filter.kmc_suf");
+      // }
     }
     else if ( control_count ==0 && reference_count != 0 ){
       command = DIR + "kmc_tools simple reference_filter " + existing + " union filter 2>&1";
       std::cout << command << "\n" ;
       
       system(command.c_str() );
-      if ( store_kmc == 0 ) {
-	std::cout << "remove(\"reference_filter.kmc_pre\")\n";
-	remove("reference_filter.kmc_pre");
-	std::cout << "remove(\"reference_filter.kmc_suf\")\n";
-	remove("reference_filter.kmc_suf");
-      }
+      // if ( store_kmc == 0 ) {
+      // 	std::cout << "remove(\"reference_filter.kmc_pre\")\n";
+      // 	remove("reference_filter.kmc_pre");
+      // 	std::cout << "remove(\"reference_filter.kmc_suf\")\n";
+      // 	remove("reference_filter.kmc_suf");
+      // }
     }
     else if ( control_count !=0 && reference_count != 0 ){
       command = DIR + "kmc_tools simple control_filter " + existing + " union filter_tmp 2>&1";
       std::cout << command << "\n";
       
       system(command.c_str() );
-      if ( store_kmc == 0 ) {
-	std::cout << "remove(\"control_filter.kmc_pre\")\n";
-	remove("control_filter.kmc_pre");
-	std::cout << "remove(\"control_filter.kmc_suf\")\n";
-	remove("control_filter.kmc_suf");
-      }
+      // if ( store_kmc == 0 ) {
+      // 	std::cout << "remove(\"control_filter.kmc_pre\")\n";
+      // 	remove("control_filter.kmc_pre");
+      // 	std::cout << "remove(\"control_filter.kmc_suf\")\n";
+      // 	remove("control_filter.kmc_suf");
+      // }
 
       command = DIR + "kmc_tools simple filter_tmp reference_filter union filter 2>&1";
       std::cout << command << "\n";
       
       system(command.c_str() );
-      if ( store_kmc == 0 ) {
-	std::cout << "remove(\"filter_tmp.kmc_pre\")\n";
-	remove("filter_tmp.kmc_pre");
-	std::cout << "remove(\"filter_tmp.kmc_suf\")\n";
-	remove("filter_tmp.kmc_suf");
-	std::cout << "remove(\"reference_filter.kmc_pre\")\n";
-	remove("reference_filter.kmc_pre");
-	std::cout << "remove(\"reference_filter.kmc_suf\")\n";
-	remove("reference_filter.kmc_suf");
-      }
+      // if ( store_kmc == 0 ) {
+      // 	std::cout << "remove(\"filter_tmp.kmc_pre\")\n";
+      // 	remove("filter_tmp.kmc_pre");
+      // 	std::cout << "remove(\"filter_tmp.kmc_suf\")\n";
+      // 	remove("filter_tmp.kmc_suf");
+      // 	std::cout << "remove(\"reference_filter.kmc_pre\")\n";
+      // 	remove("reference_filter.kmc_pre");
+      // 	std::cout << "remove(\"reference_filter.kmc_suf\")\n";
+      // 	remove("reference_filter.kmc_suf");
+      // }
     }
     else {
       // command = "ln -sf " + existing + ".kmc_pre filter.kmc_pre";
@@ -422,10 +423,10 @@ int main ( int argc , char ** argv ){
       // command = "ln -sf " + existing + ".kmc_suf filter.kmc_suf";
       // std::cout << command << "\n"; 
       // system(command.c_str() );
-      command = "mv -f " + existing + ".kmc_pre filter.kmc_pre";
+      command = "ln -sf " + existing + ".kmc_pre filter.kmc_pre";
       std::cout << command << "\n"; 
       system(command.c_str() );
-      command = "mv -f " + existing + ".kmc_suf filter.kmc_suf";
+      command = "ln -sf " + existing + ".kmc_suf filter.kmc_suf";
       std::cout << command << "\n"; 
       system(command.c_str() );
     }
@@ -438,10 +439,10 @@ int main ( int argc , char ** argv ){
       // command = "ln -sf control_filter.kmc_suf filter.kmc_suf";
       // std::cout << command << "\n"; 
       // system(command.c_str() );
-      command = "mv -f control_filter.kmc_pre filter.kmc_pre";
+      command = "ln -sf control_filter.kmc_pre filter.kmc_pre";
       std::cout << command << "\n"; 
       system(command.c_str() );
-      command = "mv -f control_filter.kmc_suf filter.kmc_suf";
+      command = "ln -sf control_filter.kmc_suf filter.kmc_suf";
       std::cout << command << "\n"; 
       system(command.c_str() );
     }
@@ -452,10 +453,10 @@ int main ( int argc , char ** argv ){
       // command = "ln -sf reference_filter.kmc_suf filter.kmc_suf";
       // std::cout << command << "\n"; 
       // system(command.c_str() );
-      command = "mv -f reference_filter.kmc_pre filter.kmc_pre";
+      command = "ln -sf reference_filter.kmc_pre filter.kmc_pre";
       std::cout << command << "\n"; 
       system(command.c_str() );
-      command = "mv -f reference_filter.kmc_suf filter.kmc_suf";
+      command = "ln -sf reference_filter.kmc_suf filter.kmc_suf";
       std::cout << command << "\n"; 
       system(command.c_str() );
     }
@@ -465,16 +466,16 @@ int main ( int argc , char ** argv ){
       std::cout << command << "\n"; 
       
       system(command.c_str() );
-      if ( store_kmc == 0 ) {
-	std::cout << "remove(\"control_filter.kmc_pre\")\n";
-	remove("control_filter.kmc_pre");
-	std::cout << "remove(\"control_filter.kmc_suf\")\n";
-	remove("control_filter.kmc_suf");
-	std::cout << "remove(\"reference_filter.kmc_pre\")\n";
-	remove("reference_filter.kmc_pre");
-	std::cout << "remove(\"reference_filter.kmc_suf\")\n";
-	remove("reference_filter.kmc_suf");
-      }
+      // if ( store_kmc == 0 ) {
+      // 	std::cout << "remove(\"control_filter.kmc_pre\")\n";
+      // 	remove("control_filter.kmc_pre");
+      // 	std::cout << "remove(\"control_filter.kmc_suf\")\n";
+      // 	remove("control_filter.kmc_suf");
+      // 	std::cout << "remove(\"reference_filter.kmc_pre\")\n";
+      // 	remove("reference_filter.kmc_pre");
+      // 	std::cout << "remove(\"reference_filter.kmc_suf\")\n";
+      // 	remove("reference_filter.kmc_suf");
+      // }
     }
     else {
       std::cout <<"ERROR!!! No filter was input";
@@ -570,16 +571,16 @@ int main ( int argc , char ** argv ){
     command = DIR + "kmc_tools simple sample_fastq sample_bam union sample 2>&1";
     std::cout << command << "\n" ; 
     system(command.c_str());
-    if ( store_kmc == 0 ) {
-      std::cout << "remove(\"sample_fastq.kmc_pre\")\n";
-      remove("sample_fastq.kmc_pre");
-      std::cout << "remove(\"sample_fastq.kmc_suf\")\n";
-      remove("sample_fastq.kmc_suf");
-      std::cout << "remove(\"sample_bam.kmc_pre\")\n";
-      remove("sample_bam.kmc_pre");
-      std::cout << "remove(\"sample_bam.kmc_suf\")\n";
-      remove("sample_bam.kmc_suf");
-    }
+    // if ( store_kmc == 0 ) {
+    //   std::cout << "remove(\"sample_fastq.kmc_pre\")\n";
+    //   remove("sample_fastq.kmc_pre");
+    //   std::cout << "remove(\"sample_fastq.kmc_suf\")\n";
+    //   remove("sample_fastq.kmc_suf");
+    //   std::cout << "remove(\"sample_bam.kmc_pre\")\n";
+    //   remove("sample_bam.kmc_pre");
+    //   std::cout << "remove(\"sample_bam.kmc_suf\")\n";
+    //   remove("sample_bam.kmc_suf");
+    // }
   }
   
   
@@ -644,16 +645,16 @@ int main ( int argc , char ** argv ){
   command = DIR + "kmc_tools simple sample -ci" + std::to_string(cutoff) + " filter -ci1 kmers_subtract " + prefix + " 2>&1";
   std::cout << command << "\n" ;
   system(command.c_str() );
-  if ( store_kmc == 0 ) {
-    std::cout << "remove(\"sample.kmc_pre\")\n";
-    remove("sample.kmc_pre");
-    std::cout << "remove(\"sample.kmc_suf\")\n";
-    remove("sample.kmc_suf");
-    std::cout << "remove(\"filter.kmc_pre\")\n";
-    remove("filter.kmc_pre");
-    std::cout << "remove(\"filter.kmc_suf\")\n";
-    remove("filter.kmc_suf");
-  }
+  // if ( store_kmc == 0 ) {
+  //   std::cout << "remove(\"sample.kmc_pre\")\n";
+  //   remove("sample.kmc_pre");
+  //   std::cout << "remove(\"sample.kmc_suf\")\n";
+  //   remove("sample.kmc_suf");
+  //   std::cout << "remove(\"filter.kmc_pre\")\n";
+  //   remove("filter.kmc_pre");
+  //   std::cout << "remove(\"filter.kmc_suf\")\n";
+  //   remove("filter.kmc_suf");
+  // }
 
   ///////////////////////////////////////////////////////////////////////////////////////
   //
@@ -665,12 +666,12 @@ int main ( int argc , char ** argv ){
   system(command.c_str() );
   std::string kmc_pre=prefix+".kmc_pre";
   std::string kmc_suf=prefix+".kmc_suf";
-  if ( store_kmc == 0 ) {
-    std::cout << "remove(" << kmc_pre.c_str() << ")\n";
-    remove(kmc_pre.c_str());
-    std::cout << "remove(" << kmc_suf.c_str() << ")\n";
-    remove(kmc_suf.c_str());
-  }
+  // if ( store_kmc == 0 ) {
+  //   std::cout << "remove(" << kmc_pre.c_str() << ")\n";
+  //   remove(kmc_pre.c_str());
+  //   std::cout << "remove(" << kmc_suf.c_str() << ")\n";
+  //   remove(kmc_suf.c_str());
+  // }
   
   ///////////////////////////////////////////////////////////////////////////////////////
   //

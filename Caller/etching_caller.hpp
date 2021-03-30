@@ -32,7 +32,7 @@
 #include "Peak_memory_measure.hpp"
 #include "CPU_TIME_measure.hpp"
 
-const std::string version ;
+const std::string version = "ETCHING_v1.3.0 (released 2021.3.25.)";
 const std::string PROGRAM = "Program: etching_caller";
 const std::string VERSION = "Version: " + version;
 const std::string CONTACT = "Contact:\n\tJang-il Sohn (sohnjangil@gmail.com)\n\tJin-Wu Nam (jwnam@hanyang.ac.kr)";
@@ -70,8 +70,8 @@ void bp_to_vcf ( const std::string genome,
 		 const bool typing, 
 		 const std::string read_orientation, 
 		 const double tumor_purity, 
-		 const double sequencing_coverage, 
-		 const std::string data_type);
+		 const double sequencing_coverage);
+
 
 int return_discordant_pair_number ( BamTools::BamReader & reader1, 
 				    const Position Pos1, 

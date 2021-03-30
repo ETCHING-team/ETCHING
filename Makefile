@@ -7,7 +7,6 @@ default:
 	cd Caller && make
 	cd Sorter && make
 	cd FG_identifier && make
-	bash decomp.sh
 	if [ ! -d "bin" ]; then mkdir bin ; fi
 	cp ETCHING/etching bin/
 	cp Filter/etching_filter bin/
@@ -18,15 +17,20 @@ default:
 	cp Filter/fastq_check bin/
 	cp Filter/sort_fastq_mem_eff bin/
 	cp Filter/match_pair bin/
+	cp Filter/find_local_min_kmer_depth bin/
 	cp Caller/estimate_coverage bin/
 	cp Caller/etching_caller bin/
 	cp Caller/etching_typer bin/
+	cp Caller/somatic_filter bin/
+	cp Caller/extract_BP_read bin/
 	cp Sorter/etching_sorter bin/
 	cp Sorter/scorer_RandomForest bin/
 	cp Sorter/scorer_XGBoost bin/
 	cp Sorter/cut_by_score bin/
+	cp Sorter/cut_by_length bin/
 	cp FG_identifier/etching_fg_identifier bin/
 	cp -ar ETCHING_ML_model bin/
+	bash decomp.sh
 
 all: library default
 

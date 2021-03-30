@@ -21,6 +21,7 @@ void usage(){
     << "\t" << "-R         \t" << "Random Forest [default]\n"
     << "\t" << "-X         \t" << "XGBoost\n"
     << "\t" << "-m         \t" << "Path to machine learning mode\n"
+    << "\t" << "-p (string)\t" << "Prefix of machine learning model files\n"
     // << "\n"
     // << "I/O option:\n"
     // << "\t" << "-Q         \t" << "Tag SVs with \"PASS\" or \"LOWQUAL\" instead of removing low quality SVs [NONE]\n"
@@ -95,8 +96,9 @@ int main ( int argc , char ** argv ){
   std::string prefix;
   std::string method;
   std::string path;
+  std::string ML_prefix;
 
-  int num_threads(8);
+  // int num_threads(8);
 
   // int tagging=0;
 
@@ -105,7 +107,7 @@ int main ( int argc , char ** argv ){
   std::size_t sz;
 
   // while ( (opt = getopt ( argc, argv, "i:o:c:m:RXQ" ) ) != -1 ){
-  while ( (opt = getopt ( argc, argv, "i:o:c:m:t:RX" ) ) != -1 ){
+  while ( (opt = getopt ( argc, argv, "i:o:c:m:t:RXp:" ) ) != -1 ){
     switch ( opt ) {
     case 'i': infile=optarg; break; // infile name
     case 'o': prefix=optarg; break; // output prefix
@@ -113,7 +115,8 @@ int main ( int argc , char ** argv ){
     case 'm': path=optarg; break; // path to machine learning model
     case 'R': method+="RandomForest"; break; // Random Forest
     case 'X': method+="XGBoost"; break; // XGBoost
-    case 't': num_threads=atoi(optarg); break; // XGBoost
+    case 'p': ML_prefix=optarg; break; // prefix of ML model files
+    // case 't': num_threads=atoi(optarg); break; // XGBoost
     // case 'Q': tagging=1; break; // Tagging SVs instead of ramoving low quality SVs.
     default: std::cout << "ERROR!!! Check options!!!\n\n" ; usage(); return 0 ; 
     }
@@ -194,7 +197,15 @@ int main ( int argc , char ** argv ){
 
   std::cout << "Scoring_command:\t";
   //command = "OMP_NUM_THREADS=4 python3 scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
-  command = "scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
+  if ( ML_prefix.size() == 0 ){
+    if ( method == "RandomForest" ){
+      ML_prefix = "etching_rf";
+    }
+    else if ( method == "XGBoost" ){
+      ML_prefix = "etching_xgb";
+    }
+  }
+  command = "scorer_" + method + " " + feature_file + " " + score_file + " " + path + " " + ML_prefix + " > " + err_fname + " 2>&1" ;
   echo="echo \"" + command + "\"";
 
   system ( echo.c_str() );
@@ -207,6 +218,14 @@ int main ( int argc , char ** argv ){
 
   if ( check_none != "None" ){
     std::cout << "ERROR!!! Python module of etching_sorter did not run properly\n";
+
+    std::string output;
+    fin.open(err_fname.c_str());
+    while ( std::getline ( fin , output) ){
+      std::cout << output << "\n";
+    }
+    fin.close();
+    
     return 0;
   }
 

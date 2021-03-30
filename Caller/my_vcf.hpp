@@ -15,6 +15,7 @@
 #include <set>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <chrono>
 #include <assert.h>
 #include <iterator>
@@ -26,7 +27,7 @@
 #include <api/BamWriter.h>
 
 #include "types.hpp"
-#include "functions.hpp"
+#include "caller_functions.hpp"
 
 
 
@@ -52,7 +53,8 @@ public:
   std::string sv_id_add;
   std::string ref;
   std::string alt;
-  int qual;
+  // int qual;
+  std::string qual;
   std::string filter;
   std::string info;
   
@@ -77,7 +79,7 @@ public:
   std::string mate_id; // for BND
   std::string svtype; // INS, DEL, DUP, INV, BND
   int svlen; // SV length
-  std::string data_type;
+  // std::string data_type;
 
   // features of first mate
   int cr; // number of Clipped Reads supporing the variation
@@ -128,13 +130,14 @@ private:
   std::vector < std::pair < std::string , std::size_t > > genome_info;
   void build_id_ref_map(const std::string infile);
   char GetNucl(const std::string & , const std::size_t &);
+  std::string get_genome_sequence_id ( std::string input );
 
 public:
   VCF_CLASS();
   VCF_CLASS(const std::string input_file);
   ~VCF_CLASS();
 
-  std::string etching_version="ETCHING_v1.2.2 (released 2021.2.16.)";
+  std::string etching_version="ETCHING_v1.3.0 (released 2021.3.25.)";
   
   // Main container
   VCF_MAP vcf_map;
@@ -174,6 +177,7 @@ public:
   VCF_MAP::iterator end();
 
   void write();
+  void write_no_header();
   void fwrite(std::string);
   void write_short();
   void fwrite_short(std::string);

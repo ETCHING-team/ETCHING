@@ -1,0 +1,15 @@
+# v1.2.3
+
+Calibrating SV length
+Accelerating BAM-mode
+Debug cut_by_score
+Add cut_by_length
+
+
+# v1.3.0
+
+Set -M as default
+Fix bug for the genome (fa) files with ID lines of multiple words.
+Removing artifact step added
+Machine learning models (random forest) updated
+XGBoost model will be updated in v1.3.1

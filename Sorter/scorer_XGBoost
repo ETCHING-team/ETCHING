@@ -13,28 +13,29 @@ import pandas as pd
 import numpy as np
 from sklearn import metrics
 
-def xgbooster(testfile,prefix,directory):
+def xgbooster(testfile,prefix,directory,ml_prefix):
 	test_file = pd.read_csv(testfile,sep="\t")
 	test_label = np.array(pd.DataFrame(test_file,columns=['ID']))
 	test_ref_file = test_file.drop(columns = ['ID','SVTYPE'])
 	test_ref_file_ar = np.array(test_ref_file)
 	
-	for fnum in range (1,11) :
-                fname = directory + 'etching_xgb_1.2.0_' + str(fnum) + '.sav'
-                if os.path.exists ( fname ) != True :
-                        print ( "ERROR!!! Check model files in path: " + directory )
-                        sys.exit()
-	
-	model_1 = pickle.load(open(str(directory) + 'etching_xgb_1.2.0_1.sav','rb'))
-	model_2 = pickle.load(open(str(directory) +'etching_xgb_1.2.0_2.sav','rb'))
-	model_3 = pickle.load(open(str(directory) +'etching_xgb_1.2.0_3.sav','rb'))
-	model_4 = pickle.load(open(str(directory) +'etching_xgb_1.2.0_4.sav','rb'))
-	model_5 = pickle.load(open(str(directory) +'etching_xgb_1.2.0_5.sav','rb'))
-	model_6 = pickle.load(open(str(directory) +'etching_xgb_1.2.0_6.sav','rb'))
-	model_7 = pickle.load(open(str(directory) +'etching_xgb_1.2.0_7.sav','rb'))
-	model_8 = pickle.load(open(str(directory) +'etching_xgb_1.2.0_8.sav','rb'))
-	model_9 = pickle.load(open(str(directory) +'etching_xgb_1.2.0_9.sav','rb'))
-	model_10 = pickle.load(open(str(directory) +'etching_xgb_1.2.0_10.sav','rb'))
+    for fnum in range (1,11) :
+            fname = directory + ml_prefix + "_" + str(fnum) + '.sav'
+            if os.path.exists ( fname ) != True :
+                print ( "ERROR!!! Check model files in path: " + directory )
+                print ( "We cannot find: " + fname )
+                sys.exit()
+
+	model_1 = pickle.load(open(str(directory) + str(ml_prefix) + '_1.sav','rb'))
+	model_2 = pickle.load(open(str(directory) + str(ml_prefix) + '_2.sav','rb'))
+	model_3 = pickle.load(open(str(directory) + str(ml_prefix) + '_3.sav','rb'))
+	model_4 = pickle.load(open(str(directory) + str(ml_prefix) + '_4.sav','rb'))
+	model_5 = pickle.load(open(str(directory) + str(ml_prefix) + '_5.sav','rb'))
+	model_6 = pickle.load(open(str(directory) + str(ml_prefix) + '_6.sav','rb'))
+	model_7 = pickle.load(open(str(directory) + str(ml_prefix) + '_7.sav','rb'))
+	model_8 = pickle.load(open(str(directory) + str(ml_prefix) + '_8.sav','rb'))
+	model_9 = pickle.load(open(str(directory) + str(ml_prefix) + '_9.sav','rb'))
+	model_10 = pickle.load(open(str(directory) + str(ml_prefix) + '_10.sav','rb'))
 
 	score_1 = model_1.predict(test_ref_file_ar)
 	score_2 = model_2.predict(test_ref_file_ar)
@@ -71,12 +72,13 @@ def xgbooster(testfile,prefix,directory):
 args = sys.argv[1]
 prefix = sys.argv[2]
 
-if len(sys.argv)==3:
-        directory = os.getcwd() + '/'
-else:
-        directory = sys.argv[3] + '/'
+#if len(sys.argv)==3:
+#        directory = os.getcwd() + '/'
+#else:
+directory = sys.argv[3] + '/'
+ml_prefix = sys.argv[4]
 
-result = xgbooster(args,prefix,directory)
+result = xgbooster(args,prefix,directory,ml_prefix)
 print ( result )
 	
 	
