@@ -11,5 +11,4 @@ Add cut_by_length
 Set -M as default
 Fix bug for the genome (fa) files with ID lines of multiple words.
 Removing artifact step added
-Machine learning models (random forest) updated
-XGBoost model will be updated in v1.3.1
+Machine learning models updated
