@@ -43,7 +43,7 @@ function USAGE {
     echo -e "Samples"
     #echo -e "-T  (string)\tW for WGS, P for Panel [W]"
     #echo -e "-P  (double)\tTumor purity in somatic call (0-1) [0.75]. Note: Set 1 for germline call."
-    echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from sample sequencing reads [automatic]"
+    echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from sample sequencing reads [5]"
     echo -e "            \tSet to 3 for low allele frequency SVs especially for subclonal evolution."
     #echo -e "            \tif you want to specify it, we recommand 3-7 for WGS data, and 5-10 for targeted panel sequencing data."
     #echo -e "--max-kmer  (int)   \tExclude the k-mers counted more than this [10000]."
