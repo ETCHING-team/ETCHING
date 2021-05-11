@@ -1,7 +1,10 @@
-default: ../lib/libetching_filter.so gzstream read_collector kmer_filter fastq_check read_length_calc sort_fastq_mem_eff match_pair find_local_min_kmer_depth
+default: ../lib/libetching_filter.so gzstream read_collector kmer_filter fastq_check read_length_calc sort_fastq_mem_eff match_pair find_local_min_kmer_depth make_pgk
 	chmod a+x etching_filter
 
 all: default
+
+make_pgk: make_pgk.cpp
+	g++ -Wall -std=c++11 make_pgk.cpp -o make_pgk
 
 kmer_filter: kmer_filter.cpp
 	g++ -Wall -std=c++11 kmer_filter.cpp -o kmer_filter
@@ -26,7 +29,7 @@ find_local_min_kmer_depth: find_local_min_kmer_depth.cpp
 
 
 clean:
-	rm -f read_collector kmer_filter fastq_check read_length_calc sort_fastq_mem_eff match_pair find_local_min_kmer_depth
+	rm -f read_collector kmer_filter fastq_check read_length_calc sort_fastq_mem_eff match_pair find_local_min_kmer_depth make_pgk
 
 cleanlibrary: 
 	rm -f ../lib/libetching_filter.so

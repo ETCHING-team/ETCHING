@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.3.0 (released 2021.3.25.)"
+VERSION="ETCHING_v1.3.1 (released 2021.5.8.)"
 MODEL_VERSION="1.3.0"
 
 #--------------------------------------------------------------------
@@ -1132,10 +1132,6 @@ if [[ $CHECK -eq 1 ]]
 then
     if [ ${REMOVE_ARTIFACT} -eq 1 ]
     then
-	echo
-	echo "[Removing artifact]"
-	DATE="[$(date)]";echo ${DATE}
-	echo
 	
 	if [ ! -d artifact ]
 	then
@@ -1231,11 +1227,11 @@ then
     echo "[FG_IDENTIFIER]"
     DATE="[$(date)]";echo ${DATE}
     
-    cmd="etching_fg_identifier ${OUTPUT_3} $ANNOTATION > ${PREFIX}.BND.fusion_gene.txt"
+    cmd="etching_fg_identifier -i ${OUTPUT_3} -a ${ANNOTATION} > ${PREFIX}.BND.fusion_gene.txt"
     echo $cmd
     eval $cmd &
 
-    cmd="etching_fg_identifier ${OUTPUT_4} $ANNOTATION > ${PREFIX}.SV.fusion_gene.txt"
+    cmd="etching_fg_identifier -i ${OUTPUT_4} -a ${ANNOTATION} > ${PREFIX}.SV.fusion_gene.txt"
     echo $cmd
     eval $cmd &
     

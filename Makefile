@@ -18,6 +18,7 @@ default:
 	cp Filter/sort_fastq_mem_eff bin/
 	cp Filter/match_pair bin/
 	cp Filter/find_local_min_kmer_depth bin/
+	cp Filter/make_pgk bin/
 	cp Caller/estimate_coverage bin/
 	cp Caller/etching_caller bin/
 	cp Caller/etching_typer bin/

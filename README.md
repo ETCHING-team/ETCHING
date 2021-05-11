@@ -1,11 +1,11 @@
 ---
 # ETCHING
 
-### Version 1.3.0 (2020.3.25.)
+### Version 1.3.1 (2021.5.8.)
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
-ETCHING takes 2-3 hours for WGS data with 30X normal and 50X tumor with 20 threads on DELL 930 server.
+ETCHING takes about 3 hours for WGS data with 30X normal and 50X tumor on 30 threads on DELL 930 server.
 You can also find codes, k-mer set, and DEMO files in our website.
 
 http://big.hanyang.ac.kr/ETCHING/
@@ -112,12 +112,11 @@ If you have no matched normal data, PGK must be helpful to select tumor specific
 Alternatively, you can make your own k-mer set as follows:
 
 ```
-kmc -k31 -v -ci1 -fa @genome_list.txt your_kmer_db ./
+make_pgk -i reference_fasta.list -o my_pgk -v dbSNP.vcf -g hg19.fa -t number_of_threads [-D /path/to/kmc/kmc]
 ```
+This command will make ```my_pgk```, which consists of 
+```my_pgk.pre``` and ```my_pgk.suf```.
 
-Keep the order and ```-k31```, ```-ci1```, and ```-fa``` options. The ```genome_list.txt``` is a file of
-reference genomes' list, which must be separated line-by-line. Use any name you prefer for ```your_kmer_db```. 
-If you use the same same, you will see ```your_kmer_db.pre``` and ```your_kmer_db.suf``` in the directory.
 
 ## Demo
 
