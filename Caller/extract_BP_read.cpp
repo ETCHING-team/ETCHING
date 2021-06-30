@@ -8,12 +8,14 @@
 #include "my_vcf.hpp"
 
 int main ( int argc , char ** argv ){
-  if ( argc !=3 ){
-    std::cout << "Usage extract_BP_read  input.vcf  input.bam > output.fastq\n";
+  if ( argc !=4 ){
+    std::cout << "Usage: extract_BP_read  input.vcf  input.bam  output.fastq\n";
+    return -1;
   }
 
   std::string input_vcf = argv[1];
   std::string input_bam = argv[2];
+  std::string output = argv[3];
 
   BamTools::BamReader reader;
   BamTools::RefVector references;
@@ -36,8 +38,8 @@ int main ( int argc , char ** argv ){
   // Read vcf
   //
 
-  std::unordered_map < std::string , int > id_ref_map;
-  std::unordered_map < int , std::string > ref_id_map;
+  std::map < std::string , int > id_ref_map;
+  std::map < int , std::string > ref_id_map;
 
   for ( std::size_t i = 0 ; i < references.size() ; i ++ ){
     id_ref_map[references[i].RefName] = i ;
@@ -62,7 +64,6 @@ int main ( int argc , char ** argv ){
     std::stringstream ss ( tmp );
     ss >> chr_str >> pos ;
     chr = id_ref_map[chr_str];
-    //std::cerr << chr_str << "\t" << chr << "\t" << pos << "\n";
     BP_position_map[chr][pos]=1;
   }
 
@@ -74,6 +75,7 @@ int main ( int argc , char ** argv ){
   //
   int count (0);
   int chr_num=-1;
+  std::ofstream fout ( output.c_str() );
   while ( reader.GetNextAlignment(al) ){
     if (chr_num != al.RefID ){
       std::cerr << ref_id_map[al.RefID] << "\n";
@@ -86,16 +88,15 @@ int main ( int argc , char ** argv ){
     for ( auto & i : BP_position_map[chr1] ){
       int pos = i.first;
       if ( pos1 - 100 < pos && pos < pos2 + 100 ){
-	std::cout << "@" << count ++ << "\n"
-	 	  << al.QueryBases << "\n"
-	   	  << "+\n"
-	 	  << al.Qualities << "\n";
-	//std::cout << "@" << al.Name << "\n";
+	fout << "@" << count ++ << "\n"
+	     << al.QueryBases << "\n"
+	     << "+\n"
+	     << al.Qualities << "\n";
 	break;
       }
     }
     
   }
-
+  fout.close();
   return 0;
 }

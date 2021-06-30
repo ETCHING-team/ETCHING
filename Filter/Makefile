@@ -1,4 +1,4 @@
-default: ../lib/libetching_filter.so gzstream read_collector kmer_filter fastq_check read_length_calc sort_fastq_mem_eff match_pair find_local_min_kmer_depth make_pgk
+default: ../lib/libetching_filter.so ../lib/gzstream/gzstream.o read_collector kmer_filter fastq_check read_length_calc sort_fastq_mem_eff match_pair find_local_min_kmer_depth make_pgk
 	chmod a+x etching_filter
 
 all: default
@@ -10,14 +10,14 @@ kmer_filter: kmer_filter.cpp
 	g++ -Wall -std=c++11 kmer_filter.cpp -o kmer_filter
 
 fastq_check: fastq_check.cpp ../lib/libetching_filter.so
-	g++ -Wall -std=c++11 -pthread -Igzstream fastq_check.cpp ../lib/zlib/*.lo -L../lib -letching_filter -o fastq_check
+	g++ -Wall -std=c++11 -pthread -I../lib/gzstream -I../lib/zlib fastq_check.cpp ../lib/zlib/*.lo -L../lib -letching_filter -o fastq_check
 
 read_length_calc: read_length_calc.cpp ../lib/libetching_filter.so 
-	g++ -Wall -std=c++11 -pthread -Igzstream -I../lib/bamtools read_length_calc.cpp -L../lib -letching_filter ../lib/bamtools/api/internal/*/*o ../lib/bamtools/api/*o ../lib/zlib/*.lo -o read_length_calc
+	g++ -Wall -std=c++11 -pthread -I../lib/gzstream -I../lib/zlib -I../lib/bamtools read_length_calc.cpp -L../lib -letching_filter ../lib/bamtools/api/internal/*/*.o ../lib/bamtools/api/*.o ../lib/zlib/*.lo -o read_length_calc
 
 read_collector: read_collector.cpp ../lib/libetching_filter.so 
-	g++ -Wall -std=c++11 -fPIC -c read_collector.cpp -o read_collector.lo -L../lib -letching_filter -I gzstream -pthread
-	g++ -Wall -std=c++11 ../lib/bamtools/api/internal/*/*o ../lib/bamtools/api/*o read_collector.lo ../lib/zlib/*.lo -L../lib -letching_filter -pthread -o read_collector
+	g++ -Wall -std=c++11 -fPIC -c read_collector.cpp -o read_collector.lo -L../lib -letching_filter -I../lib/gzstream -I../lib/zlib -pthread
+	g++ -Wall -std=c++11 ../lib/bamtools/api/internal/*/*.o ../lib/bamtools/api/*.o read_collector.lo ../lib/zlib/*.lo -L../lib -letching_filter -pthread -o read_collector
 sort_fastq_mem_eff: sort_fastq_mem_eff.cpp
 	g++ -Wall -std=c++11 sort_fastq_mem_eff.cpp -o sort_fastq_mem_eff
 match_pair: match_pair.cpp
@@ -36,4 +36,4 @@ cleanlibrary:
 
 cleanall: clean cleanlibrary
 	rm -f *.lo *.o
-	cd gzstream && make cleanall
+	cd ../lib/gzstream && make cleanall

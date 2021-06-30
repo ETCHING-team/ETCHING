@@ -13,22 +13,22 @@
 #include <vector>
 
 void typer_usage(){
-  std::cout << "Usage:  etching_typer  input.vcf\n" ;
+  std::cout << "Usage:  etching_typer  input.vcf  genome.fa.fai\n" ;
 }
 
 
 int main ( int argc , char ** argv ){
-  if ( argc == 1 ){
+  if ( argc != 3 ){
   typer_usage();
   return 0;
-}
-
+  }
+  
   std::string infile = argv[1];
-  // std::string index = argv[2];
+  std::string index = argv[2];
   std::string outfile = infile.substr(0,infile.size()-3) + "etching_typer.vcf";
 
   std::string id;
-  // int length;
+  int length;
 
   std::string tmp;
   std::vector < std::string > metainfo;
@@ -36,18 +36,18 @@ int main ( int argc , char ** argv ){
   VCF_CLASS container;
   VCF_CLASS container_SV;
 
-  // int count = 0 ;
+  int count = 0 ;
   
   std::ifstream fin;
-  // fin.open( index.c_str() );
-  // while ( fin >> id ){
-  //   fin >> length;
-  //   container.id_ref_map[id] = count;
-  //   container.ref_id_map[count] = id;
-  //   count ++;
-  // }
+  fin.open( index.c_str() );
+  while ( fin >> id ){
+    fin >> length;
+    container.id_ref_map[id] = count;
+    container.ref_id_map[count] = id;
+    count ++;
+  }
 
-  // fin.close();
+  fin.close();
   fin.open( infile.c_str() );
 
   /////////////////////////////////////////////////////////////////
@@ -63,15 +63,6 @@ int main ( int argc , char ** argv ){
   }
   metainfo.push_back(tmp);
 
-  /////////////////////////////////////////////////////////////////
-  //
-  // Make id number maps
-  //
-
-  const std::string key = "##contig=<ID=";
-  const std::string len = ",length=";
-  std::string Chr;
-
   
   /////////////////////////////////////////////////////////////////
   //
@@ -80,7 +71,8 @@ int main ( int argc , char ** argv ){
 
 
   while ( std::getline ( fin , tmp ) ){
-    vcf.parse_etching(tmp);
+    // vcf.parse_etching(tmp);
+    vcf.parse(tmp);
     container.insert(vcf);
   }
 

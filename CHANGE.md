@@ -1,3 +1,9 @@
+# v1.3.2
+
+Updated to stop when an error occurs
+README updated
+Debug: PGK path misfinding, match_pair
+
 # v1.3.1
 
 Fix option description

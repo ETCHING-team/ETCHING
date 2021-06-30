@@ -21,8 +21,6 @@ function USAGE {
     echo -e "            \t-1 and -2 must be used together."
     echo -e "-b  (string)\tAligned bam file of paired-end. No need to be sorted."
     echo -e "            \tDo not use along with -1 or -2."
-    #echo -e
-    #echo -e "[Reference genome]"
     echo -e "-g  (string)\tBWA indexed reference genome."
     echo -e
     echo -e
@@ -33,21 +31,13 @@ function USAGE {
     echo -e "-l  (int)   \tk-mer size (<=32) [31]"
     echo -e "            \tPlease check k-mer size before using -f option."
     echo -e "            \tOur default k-mer size of PGK is 31."
-    #echo -e "-D (int)   \tSequencing depth [automatic for WGS]"
-    #echo -e "            \tTargeted sequencing data have >=500X depth. However, we set"
-    #echo -e "            \tdefault to 50 for panel, because it works well"
     echo -e
     echo -e "[Sample]"
-    #echo -e "-T  (string)\tW for WGS, P for Panel [W]"
     echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from"
     echo -e "            \tsample sequencing reads [3]"
-    #echo -e "            \tThough ETCHING can calculate optimal cut-off automatically,"
-    #echo -e "            \tIf you want to specify it, we recommand 3-7 for WGS data, and"
-    #echo -e "            \t5-10 for targeted panel sequencing data."
     echo -e "            \tThe lesser, the more sensitive, and the more, the more specific."
     echo -e "--max-kmer (int)"
     echo -e "            \tExclude the k-mers counted more than this [10000]"
-    #echo -e "-M          \tUsing pre-mapping result for -b option."
     echo -e "--bam2fastq \tConvert bam to fastq when bam was input. This may take more time."
     echo -e "            \tNOTE: Do not use this if you want to keep pre-aligned bam."
     echo -e "-F          \tFast-bam mode for -b option. Only clipped reads are used."
@@ -470,16 +460,18 @@ then
     eval $cmd
     
     KMC_DIR=$(which ${KMC} | sed 's/\/kmc$//g')
+
+   
     if [ ${#FILTER} == 0 ]
     then
-	#cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -r filter_fa.list -p $PREFIX -t $THREADS -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${KMC_DIR} ${STORE_KMC}"
-	cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -p $PREFIX -t $THREADS -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${KMC_DIR}"
+	cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -p $PREFIX -t ${THREADS} -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${KMC_DIR}"
     else
-	#cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -r filter_fa.list -a $FILTER -p $PREFIX -t $THREADS -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${KMC_DIR} ${STORE_KMC}"
-	cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -a $FILTER -p $PREFIX -t $THREADS -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${KMC_DIR}"
+	cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -a $FILTER -p $PREFIX -t ${THREADS} -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${KMC_DIR}"
     fi
     echo $cmd
-    eval $cmd
+    eval $cmd &
+
+    wait 
     KMER_TABLE=${PREFIX}.kmer_table.txt
 else
     echo "[Skip kmer_filter and use ${KMER_TABLE}]"
@@ -500,18 +492,7 @@ then
     echo $cmd
     eval $cmd 2> /dev/null
 
-    #############################
-    #
-    # Sort
-    #
-
-    #sort_fastq_mem_eff ${PREFIX}_1.fastq ${PREFIX}_1.sort.fastq 4 &
-    #sort_fastq_mem_eff ${PREFIX}_2.fastq ${PREFIX}_2.sort.fastq 4 &
-    #wait 
-
-    #mv ${PREFIX}_1.sort.fastq ${PREFIX}_1.fastq &
-    #mv ${PREFIX}_2.sort.fastq ${PREFIX}_2.fastq &
-    #wait
+    echo 
     echo "[Remove unmatched reads]"
     cmd="${MATCH_PAIR} ${PREFIX}_1.fastq ${PREFIX}_2.fastq"
     echo $cmd
@@ -519,16 +500,13 @@ then
     
     cmd="mv ${PREFIX}_1.fastq_idmatched ${PREFIX}_1.fastq"
     echo $cmd
-    echo $cmd
+    eval $cmd &
     cmd="mv ${PREFIX}_2.fastq_idmatched ${PREFIX}_2.fastq"
     echo $cmd
-    echo $cmd
+    eval $cmd &
+    wait
 
 
-    #############################
-    #
-    # Mapping
-    #
     echo
     echo "[Mapping]"
     DATE="[$(date)]";echo ${DATE}
@@ -538,19 +516,6 @@ then
     cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq 2> logs/${PREFIX}_bwa_mem.log | samtools view -@ ${HALF} -Sbh - > ${PREFIX}.bam"
     echo $cmd
     eval $cmd
-
-    #cmd="${SAMTOOLS} view -S -H ${PREFIX}.bam > ${PREFIX}.header"
-    #echo $cmd
-    #eval $cmd
-    #cmd="${SAMTOOLS} view -S -@ ${THREADS} ${PREFIX}.bam | awk '\$6 ~ /H|S|*/ || \$0 !~ \"NM:i:0\" {print}' > ${PREFIX}.SHNM.sam"
-    #echo $cmd
-    #eval $cmd
-    #cmd="cat ${PREFIX}.header ${PREFIX}.SHNM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.SHNM.bam"
-    #echo $cmd
-    #eval $cmd
-    #cmd="rm -f ${PREFIX}.header ${PREFIX}.SHNM.sam"
-    #echo $cmd
-    #eval $cmd
 
 else
     #############################
@@ -669,19 +634,6 @@ else
 	echo $cmd
 	eval $cmd
 
-	#cmd="${SAMTOOLS} view -S -H ${PREFIX}.bam > ${PREFIX}.header"
-	#echo $cmd
-	#eval $cmd
-	#cmd="${SAMTOOLS} view -S -@ ${THREADS} ${PREFIX}.bam | gawk '\$6 ~ /H|S|*/ || \$0 !~ \"NM:i:0\" {print}' > ${PREFIX}.SHNM.sam"
-	#echo $cmd
-	#eval $cmd
-	#cmd="cat ${PREFIX}.header ${PREFIX}.SHNM.sam | ${SAMTOOLS} view -Sbh -@ ${THREADS} - > ${PREFIX}.SHNM.bam"
-	#echo $cmd
-	#eval $cmd
-	#cmd="rm -f ${PREFIX}.header ${PREFIX}.SHNM.sam"
-	#echo $cmd
-	#eval $cmd
-
     fi
 fi    
 
@@ -690,25 +642,14 @@ CHECK=$($SAMTOOLS sort 2>&1 | grep "\-o" | grep "final output to stdout")
 
 if [ ${#CHECK} == 0 ]
 then
-    #cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.SHNM.bam -o ${PREFIX}.SHNM.sort.bam"
     cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.bam -o ${PREFIX}.sort.bam"
     echo $cmd
     eval $cmd
 else
-    #cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.SHNM.bam ${PREFIX}.SHNM.sort"
     cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.bam ${PREFIX}.sort"
     echo $cmd
     eval $cmd
 fi
-
-#cmd="rm -f ${PREFIX}.SHNM.bam"
-#echo $cmd
-#eval $cmd
-
-
-#cmd="ln -s ${PREFIX}.SHNM.sort.bam ${PREFIX}.sort.bam"
-#echo $cmd
-#eval $cmd
 
 
 cmd="${SAMTOOLS} index ${PREFIX}.sort.bam"

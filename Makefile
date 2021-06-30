@@ -1,6 +1,7 @@
 default:
 	bash libconf.sh
 	cd lib/zlib && make
+	cd lib/gzstream && make
 	cd lib/bamtools && make
 	cd ETCHING && make
 	cd Filter && make
@@ -19,7 +20,6 @@ default:
 	cp Filter/match_pair bin/
 	cp Filter/find_local_min_kmer_depth bin/
 	cp Filter/make_pgk bin/
-	cp Caller/estimate_coverage bin/
 	cp Caller/etching_caller bin/
 	cp Caller/etching_typer bin/
 	cp Caller/somatic_filter bin/
@@ -36,7 +36,6 @@ default:
 all: library default
 
 
-	cd lib/zlib && make
 clean:
 	rm -rf bin/*
 	cd ETCHING && make clean
@@ -44,16 +43,6 @@ clean:
 	cd Caller && make clean
 	cd Sorter && make clean
 	cd FG_identifier && make clean
-
-cleanlibrary:
-	rm -f lib/*so
-	cd Filter && make cleanlibrary
-	cd Caller && make cleanlibrary
-	cd Sorter && make cleanlibrary
-	cd FG_identifier && make cleanlibrary
-	cd lib/zlib && make clean
-	cd lib/bamtools && make clean
-	rm -f lib/lib*
 
 cleanall: clean
 	cd ETCHING && make cleanall
@@ -63,6 +52,7 @@ cleanall: clean
 	cd FG_identifier && make cleanall
 	rm -rf bin
 	rm -f ETCHING_ML_model/*sav
+	cd lib/gzstream && make clean
 	cd lib/zlib && make clean
 	cd lib/bamtools && make clean
 	rm -f lib/lib*

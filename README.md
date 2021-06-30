@@ -1,7 +1,7 @@
 ---
 # ETCHING
 
-### Version 1.3.1 (2021.5.8.)
+### Version 1.3.2 (2021.6.30.)
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
@@ -14,20 +14,6 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
 
 ---
 
-## Table of contents
-
-  * [Requirement](#requirement)
-  * [Installation](#installation)
-    * [From source code](#from-source-code)
-    * [Pan-Genome k-mer set](#pan-genome-k-mer-set)
-  * [Usage](#usage)
-    * [Pan-genome k-mer - PGK](#pan-genome-k-mer---pgk)
-    * [Example execution](#example-execution)
-    * [Step-by-step execution](#step-by-step-execution)
-	* [Docker](#docker)
-  * [Contributors](#contributors)
-  * [Contact](#contact)
-
 
 ## Requirement
 
@@ -35,106 +21,101 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
 
 * 64-bit LINUX with >=64GB RAM (at least >=16GB).
 
-* C++11 with g++>=4.7.0
+	* Tested on Fedora workstation, Centos, and Ubuntu
 
-* python3 with pandas, numpy, scikit-learn, skranger, and xgboost packages. You can simply install the packages as follows:
+### Software
 
+
+* g++ (>=4.7.0), make, gawk, BWA, samtools
+* Python3 (>=3.6.1, <4) with pandas, numpy, scikit-learn, skranger, and xgboost modules
+
+### Simple guide for Linux desktop beginners to install requirements.
+
+#### Fedora
 ```
+sudo yum install -y gawk gcc gcc-c++ make cmake bwa samtools
 pip3 install pandas numpy scikit-learn skranger xgboost
 ```
 
-* BWA (https://github.com/lh3/bwa.git) 
- 
-* samtools (http://www.htslib.org/)
+#### CentOS 8
+```
+sudo yum install -y epel-release
+sudo yum install -y gawk gcc gcc-c++ make cmake bwa samtools
+wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py
+pip3 install pandas numpy scikit-learn skranger xgboost
+```
 
-You can install ETCHING even if you did not install the python packages, but ETCHING-Sorter will not be working properly.
+#### CentOS 7
+```
+sudo yum install -y epel-release
+sudo yum install -y gawk gcc gcc-c++ make cmake3 bwa samtools
+wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py
+pip3 install pandas numpy scikit-learn skranger xgboost
+```
 
-##### We tested this version on CentOS 7.4.1708 (with g++ >4.7 and python-3.6.10) and on Ubuntu 20.04.
+#### Ubuntu 20.04
+```
+sudo apt install -y gawk gcc g++ make cmake bwa samtools python3-pip
+pip3 install pandas numpy scikit-learn skranger xgboost
+```
 
+#### Ubuntu 14.04, 16.04, and 18.04
+```
+sudo apt install -y gawk gcc g++ make bwa samtools
 
-## Installation
+# Check cmake version
+cmake --version
 
-### From source code
+# If cmake is <3.13 or not installed, 
+wget https://github.com/Kitware/CMake/releases/download/v3.13.0/cmake-3.13.0.tar.gz
+tar zxvf cmake-3.13.0.tar.gz
+cd cmake-3.13.0 
+./bootstrap && make && sudo make install 
+cd ..
 
-Download code from git
+# Check python3 version
+python3 --version
+
+# If python3 is <3.6,
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt-get update
+sudo apt-get install -y python3.6
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
+
+# Install recent version of pip3 and python modules
+wget https://bootstrap.pypa.io/get-pip.py
+python3 get-pip.py
+
+# Ubuntu 14.04
+echo "export PATH=${HOME}/.local/bin:\$PATH" >> ~/.bashrc
+source ~/.bashrc 
+
+pip3 install pandas numpy scikit-learn skranger xgboost
+```
+
+## Installation of ETCHING
 
 ```
+# Download ETCHING
 git clone https://github.com/ETCHING-team/ETCHING.git
+
+# Compile
 cd etching
 make
-echo "export PATH=$PWD/bin:$PATH" >> ~/.bashrc
-echo "export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
+
+ETCHING_PATH=$PWD
+
+# Installation
+# Do either
+echo "export PATH=$ETCHING_PAHT/bin:\$PATH" >> ~/.bashrc
+echo "export LD_LIBRARY_PATH=$ETCHING_PATH/lib:\$LD_LIBRARY_PATH" >> ~/.bashrc
+source ~/.bashrc
+
+# or 
+sudo cp -ar $ETCHING_PAHT/bin/* /usr/bin
+sudo cp $ETCHING_PAHT/lib/*.so /usr/lib
 ```
-### From docker image
-
-Download the docker image from our web (http://big.hanyang.ac.kr/ETCHING/download.html)
-And load ETCHING docker image
-```
-wget http://big.hanyang.ac.kr/ETCHING/etching_docker_v1.3.0.tar
-docker load -i etching_v1.3.0.tar
-```
-
-Check if the docker image is loaded properly
-
-```
-docker images
-```
-
-Output should be like below
-
-|REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
-|:---|:---|:---|:---|:---|
-|etching|1.3.0|16647cac9a99|40 hours ago|3.5GB|
-
-
-### Pan-Genome k-mer set
-
-After installation of ETCHING, you need pan-genome k-mer set (PGK).
-
-```
-cd /path/to/etching
-wget http://big.hanyang.ac.kr/ETCHING/PGK.tar.gz
-tar zxvf PGK.tar.gz
-```
-
-Then, you will see the files ```PGK_20200103.kmc_pre``` and ```PGK_20200103.kmc_suf``` 
-in the directory ```PGK```:
-
-```
-ls PGK/
-PGK_20200103.kmc_pre
-PGK_20200103.kmc_suf
-```
-
-Here, ```PGK_20200103``` is the name of k-mer set to be used for ETCHING.
-If you have no matched normal data, PGK must be helpful to select tumor specific reads.
-
-Alternatively, you can make your own k-mer set as follows:
-
-```
-make_pgk -i reference_fasta.list -o my_pgk -v dbSNP.vcf -g hg19.fa -t number_of_threads [-D /path/to/kmc/kmc]
-```
-This command will make ```my_pgk```, which consists of 
-```my_pgk.pre``` and ```my_pgk.suf```.
-
-
-## Demo
-
-After installation, you can download and run demo
-
-```
-wget http://big.hanyang.ac.kr/ETCHING/DEMO.tar.gz
-tar zxvf DEMO.tar.gz
-cd DEMO
-etching -1 tumor_1.fq -2 tumor_2.fq \
--1c normal_1.fastq -2c normal_2.fastq \
--g small_genome.fa \
--a small_genome.gtf \
--o OUTPUT \
--f demo_PGK
-```
-
-If you want the list of options, check with this command
+If you want to see usage, 
 
 ```
 etching -h
@@ -145,100 +126,117 @@ If you need some example,
 etching --example
 ```
 
-#### Output
 
-The above command will give you four vcf files:
 
-```
-OUTPUT.BND.etching_sorter.vcf
-OUTPUT.BND.unfiltered.vcf
-OUTPUT.SV.etching_sorter.vcf
-OUTPUT.SV.unfiltered.vcf
-```
+## Demo
 
-In OUTPUT.BND.etching_sorter.vcf, all vcf lines are recoded in breakend (BND) level.
-In OUTPUT.SV.etching_sorter.vcf, you will see SV typs, such as DEL, DUP, INV, or TRA. 
-
-If you want to apply different cutoff for SV-score, use `cut_by_score`. For instance, if yoy want 0.2 as cutoff, do like this
-```
-cut_by_score OUTPUT.SV.unfiltered.vcf 0.2 > OUTPUT.SV.filtered.vcf
-```
-The greater (or lesser) cutoff, the more specfic (or sensitive). Cutoff range is from 0 to 1, and default is 0.4.
-
-#### Fusion-gene
-
-If you use `-a annotation.gtf` option, ETCHING will
-make two more files of fusion-genes:
+After installation, you can download and run demo
 
 ```
-OUTPUT.BND.fusion_gene.txt
-OUTPUT.SV.fusion_gene.txt
+# Download and decompress DEMO
+wget http://big.hanyang.ac.kr/ETCHING/DEMO.tar.gz
+tar zxvf DEMO.tar.gz
+
+# Run demo
+cd DEMO
+etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
+-g small_genome.fa -a small_genome.gtf -f demo_PGK -o example -t 8
 ```
 
 
-### Step-by-step execution
+## Pan-Genome k-mer set
 
-If you want to run ETCHING step-by-step, follow the steps.
+If you have no matched normal data, PGK must be helpful to select tumor specific reads.
 
-```
-etching_filter -1 tumor_1.fq -2 tumor_2.fq \
--1c normal_1.fastq -2c normal_2.fastq \
--o OUTPUT \
--t 30 \
--g small_genome.fa \
--f demo_PGK
-```
-
-2. Caller
+You can download pan-genome k-mer set (PGK) from our website.
 
 ```
-etching_caller -b filtered_read.sort.bam -g small_genome.fa -o OUTPUT
+# Move to etching directory
+cd /somewhere/you/want/
+
+# Download
+wget http://big.hanyang.ac.kr/ETCHING/PGK.tar.gz
+
+# Decompress
+tar zxvf PGK.tar.gz
+
+# Then, you will see PGK_20200103.kmc_pre and PGK_20200103.kmc_suf in PGK:
+# Here, PGK_20200103 is the name of k-mer set to be used for ETCHING.
+ls PGK
 ```
 
-This command returns two output, ```OUTPUT.BND.vcf``` and ```OUTPUT.SV.vcf```.
-
-3. Sorter
+Alternatively, you can make your own k-mer set as follows:
 
 ```
-etching_sorter -i OUTPUT.BND.vcf -o OUTPUT.BND -m /path/to/ETCHING_ML_model
-etching_sorter -i OUTPUT.SV.vcf -o OUTPUT.SV -m /path/to/ETCHING_ML_model
+make_pgk -i reference.list -o my_pgk -v dbSNP.vcf -g hg19.fa
 ```
 
-4. FG_identifiter
 
+
+
+## Docker
+
+### Installation of docker
 ```
-etching_fg_identifier output.BND.etching_sorter.vcf hg19.annot.gtf > output.BND.FG.txt
-etching_fg_identifier output.SV.etching_sorter.vcf hg19.annot.gtf > output.SV.FG.txt
+sudo snap install docker     # version 19.03.13, or
+sudo apt  install docker.io  # version 20.10.2-0ubuntu1~20.04.2
+sudo usermod -a -G docker $USER
 ```
 
-### Docker
+### ETCHING on a ship (for docker users)
 
-In case of using ETCHING docker image,
+Download our docker image using ```wget``` from our website (http://big.hanyang.ac.kr/ETCHING/download.html)
+```
+# Download ETCHING docker image
+wget http://big.hanyang.ac.kr/ETCHING/etching_v1.3.2.tar
 
+# Load the image
+docker load -i etching_v1.3.2.tar
+
+# Check the image
+docker images
 ```
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.0 etching [options]
+
+Output should be like below
+
+|REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
+|:---|:---|:---|:---|:---|
+|etching|1.3.2|16647cac9a99|40 hours ago|4.3 GB|
+
+### Demo for docker user
+
+Download our DEMO
 ```
-Mount your directory containing all required files, such as PGK, reference fasta, sample and normal 
-fastq  to '/work/' directory in the docker container. The mount point on docker '/work/' should not be
-changed. 
-So path should be either relative path starting from your mount point or absolute path starting from 
-'/work/' directory. To say, if you have the data path '/path/to/mounted/directory/sample.fq', and mounted
-'/path/to/mounted/directory' to '/work/' on docker container, then the file path on configure file should
-be either 'sample.fq' or '/work/sample.fq'.
+# Download and decompress DEMO
+wget http://big.hanyang.ac.kr/ETCHING/DEMO.tar.gz
+tar zxvf DEMO.tar.gz
+```
+
+Run ETCHING with docker
+```
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.2 etching \
+-1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
+-g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_1 -t 8
+```
+Here, ```etching:1.3.2``` is ```REPOSITORY``` and ```TAG``` of ETCHING docker image.
+
+Replace ```/path/to/DEMO``` with ```/your/data/path/```.
+
+Note: Keep ```/work/``` in the above command line.
+
 
 Alternatively, you can run ETCHING inside docker container
 ```
-docker run -i -t --rm -v /local/path/to/example/directory/:/work/ etching:1.3.0 /bin/bash
-etching [options]
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.2 /bin/bash
+
+etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
+-g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_2 -t 8
 ```
-The ETCHING binary and ML models are located on '/etching/'
-
-
 
 ----------------------------------------------------------------------------------
 ## Contributors
 
-Min-Hak Choi, Jang-il Sohn, Dohun Yi, A. Vipin Menon, and Jin-Wu Nam
+Jang-il Sohn, Min-Hak Choi, Dohun Yi, A. Vipin Menon, and Jin-Wu Nam
 
 Bioinformatic and Genomics Lab., Hanyang University, Seoul 04763, Korea
 

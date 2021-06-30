@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.3.1 (released 2021.5.8.)"
+VERSION="ETCHING_v1.3.2 (released 2021.6.30.)"
 MODEL_VERSION="1.3.0"
 
 #--------------------------------------------------------------------
@@ -31,27 +31,15 @@ function USAGE {
     echo -e "-g  (string)\tBWA indexed reference genome."
     echo -e
     echo -e "[Options]"
-    #echo -e "-p  (string)\tPrefix of output [etching]"
     echo -e "-o  (string)\tPrefix of output (-p is same) [etching]"
     echo -e "-w  (string)\tWorking directory [-o]"
     echo -e "-t  (int)   \tNumber of threads [8]"
-    #echo -e "-l  (int)   \tk-mer size (<=32) [31]"
-    #echo -e "            \tWarning! Do not use this option, unless you know the details of ETCHING-Filter."
     echo -e "-a  (string)\tAnnotation file in gtf. If you use this option, Fusion-genes will be predicted in a genome level."
-    #echo -e "-M          \tUsing pre-alignment result for -b option"
     echo -e
     echo -e "Samples"
-    #echo -e "-T  (string)\tW for WGS, P for Panel [W]"
-    #echo -e "-P  (double)\tTumor purity in somatic call (0-1) [0.75]. Note: Set 1 for germline call."
     echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from sample sequencing reads [5]"
     echo -e "            \tSet to 3 for low allele frequency SVs especially for subclonal evolution."
-    #echo -e "            \tif you want to specify it, we recommand 3-7 for WGS data, and 5-10 for targeted panel sequencing data."
-    #echo -e "--max-kmer  (int)   \tExclude the k-mers counted more than this [10000]."
-    #echo -e "-I  (int)   \tInsert-size [500]"
-    #echo -e "-L  (int)   \tRead-length [automatic]"
     echo -e "-O  (string)\tRead-orientation FR or RF. [FR]"
-    #echo -e "-D  (int)   \tSequencing depth [automatic for WGS; 500 for panel]"
-    #echo -e "            \tNote: This is used only for WGS read filtration, and not affecting on SV calling or scoring."
     echo -e
     echo -e "Control sample (matched normal in somatic call)"
     echo -e "-1c (string)\tFirst fastq file of paried-end"
@@ -68,18 +56,13 @@ function USAGE {
     echo -e "            \tUsing already made k-mer table ignoring -1/2/bc options"
     echo -e "--no-filter \tSkip etching_filter, and use all sequencing data. This requires sorted BAM files with -b option."
     echo -e 
-    #echo -e "Initial SV call"
-    #echo -e "-A          \tUse all split-reads"
-    #echo -e "            \tThis option increases recall. However, lots of false-positives also can be generated."
-    #echo -e "            \tUse this option to detect low allele frequency SVs, or for SVs <1000bp."
-    #echo -e 
     echo -e "FP SV removing"
-    #echo -e "-R          \tRandom Forest in scoring [default]"
-    #echo -e "-X          \tXGBoost in scoring"
+    echo -e "-R          \tRandom Forest in scoring [default]"
+    echo -e "-X          \tXGBoost in scoring"
     echo -e "-C  (double)\tCut-off of false SVs [0.4]"
     echo -e "-m  (string)\tPath to ETCHING machine learning model"
-    echo -e "--remove-artifact (1 or 0)"
-    echo -e "            \t1 to remove artifact mis-called as somatic. Only for -1c/2c/bc options [1]"
+    echo -e "--remove-miscall (1 or 0)"
+    echo -e "            \t1 to remove mis-called germline as somatic. Only for -1c/2c/bc options [1]"
     echo -e 
     echo -e "Others"
     echo -e "-S  (string)\t/path/to/samtools"
@@ -99,46 +82,45 @@ function USAGE {
 }
 
 function EXAMPLE {
-    echo -e "ETCHING examples)"
+    echo -e "ETCHING examples for DEMO"
     echo -e 
-    echo -e "Fastq input files: tumor_1/2.fq, normal_1/2.fq"
-    echo -e "Pre-made PGK (kmc database file): PGK.kmc_pre, PGK.kmc_suf"
-    echo -e "Thread: 30"
-    echo -e "Output prefix: Result"
-    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -f PGK -o Result -t 30"
+    echo -e "\$ wget http://big.hanyang.ac.kr/ETCHING/DEMO.tar.gz"
+    echo -e "\$ tar zxvf DEMO.tar.gz"
+    echo -e "\$ cd DEMO"
+    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \\"
+    echo -e "  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_1 -t 8"
     echo -e 
     echo -e "----------------------------------------------------------------------------------------------------------"
     echo -e 
     echo -e "Bam input files"
-    echo -e "\$ etching -b tumor.bam -bc normal.bam -f PGK -o Result -t 30"
+    echo -e "\$ etching -b tumor.sort.bam -bc normal.sort.bam \\"
+    echo -e "  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_1 -t 8"
     echo -e
     echo -e "You can use a bam file for tumor sample"
-    echo -e "\$ etching -b tumor.bam 1c normal_1.fq -2c normal_2.fq -o Result -t 30"
+    echo -e "\$ etching -b tumor.sort.bam -1c normal_1.fq -2c normal_2.fq \\"
+    echo -e "  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_2 -t 8"
     echo -e
     echo -e "You can use a bam file for normal sample"
-    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -bc normal.bam -o Result -t 30"
+    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -bc normal.sort.bam \\"
+    echo -e "  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_3 -t 8"
     echo -e
     echo -e "----------------------------------------------------------------------------------------------------------"
     echo -e 
     echo -e "If you want to use pre-made k-mer table (31-mer only), use --kmer-table option"
-    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -o Result -t 30 --kmer-table tumor_specific_kmer_table.txt"
+    echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq --kmer-table tumor_specific_kmer_table.txt"
+    echo -e "  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_4 -t 8"
     echo -e 
     echo -e "k-mer table must be like:"
     echo -e "AACCTAACCTAACCTAACCTAACCTAACCTG 14"
     echo -e "AACCTAACCTAACCTAACCTAACCTAACCAA 12"
     echo -e "AACCTAACCTAACCTAACCTAACCTAACCAC 6"
     echo -e 
-    #echo -e "----------------------------------------------------------------------------------------------------------"
-    #echo -e 
-    #echo -e "Panel data: -T P"
-    #echo -e "\$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -f PGK -o Result -t 30 -T P"
-    #echo -e
     echo -e "----------------------------------------------------------------------------------------------------------"
     echo -e 
     echo -e "[Contact]"
     echo -e "Please report bugs to"
-    echo -e "\tJang-il Sohn (sohnjangil@gmail.com)"
-    echo -e "\tJin-Wu Nam (jwnam@hanyang.ac.kr)"
+    echo -e "  Jang-il Sohn (sohnjangil@gmail.com)"
+    echo -e "  Jin-Wu Nam (jwnam@hanyang.ac.kr)"
     echo -e
 }
 
@@ -202,7 +184,6 @@ FILTER=
 KMER_TABLE=
 
 ALLSPLIT="-A"
-DEPTH=
 
 ALGOR=
 ALGOR_R=0
@@ -214,7 +195,7 @@ MAPPER=
 SAMTOOLS=
 STORE_KMC=
 
-REMOVE_ARTIFACT=1
+REMOVE_MISCALL=1
 KEEP_ALIGNMENT=
 
 NO_FILTER=0
@@ -247,9 +228,6 @@ while [ ${#1} != 0 ]; do
         -t | --threads ) shift
 	    THREADS=$1
             ;;
-        #-l | --k-mer-size ) shift
-	#    KL=$1
-        #-l    ;;
 
 
         -a | --annotation ) shift
@@ -283,16 +261,9 @@ while [ ${#1} != 0 ]; do
         -I | --insert ) shift
 	    INSERTSIZE=$1
             ;;
-        #-L | --read_length ) shift
-	#    READLENGTH=$1
-        #    ;;
         -O | --orientation ) shift
 	    ORIENT=$1
             ;;
-        -D | --sequencing-depth ) shift
-	    DEPTH="-D "$1
-            ;;
-
 
         -1c | --first )  shift
             FIRST_CONT=$1
@@ -342,8 +313,8 @@ while [ ${#1} != 0 ]; do
         -E ) 
 	    STORE_KMC="-E"
             ;;
-	--remove-artifact ) shift
-	REMOVE_ARTIFACT=$1
+	--remove-miscall ) shift
+	REMOVE_MISCALL=$1
 	;;
 
         -h | --help ) USAGE
@@ -365,7 +336,7 @@ while [ ${#1} != 0 ]; do
 	    echo "ERROR!!! Unavailable option: $1"
 	    echo "-------------------------------"
 	    USAGE
-	    exit -1
+	    exit 1
 	    ;;
     esac
     shift
@@ -392,31 +363,31 @@ then
     if [ ! -f ${FIRST} ]
     then
 	echo "ERROR!!! Ther is no ${FIRST}".
-	exit -1
+	exit 2
     fi
 
     if [ ! -f ${SECOND} ]
     then
         echo "ERROR!!! Ther is no ${SECOND}".
-	exit -1
+	exit 3
     fi
 
     if [ ${#BAM} != 0 ]
     then
 	echo "ERROR!!! Do not use -1, -2 and -b at a same time."
-	exit -1
+	exit 4
     fi
 
     if [ ${#KEEP_ALIGNMENT} != 0 ]
     then
 	echo "ERROR!!! Do not use -M with -1 and -2 options."
-	exit -1
+	exit 5
     fi
 
     if [ ${#FAST_BAM} != 0 ]
     then
 	echo "ERROR!!! Do not use -F with -1 and -2 options."
-	exit -1
+	exit 6
     fi
 else
     if [ ${#BAM} != 0 ]
@@ -424,13 +395,13 @@ else
 	if [ ! -f ${BAM} ]
 	then
             echo "ERROR!!! Ther is no ${BAM}".
-	    exit -1
+	    exit 7
 	fi
     else
         echo "ERROR!!! Please check required option"
         echo "-------------------------------------"
         USAGE
-        exit -1
+        exit 8
     fi
 fi
 
@@ -444,7 +415,7 @@ then
     echo "ERROR!!! -g (reference_genome) is required"
     echo "------------------------------------------"
     USAGE
-    exit -1
+    exit 9
 fi
 
 if [ ! -f ${GENOME} ]
@@ -452,7 +423,7 @@ then
     echo "ERROR!!! There is no reference genome: $GENOME"
     echo "----------------------------------------------"
     USAGE
-    exit -1
+    exit 10
 fi
 
 
@@ -468,7 +439,7 @@ then
     then
 	echo "ERROR!!!"
 	echo "There is no annotation file: ${ANNOTATION}"
-	exit -1
+	exit 11
     fi
 fi
 
@@ -483,7 +454,7 @@ then
     echo "ERROR!!! -T must be used with W or P."
     echo "---------------------------"
     USAGE
-    exit -1
+    exit 12
 fi
 
 
@@ -495,7 +466,7 @@ if [ "$ORIENT" != "FR" ] && [ "$ORIENT" != "RF" ]
 then
     echo "ERROR!!!"
     echo "-O must be FR or RF"
-    exit -1
+    exit 13
 fi 
 
 
@@ -510,7 +481,7 @@ then
     if [ ! -f ${FIRST_CONT} ]
     then
 	echo "ERROR!!! Ther is no ${FIRST_CONT}".
-	exit -1
+	exit 14
     fi
 fi
 
@@ -519,7 +490,7 @@ then
     if [ ! -f ${SECOND_CONT} ]
     then
 	echo "ERROR!!! Ther is no ${SECOND_CONT}".
-	exit -1
+	exit 15
     fi
 fi
 
@@ -529,7 +500,7 @@ then
     if [ ! -f ${BAM_CONT} ]
     then
         echo "ERROR!!! Ther is no ${BAM_CONT}".
-	exit -1
+	exit 16
     fi
 fi
 
@@ -545,7 +516,7 @@ then
     echo "ERROR!!! -R and -X can not used together."
     echo "-----------------------------------------"
     USAGE
-    exit -1
+    exit 17
 fi
 
 # Setting default algorithm
@@ -624,7 +595,7 @@ do
 	    echo "ERROR!!!"
 	    echo "No model files in ${ML_PATH}"
 	    echo "-------------------------------"
-	    exit -1
+	    exit 18
 	fi
     fi
 done
@@ -634,7 +605,7 @@ done
 #
 # CHECKING REQUIRED PROGRAMS
 #
-for i in extract_BP_read somatic_filter cut_by_score estimate_coverage etching etching_caller etching_fg_identifier etching_filter etching_sorter etching_typer fastq_check kmc kmc_dump kmc_tools kmer_filter match_pair read_collector read_length_calc scorer_RandomForest scorer_XGBoost sort_fastq_mem_eff somatic_filter
+for i in extract_BP_read somatic_filter cut_by_score etching etching_caller etching_fg_identifier etching_filter etching_sorter etching_typer fastq_check kmc kmc_dump kmc_tools kmer_filter match_pair read_collector read_length_calc scorer_RandomForest scorer_XGBoost sort_fastq_mem_eff somatic_filter
 do
     CHECK=$(which ${i})
     
@@ -642,7 +613,7 @@ do
     then
 	echo "ERROR!!! We cannot find ${i}. Please check PATH."
 	echo "."
-	exit -1
+	exit 19
     fi
 
 done
@@ -661,7 +632,7 @@ do
     then
 	cat library_check.txt
 	echo "Please check LD_LIBRARY_PATH"
-	exit -1
+	exit 20
     fi
 done
 
@@ -674,7 +645,7 @@ do
     then
 	echo "ERROR!!!"
 	echo "KMC3 was not install properly."
-	exit -1
+	exit 21
     fi
 done
 
@@ -690,7 +661,7 @@ if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!!"
     echo "bwa was not found"
-    exit -1
+    exit 22
 else
     MAPPER=$CHECK
 fi
@@ -707,7 +678,7 @@ if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!!"
     echo "samtools was not installed"
-    exit -1
+    exit 23
 else
     SAMTOOLS=$CHECK
 fi
@@ -717,21 +688,6 @@ fi
 #
 # make path absolute
 #
-
-if [ ${#FIRST} != 0 ] 
-then
-    FIRST_DIR=$(ls ${FIRST} | awk -F "/" 'NF{NF-=1};1' | sed 's/ /\//g')
-    if [ ${#FIRST_DIR} != 0 ]
-    then
-	cd ${FIRST_DIR}
-	FIRST_DIR=$PWD
-	cd - > /dev/null
-	FIRST_FILE=$(ls ${FIRST} | rev | cut -d'/' -f 1 | rev)
-	FIRST=${FIRST_DIR}/${FIRST_FILE}
-    else
-	FIRST=$PWD/$FIRST
-    fi
-fi
 
 first=$FIRST
 second=$SECOND
@@ -749,25 +705,16 @@ FIRST_CONT=$(ABS_PATH $FIRST_CONT)
 SECOND_CONT=$(ABS_PATH $SECOND_CONT)
 BAM_CONT=$(ABS_PATH $BAM_CONT)
 
-filter=$FILTER    
-if [ ${#FILTER} != 0 ]
-then
-    FILTER_PRE=${FILTER}.kmc_pre
-    FILTER_SUF=${FILTER}.kmc_suf
-    if [ ! -f ${FILTER_PRE} ] || [ ! -f ${FILTER_SUF} ]
-    then
-        echo "ERROR!!! Ther is no ${FILTER}".
-	exit -1
-    fi
-    FILTER_DIR=$(ls ${FILTER_PRE} | awk -F "/" 'NF{NF-=1};1' | sed 's/ /\//g')
-    cd ${FILTER_DIR}
-    FILTER_DIR=$PWD
-    cd - > /dev/null
-    FILTER_FILE=$(ls ${FILTER_PRE} | rev | cut -d'/' -f 1 | rev | sed 's/.kmc_pre$//1')
-    FILTER=${FILTER_DIR}/${FILTER_FILE}
-fi
+FILTER_PRE=${FILTER}.kmc_pre
+FILTER_SUF=${FILTER}.kmc_suf
 
-if [[ $((${#first_cont} + ${#second_cont} + ${#bam_cont} + ${#filter})) -eq 0 ]]
+FILTER_PRE=$(ABS_PATH $FILTER_PRE)
+FILTER_SUF=$(ABS_PATH $FILTER_SUF)
+
+filter=$FILTER
+FILTER=$(ls ${FILTER_PRE} | sed 's/.kmc_pre$//1')
+
+if [[ $((${#first_cont} + ${#second_cont} + ${#bam_cont} + ${#FILTER})) -eq 0 ]]
 then 
     NO_FILTER=1
 fi
@@ -791,11 +738,15 @@ then
     WORKDIR=${PREFIX}
 fi
 
-if [ ! -d ${WORKDIR} ]
+cmd="mkdir -p ${WORKDIR}"
+echo $cmd
+eval $cmd
+
+STATUS=$(echo $?)
+if (( STATUS != 0 ))
 then
-    cmd="mkdir ${WORKDIR}"
-    echo $cmd
-    eval $cmd
+    echo "Failed: ${STATUS}: $cmd"
+    exit 1001
 fi
 
 cd $WORKDIR
@@ -806,6 +757,13 @@ cd - > /dev/null
 cmd="cd $WORKDIR"
 echo $cmd
 eval $cmd
+
+STATUS=$(echo $?)
+if (( STATUS != 0 ))
+then
+    echo "Failed: ${STATUS}: $cmd"
+    exit 1002
+fi
 
 
 #######################################################################################
@@ -820,12 +778,17 @@ echo
 echo "[FILTER]"
 DATE="[$(date)]";echo ${DATE}
 
-if [ ! -d logs ]
-then 
-    cmd="mkdir logs"
-    echo $cmd
-    eval $cmd
+cmd="mkdir -p logs"
+echo $cmd
+eval $cmd
+
+STATUS=$(echo $?)
+if (( STATUS != 0 ))
+then
+    echo "Failed: ${STATUS}: $cmd"
+    exit 1003
 fi
+
 
 REQUIRED=
 #echo $FIRST
@@ -834,7 +797,6 @@ REQUIRED=
 if [ ${#first} != 0 ] && [ ${#second} != 0 ]
 then
     REQUIRED="-1 $FIRST -2 $SECOND -g ${GENOME}"
-    #echo $REQUIRED
 else
     REQUIRED="-b $BAM -g ${GENOME}"
 fi
@@ -870,16 +832,6 @@ then
 	OPTIONS="-l $KL"
     fi
 fi
-
-#if [ ${DATATYPE} != "W" ]
-#then
-#    if [ ${#OPTIONS} != 0 ]
-#    then
-#	OPTIONS="${OPTIONS} -T ${DATATYPE}"
-#    else
-#	OPTIONS="-T $DATATYPE"
-#    fi
-#fi
 
 if [ ${#KMERCUTOFF} != 0 ]
 then
@@ -992,6 +944,7 @@ then
     fi
 fi
 
+
 # Run etching_filter
 
 if [[ ${NO_FILTER} -eq 0 ]]
@@ -999,6 +952,14 @@ then
     cmd="etching_filter ${REQUIRED} ${OPTIONS} > logs/ETCHING_FILTER.log"
     echo $cmd
     eval $cmd 2> /dev/null
+    STATUS=$(echo $?)
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit 1004
+    fi
+    
+    
 else
     echo "Skipped by --no-filter"
 fi
@@ -1029,40 +990,42 @@ then
     cmd="read_length_calc $INPUT 100000"
     echo $cmd
     READLENGTH=$(eval $cmd)
+
+    STATUS=$(echo $?)
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit 1005
+    fi
     echo "Read length: $READLENGTH"
 fi
 
-
-if [ ${#DEPTH} == 0 ]
-then
-    if [ $DATATYPE == "W" ]
-    then 
-	if [ -f sample.hist ]
-	then
-	    cmd="estimate_coverage sample.hist $READLENGTH $KL"
-	    echo $cmd
-	    DEPTH=$(eval $cmd)
-	else
-	    DEPTH=50
-	fi
-	
-	DEPTH="-D $DEPTH"
-    else
-	DEPTH="-D 500"
-    fi
-fi
 
 if [[ ${NO_FILTER} -eq 0 ]]
 then
     cmd="etching_caller -b ${PREFIX}.sort.bam -g $GENOME -o $PREFIX -O $ORIENT > logs/ETCHING_CALLER.log "
     echo $cmd
     eval $cmd
+
+    STATUS=$(echo $?)
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit 1006
+    fi
 else
     if [ ${#bam} != 0 ]
     then
 	cmd="etching_caller -b ${BAM} -g $GENOME -o $PREFIX -O $ORIENT > logs/ETCHING_CALLER.log "
 	echo $cmd
 	eval $cmd
+
+	STATUS=$(echo $?)
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit 1007
+	fi
     else
 	BAM_ALL=${PREFIX}.bam
 
@@ -1070,21 +1033,53 @@ else
 	echo $cmd
 	eval $cmd
 
+
+	STATUS=$(echo $?)
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit 1008
+	fi
+
 	CHECK=$($SAMTOOLS sort 2>&1 | grep "\-o" | grep "final output to stdout")
 	if [ ${#CHECK} == 0 ]
 	then
 	    cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.bam -o ${PREFIX}.sort.bam"
 	    echo $cmd
 	    eval $cmd
+
+	    STATUS=$(echo $?)
+	    if (( STATUS != 0 ))
+	    then
+		echo "Failed: ${STATUS}: $cmd"
+		exit 1009
+	    fi
+
 	else
 	    cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.bam ${PREFIX}.sort"
 	    echo $cmd
 	    eval $cmd
+
+	    STATUS=$(echo $?)
+	    if (( STATUS != 0 ))
+	    then
+		echo "Failed: ${STATUS}: $cmd"
+		exit 1010
+	    fi
+
 	fi
 
 	cmd="etching_caller -b ${PREFIX}.sort.bam -g $GENOME -o $PREFIX -O $ORIENT > logs/ETCHING_CALLER.log "
 	echo $cmd
 	eval $cmd
+
+	STATUS=$(echo $?)
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit 1011
+	fi
+
     fi
 fi
 
@@ -1099,13 +1094,25 @@ DATE="[$(date)]";echo ${DATE}
 
 cmd="etching_sorter -i ${PREFIX}.SV.vcf -o ${PREFIX}.SV -c $CUTOFF -m ${ML_PATH} $ALGOR -p ${ML_PREFIX} > logs/ETCHING_SORTER.SV.log"
 echo $cmd
-eval $cmd &
+eval $cmd 
+
+STATUS=$(echo $?)
+if (( STATUS != 0 ))
+then
+    echo "Failed: ${STATUS}: $cmd"
+    exit 1012
+fi
 
 cmd="etching_sorter -i ${PREFIX}.BND.vcf -o ${PREFIX}.BND -c $CUTOFF -m ${ML_PATH} $ALGOR -p ${ML_PREFIX} > logs/ETCHING_SORTER.BND.log"
 echo $cmd
-eval $cmd &
+eval $cmd 
 
-wait
+STATUS=$(echo $?)
+if (( STATUS != 0 ))
+then
+    echo "Failed: ${STATUS}: $cmd"
+    exit 1013
+fi
 
 OUTPUT_1="${PREFIX}.BND.unfiltered.vcf"
 OUTPUT_2="${PREFIX}.SV.unfiltered.vcf"
@@ -1114,7 +1121,7 @@ OUTPUT_4="${PREFIX}.SV.etching_sorter.vcf"
 
 #######################################################################################################################
 #
-# Remove artifact
+# Remove miscall
 #
 
 CHECK=
@@ -1130,50 +1137,65 @@ fi
 
 if [[ $CHECK -eq 1 ]]
 then
-    if [ ${REMOVE_ARTIFACT} -eq 1 ]
+    if [ ${REMOVE_MISCALL} -eq 1 ]
     then
-	
-	if [ ! -d artifact ]
+
+	cmd="extract_BP_read ${PREFIX}.BND.etching_sorter.vcf ${PREFIX}.sort.bam ${PREFIX}.BP_reads.fastq 2> logs/${PREFIX}_extract_BP_read.log"
+	echo $cmd
+	eval $cmd
+
+	STATUS=$(echo $?)
+	if (( STATUS != 0 ))
 	then
-	    cmd="mkdir artifact"
-	    echo $cmd
-	    eval $cmd
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit 1018
 	fi
 
-	cmd="cd artifact"
+	cmd="mkdir -p tmp_BP_reads_xxx"
 	echo $cmd
 	eval $cmd
 
-	cmd="ln -s ../${PREFIX}.BND.etching_sorter.vcf ../${PREFIX}.sort.bam ./"
-	echo $cmd
-	eval $cmd
-
-	if [ ! -d logs ]
+	STATUS=$(echo $?)
+	if (( STATUS != 0 ))
 	then
-	    cmd="mkdir logs"
-	    echo $cmd
-	    eval $cmd
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit 1019
 	fi
 
-	cmd="extract_BP_read ${PREFIX}.BND.etching_sorter.vcf ${PREFIX}.sort.bam > ${PREFIX}.BP_reads.fastq 2> logs/${PREFIX}_extract_BP_read.log"
+	cmd="kmc -t${THREADS} -k31 -v -fq ${PREFIX}.BP_reads.fastq ${PREFIX}.BP_reads tmp_BP_reads_xxx > logs/BP_reads.log 2>&1"
 	echo $cmd
 	eval $cmd
 
-	cmd="mkdir tmp_BP_reads_xxx"
-	echo $cmd
-	eval $cmd
-
-	cmd="kmc -k31 -v -fq ${PREFIX}.BP_reads.fastq ${PREFIX}.BP_reads tmp_BP_reads_xxx > logs/BP_reads.log 2>&1"
-	echo $cmd
-	eval $cmd
+	STATUS=$(echo $?)
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit 1020
+	fi
 
 	cmd="rm -r tmp_BP_reads_xxx"
 	echo $cmd
 	eval $cmd
+
+	STATUS=$(echo $?)
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit 1021
+	fi
+
 	cmd="kmc_dump -ci5 ${PREFIX}.BP_reads ${PREFIX}.BP_reads.kmer_table.txt"
 	echo $cmd
 	eval $cmd
-	
+
+	STATUS=$(echo $?)
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit 1022
+	fi
+
+	#############################################################################################################################################################################
 	if [ ${#FIRST_CONT} != 0 ] && [ ${#SECOND_CONT} != 0 ]
 	then
 	    INPUT="-1 ${FIRST_CONT} -2 ${SECOND_CONT}"
@@ -1183,31 +1205,51 @@ then
 		INPUT="-b ${BAM_CONT} -F "
 	    fi
 	fi
-	cmd="etching_filter ${INPUT} --kmer-table ${PREFIX}.BP_reads.kmer_table.txt -p ${PREFIX}.BP_reads -t ${THREADS} -g ${GENOME} > logs/remove_artifact_etching_filter.log 2>&1"
+
+	cmd="etching_filter ${INPUT} --kmer-table ${PREFIX}.BP_reads.kmer_table.txt -p ${PREFIX}.BP_reads -t ${THREADS} -g ${GENOME} > logs/remove_miscall_etching_filter.log 2>&1"
 	echo $cmd
 	eval $cmd
 
-	cmd="cd .."
+	STATUS=$(echo $?)
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit 1023
+	fi
+	#############################################################################################################################################################################
+
+	cmd="etching_caller -b ${PREFIX}.BP_reads.sort.bam -o ${PREFIX}.miscall -g ${GENOME} -A -B > logs/remove_miscall_etching_caller 2>&1"
 	echo $cmd
 	eval $cmd
-	
-	cmd="ln -s artifact/${PREFIX}.BP_reads.sort.bam* ./"
-	echo $cmd
-	eval $cmd	
-	
-	cmd="etching_caller -b ${PREFIX}.BP_reads.sort.bam -o ${PREFIX}.artifact -g ${GENOME} -A -B > logs/remove_artifact_etching_caller 2>&1"
-	echo $cmd
-	eval $cmd
 
-	cmd="somatic_filter ${PREFIX}.BND.etching_sorter.vcf ${PREFIX}.artifact.BND.vcf ${PREFIX}.BP_reads.sort.bam > ${PREFIX}.BND.etching_sorter.final.vcf 2> logs/${PREFIX}_somatic_filter_BND.log"
-	echo $cmd
-	eval $cmd &
+	STATUS=$(echo $?)
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit 1026
+	fi
 
-	cmd="somatic_filter ${PREFIX}.SV.etching_sorter.vcf ${PREFIX}.artifact.BND.vcf ${PREFIX}.BP_reads.sort.bam > ${PREFIX}.SV.etching_sorter.final.vcf 2> logs/${PREFIX}_somatic_filter_SV.log"
+	cmd="somatic_filter ${PREFIX}.BND.etching_sorter.vcf ${PREFIX}.miscall.BND.vcf ${PREFIX}.BP_reads.sort.bam > ${PREFIX}.BND.etching_sorter.final.vcf 2> logs/${PREFIX}_somatic_filter_BND.log"
 	echo $cmd
-	eval $cmd &
+	eval $cmd 
 
-	wait
+	STATUS=$(echo $?)
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit 1027
+	fi
+
+	cmd="somatic_filter ${PREFIX}.SV.etching_sorter.vcf ${PREFIX}.miscall.BND.vcf ${PREFIX}.BP_reads.sort.bam > ${PREFIX}.SV.etching_sorter.final.vcf 2> logs/${PREFIX}_somatic_filter_SV.log"
+	echo $cmd
+	eval $cmd 
+
+	STATUS=$(echo $?)
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit 1028
+	fi
 
 	OUTPUT_3="${PREFIX}.BND.etching_sorter.final.vcf"
 	OUTPUT_4="${PREFIX}.SV.etching_sorter.final.vcf"
@@ -1229,12 +1271,26 @@ then
     
     cmd="etching_fg_identifier -i ${OUTPUT_3} -a ${ANNOTATION} > ${PREFIX}.BND.fusion_gene.txt"
     echo $cmd
-    eval $cmd &
+    eval $cmd
+
+    STATUS=$(echo $?)
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit 1029
+    fi
 
     cmd="etching_fg_identifier -i ${OUTPUT_4} -a ${ANNOTATION} > ${PREFIX}.SV.fusion_gene.txt"
     echo $cmd
-    eval $cmd &
+    eval $cmd
     
+    STATUS=$(echo $?)
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit 1030
+    fi
+
     wait
 fi
 
@@ -1244,11 +1300,25 @@ then
     cmd="rm -f *kmc_pre *kmc_suf"
     echo $cmd
     eval $cmd
+
+    STATUS=$(echo $?)
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit 1031
+    fi
+
 fi
 
 cmd="cd ${PREDIR}"
 echo $cmd
 eval $cmd
+STATUS=$(echo $?)
+if (( STATUS != 0 ))
+then
+    echo "Failed: ${STATUS}: $cmd"
+    exit 1032
+fi
 
 #######################################################################################################################
 #############################
@@ -1262,12 +1332,26 @@ echo "[RESULTS]"
 cmd="cp ${WORKDIR}/${OUTPUT_1} ${WORKDIR}/${OUTPUT_2} ${WORKDIR}/${OUTPUT_3} ${WORKDIR}/${OUTPUT_4} ./"
 echo $cmd
 eval $cmd
+STATUS=$(echo $?)
+if (( STATUS != 0 ))
+then
+    echo "Failed: ${STATUS}: $cmd"
+    exit 1033
+fi
+
 
 if [ -f ${WORKDIR}/${PREFIX}.BND.fusion_gene.txt ]
 then
     cmd="cp ${WORKDIR}/${PREFIX}.BND.fusion_gene.txt ./"
     echo $cmd
     eval $cmd
+    STATUS=$(echo $?)
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit 1034
+    fi
+
 fi
 
 if [ -f ${WORKDIR}/${PREFIX}.SV.fusion_gene.txt ]
@@ -1275,6 +1359,13 @@ then
     cmd="cp ${WORKDIR}/${PREFIX}.SV.fusion_gene.txt ./"
     echo $cmd
     eval $cmd
+    STATUS=$(echo $?)
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit 1035
+    fi
+
 fi
 echo
 

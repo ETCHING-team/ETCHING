@@ -9,7 +9,6 @@
 
 #include <set>
 #include <map>
-#include <unordered_map>
 #include <unordered_set>
 #include <iostream>
 #include <fstream>
@@ -32,7 +31,7 @@
 #include "Peak_memory_measure.hpp"
 #include "CPU_TIME_measure.hpp"
 
-const std::string version = "ETCHING_v1.3.1 (released 2021.5.8.)";
+const std::string version = "ETCHING_v1.3.2 (released 2021.6.30.)";
 const std::string PROGRAM = "Program: etching_caller";
 const std::string VERSION = "Version: " + version;
 const std::string CONTACT = "Contact:\n\tJang-il Sohn (sohnjangil@gmail.com)\n\tJin-Wu Nam (jwnam@hanyang.ac.kr)";

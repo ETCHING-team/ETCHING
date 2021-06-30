@@ -1,7 +1,19 @@
 #include <string>
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <unordered_set>
+
+std::string extract_id ( std::string id ){
+  std::stringstream ss1 ( id );
+  std::string tmp ;
+  ss1 >> tmp;
+  std::stringstream ss2 ( tmp );
+  std::string output;
+  std::getline ( ss2 , output , '/' );
+  return output;
+}
+
 
 int main ( int argc , char ** argv){
   if ( argc == 0 ){
@@ -37,6 +49,7 @@ int main ( int argc , char ** argv){
     std::getline ( fin1 , desc1);
     std::getline ( fin1 , qual1);
 
+    id1 = extract_id ( id1 );
     id1_set.insert ( id1 );
   }
 
@@ -45,6 +58,7 @@ int main ( int argc , char ** argv){
     std::getline ( fin2 , desc2);
     std::getline ( fin2 , qual2);
 
+    id2 = extract_id ( id2 );
     id2_set.insert ( id2 );
   }
 
@@ -74,7 +88,8 @@ int main ( int argc , char ** argv){
     std::getline ( fin1 , seq1);
     std::getline ( fin1 , desc1);
     std::getline ( fin1 , qual1);
-
+    
+    id1 = extract_id ( id1 );
     if ( inter_id_set.find(id1) != inter_id_set.end() ){
       fout1 << id1 << "\n" << seq1 << "\n" << desc1 << "\n" << qual1 << "\n";
     }
@@ -85,6 +100,7 @@ int main ( int argc , char ** argv){
     std::getline ( fin2 , desc2);
     std::getline ( fin2 , qual2);
 
+    id2 = extract_id ( id2 );
     if ( inter_id_set.find(id2) != inter_id_set.end() ){
       fout2 << id2 << "\n" << seq2 << "\n" << desc2 << "\n" << qual2 << "\n";
     }

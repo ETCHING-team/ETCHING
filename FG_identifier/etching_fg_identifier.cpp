@@ -90,7 +90,7 @@ int main ( int argc , char ** argv ){
 
   fin.close();
 
-  std::cout << "#gene_1\tgene_2\tchr_1\tpos_1\tstrand_1\tchr_2\tpos_2\tstrand_2\n";
+  std::cout << "#gene_1\tgene_2\tchr_1\tpos_1\tstrand_1\tchr_2\tpos_2\tstrand_2\tclass\n";
 
   find_fg ( bp_pair, gene_list, window);
 

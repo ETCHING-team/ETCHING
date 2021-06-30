@@ -22,6 +22,11 @@ then
     fi
 fi
 
+if (( $version > 10 ))
+then
+    version=10
+fi
+
 
 if [ $version -eq 5 ]
 then

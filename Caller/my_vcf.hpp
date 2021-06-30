@@ -11,7 +11,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <unordered_map>
 #include <set>
 #include <iostream>
 #include <fstream>
@@ -137,7 +136,7 @@ public:
   VCF_CLASS(const std::string input_file);
   ~VCF_CLASS();
 
-  std::string etching_version="ETCHING_v1.3.1 (released 2021.5.8.)";
+  std::string etching_version="ETCHING_v1.3.2 (released 2021.6.30.)";
   
   // Main container
   VCF_MAP vcf_map;
@@ -160,8 +159,8 @@ public:
 
   
   BamTools::RefVector refvector;
-  std::unordered_map < std::string , int > id_ref_map;
-  std::unordered_map < int , std::string > ref_id_map;
+  std::map < std::string , int > id_ref_map;
+  std::map < int , std::string > ref_id_map;
 
   std::map < std::string , std::string > genome;
 

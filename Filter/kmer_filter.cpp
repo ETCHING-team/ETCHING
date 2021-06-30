@@ -236,7 +236,7 @@ int main ( int argc , char ** argv ){
   std::mt19937 generator (seed);
 
   std::string tmp_dir = "tmp_" + std::to_string(generator());
-  std::string command = "mkdir " + tmp_dir;
+  std::string command = "mkdir -p " + tmp_dir;
   std::cout << command << "\n" ; 
   system(command.c_str());
 

@@ -227,7 +227,7 @@ int main ( int argc, char ** argv ){
 
   std::string command ;
   std::string tmp_dir = prefix + ".tmp_dir";
-  command = "mkdir " + tmp_dir;
+  command = "mkdir -p " + tmp_dir;
   system(command.c_str());
 
   std::cerr << "[Build k-mer database]\n";
