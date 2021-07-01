@@ -107,7 +107,7 @@ ETCHING_PATH=$PWD
 
 # Installation
 # Do either
-echo "export PATH=$ETCHING_PAHT/bin:\$PATH" >> ~/.bashrc
+echo "export PATH=$ETCHING_PATH/bin:\$PATH" >> ~/.bashrc
 echo "export LD_LIBRARY_PATH=$ETCHING_PATH/lib:\$LD_LIBRARY_PATH" >> ~/.bashrc
 source ~/.bashrc
 
