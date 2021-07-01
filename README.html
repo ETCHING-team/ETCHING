@@ -1152,13 +1152,13 @@ ETCHING_PATH=$PWD
 
 # Installation
 # Do either
-echo &quot;export PATH=$ETCHING_PAHT/bin:\$PATH&quot; &gt;&gt; ~/.bashrc
+echo &quot;export PATH=$ETCHING_PATH/bin:\$PATH&quot; &gt;&gt; ~/.bashrc
 echo &quot;export LD_LIBRARY_PATH=$ETCHING_PATH/lib:\$LD_LIBRARY_PATH&quot; &gt;&gt; ~/.bashrc
 source ~/.bashrc
 
 # or 
-sudo cp -ar $ETCHING_PAHT/bin/* /usr/bin
-sudo cp $ETCHING_PAHT/lib/*.so /usr/lib
+sudo cp -ar $ETCHING_PATH/bin/* /usr/bin
+sudo cp $ETCHING_PATH/lib/*.so /usr/lib
 </code></pre>
 <p>If you want to see usage,</p>
 <pre><code>etching -h
