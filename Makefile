@@ -51,7 +51,6 @@ cleanall: clean
 	cd Sorter && make cleanall
 	cd FG_identifier && make cleanall
 	rm -rf bin
-	rm -f ETCHING_ML_model/*sav
 	cd lib/gzstream && make clean
 	cd lib/zlib && make clean
 	cd lib/bamtools && make clean
