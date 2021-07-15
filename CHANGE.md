@@ -1,3 +1,8 @@
+# v1.3.3
+
+```--strand-aware``` and ```--fusion-window``` options added
+for fusion-gene detection
+
 # v1.3.2
 
 Updated to stop when an error occurs

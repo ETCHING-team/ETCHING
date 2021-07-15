@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include <unistd.h>
+#include <getopt.h>
 
 #include "find_fg.hpp"
 #include "make_bp_pair.hpp"
@@ -17,7 +18,10 @@ void fg_identifier_usage(){
 	    << "\n"
 	    << "[Options]\n"
 	    << "-f (string)\tField name [gene_name]\n"
-	    << "-w (int)   \tWindow [10000]\n"
+	    << "--strand-aware\tPredict FGs connecting nearest genes to a BP-pair awaring strand\n"
+	    << "              \t[Default: NONE (all possible gene-pairs both sides of each BP-pair)]\n"
+	    << "-w (int)   \tWindow size for fusion-gene prediction [10000]\n"
+	    << "--fusion-window (int)\n"
 	    << "-h         \tPrint this message\n";
 }
 
@@ -32,10 +36,28 @@ int main ( int argc , char ** argv ){
   std::string annotation;
   int window=10000;
   std::string fieldName = "gene_name";
+  int strand_aware=0;
 
   int opt = 0;
-  while ((opt = getopt ( argc , argv , "i:a:f:w:h") ) != -1 ){
+
+  while (1){
+    static struct option long_options[]=
+      {
+        {"strand-aware",   no_argument,       &strand_aware, 0},
+        {"input-vcf",      required_argument, 0, 'i'},
+        {"annotation-gtf", required_argument, 0, 'a'},
+        {"field-name",     required_argument, 0, 'f'},
+        {"fusion-window",  required_argument, 0, 'w'},
+        {"help",           no_argument,       0, 'h'},
+        {0, 0, 0, 0}
+      };
+
+    int opt_ind=0;
+    opt=getopt_long(argc,argv,"i:a:f:w:h",long_options,&opt_ind);
+    if (opt==-1) break;
+
     switch(opt){
+    case   0: strand_aware = 1; break;
     case 'i': infile = optarg; break;
     case 'a': annotation = optarg; break;
     case 'w': window = atoi(optarg); break;
@@ -92,7 +114,7 @@ int main ( int argc , char ** argv ){
 
   std::cout << "#gene_1\tgene_2\tchr_1\tpos_1\tstrand_1\tchr_2\tpos_2\tstrand_2\tclass\n";
 
-  find_fg ( bp_pair, gene_list, window);
+  find_fg ( bp_pair, gene_list, window, strand_aware );
 
   return 0;
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.3.2 (released 2021.6.30.)"
+VERSION="ETCHING_v1.3.3 (released 2021.7.15.)"
 MODEL_VERSION="1.3.0"
 
 #--------------------------------------------------------------------
@@ -14,10 +14,8 @@ MODEL_VERSION="1.3.0"
 # Help message
 #
 
-#############################
-#
-# Convert to absolute path if relative path
-#
+DEFA_STRAND_AWARE=1
+DEFA_FUSION_WINDOW=10000
 
 function USAGE {
     echo -e "$VERSION"
@@ -34,7 +32,6 @@ function USAGE {
     echo -e "-o  (string)\tPrefix of output (-p is same) [etching]"
     echo -e "-w  (string)\tWorking directory [-o]"
     echo -e "-t  (int)   \tNumber of threads [8]"
-    echo -e "-a  (string)\tAnnotation file in gtf. If you use this option, Fusion-genes will be predicted in a genome level."
     echo -e
     echo -e "Samples"
     echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from sample sequencing reads [5]"
@@ -61,13 +58,19 @@ function USAGE {
     echo -e "-X          \tXGBoost in scoring"
     echo -e "-C  (double)\tCut-off of false SVs [0.4]"
     echo -e "-m  (string)\tPath to ETCHING machine learning model"
-    echo -e "--remove-miscall (1 or 0)"
-    echo -e "            \t1 to remove mis-called germline as somatic. Only for -1c/2c/bc options [1]"
+    echo -e "--remove-miscall (1 or 0) \tRemove germline SV near as somatic SNV or indels [1 for yes]"
+    echo -e "                          \tNOTE: -1c/2c/bc options are required, else skip."
+    echo -e 
+    echo -e "Fusion-gene prediction"
+    echo -e "-a  (string)\tAnnotation file in gtf. Use this option to predict fusion-genes on a genome level."
+    echo -e "--strand-aware\tPredict FGs connecting nearest genes to BP-pairs awaring strand"
+    echo -e "              \t[Default: NONE (all possible gene-pairs both sides of each BP-pair)]"
+    echo -e "--fusion-window (int)\tWindow size for fusion-gene prediction [${DEFA_FUSION_WINDOW}]"
     echo -e 
     echo -e "Others"
     echo -e "-S  (string)\t/path/to/samtools"
     echo -e "-B  (string)\t/path/to/bwa"
-    echo -e "-E          \tStore k-mer database files"
+    echo -e "-E          \tStore k-mer database files. [Default: NONE (remove k-mer DB files to save storage)]"
     echo -e 
     echo -e "About ETCHING"
     echo -e "-h          \tPrint this message"
@@ -200,6 +203,9 @@ KEEP_ALIGNMENT=
 
 NO_FILTER=0
 
+STRAND_AWARE=DEFA_STRAND_AWARE
+FUSION_WINDOW=DEFA_FUSION_WINDOW
+
 while [ ${#1} != 0 ]; do
     case $1 in
         -1 | --first )  shift
@@ -229,10 +235,6 @@ while [ ${#1} != 0 ]; do
 	    THREADS=$1
             ;;
 
-
-        -a | --annotation ) shift
-	    ANNOTATION=$1
-            ;;
 
 	--bam2fastq )
 	    KEEP_ALIGNMENT="--bam2fastq"
@@ -317,6 +319,19 @@ while [ ${#1} != 0 ]; do
 	REMOVE_MISCALL=$1
 	;;
 
+
+
+        -a | --annotation ) shift
+	    ANNOTATION=$1
+            ;;
+	--strand-aware )
+	    STRAND_AWARE=1
+	    ;;
+        --fusion-window ) shift
+	    FUSION_WINDOW=$1
+            ;;
+	
+	
         -h | --help ) USAGE
             exit 0
             ;;
@@ -803,7 +818,7 @@ fi
 
 OPTIONS=
 
-if [ ${PREFIX} != 8 ]
+if [[ ${PREFIX} != "etching" ]]
 then
     if [ ${#OPTIONS} != 0 ]
     then
@@ -1265,11 +1280,35 @@ fi
 
 if [ ${#annotation} != 0 ]
 then
+
+    OPTIONS=
+
+    if [ ${STRAND_AWARE} == ${DEF_STRAND_AWARE} ]
+    then
+	if [ ${#OPTIONS} != 0 ]
+	then
+	    OPTIONS="${OPTIONS} --strand-aware"
+	else
+	    OPTIONS="--strand-aware"
+	fi
+    fi
+
+    if [ ${FUSION_WINDOW} != ${DEFA_FUSION_WINDOW} ]
+    then
+	if [ ${#OPTIONS} != 0 ]
+	then
+	    OPTIONS="${OPTIONS} --fusion-window ${FUSION_WINDOW}"
+	else
+	    OPTIONS="--fusion-window ${FUSION_WINDOW}"
+	fi
+    fi
+
+
     echo
     echo "[FG_IDENTIFIER]"
     DATE="[$(date)]";echo ${DATE}
     
-    cmd="etching_fg_identifier -i ${OUTPUT_3} -a ${ANNOTATION} > ${PREFIX}.BND.fusion_gene.txt"
+    cmd="etching_fg_identifier -i ${OUTPUT_3} -a ${ANNOTATION} ${OPTIONS} > ${PREFIX}.BND.fusion_gene.txt"
     echo $cmd
     eval $cmd
 
@@ -1280,7 +1319,7 @@ then
 	exit 1029
     fi
 
-    cmd="etching_fg_identifier -i ${OUTPUT_4} -a ${ANNOTATION} > ${PREFIX}.SV.fusion_gene.txt"
+    cmd="etching_fg_identifier -i ${OUTPUT_4} -a ${ANNOTATION} ${OPTIONS} > ${PREFIX}.SV.fusion_gene.txt"
     echo $cmd
     eval $cmd
     

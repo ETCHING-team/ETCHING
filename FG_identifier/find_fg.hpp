@@ -27,8 +27,8 @@ void read_gene_list(const std::string gene_list_file,
 void find_fusion_gene ( std::map < int , std::map < Position , std::set < Position > > > & BP_pair,
 			std::map < std::string , std::map < Loci , std::string > > & gene_list_for,
 			std::map < std::string , std::map < Loci , std::string > > & gene_list_rev,
-			std::set < std::string > & fusion_genes, int window );
+			std::set < std::string > & fusion_genes, int window, int strand_aware );
 
-int find_fg ( std::string BP_pair_file, std::string gene_list_file, int window );
+int find_fg ( std::string BP_pair_file, std::string gene_list_file, int window, int strand_aware );
 
 #endif
