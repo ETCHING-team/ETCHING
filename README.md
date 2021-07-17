@@ -1,6 +1,6 @@
 # ETCHING
 
-### Version 1.3.3 (2021.7.15.)
+### Version 1.3.4 (2021.7.18.)
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
@@ -189,10 +189,10 @@ sudo usermod -a -G docker $USER
 Download our docker image using ```wget``` from our website (http://big.hanyang.ac.kr/ETCHING/download.html)
 ```
 # Download ETCHING docker image
-wget http://big.hanyang.ac.kr/ETCHING/etching_v1.3.3.tar
+wget http://big.hanyang.ac.kr/ETCHING/etching_v1.3.4.tar
 
 # Load the image
-docker load -i etching_v1.3.3.tar
+docker load -i etching_v1.3.4.tar
 
 # Check the image
 docker images
@@ -202,7 +202,7 @@ Output should be like below
 
 |REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
 |:---|:---|:---|:---|:---|
-|etching|1.3.3|16647cac9a99|40 hours ago|4.3 GB|
+|etching|1.3.4|16647cac9a99|40 hours ago|4.3 GB|
 
 ### Demo for docker user
 
@@ -215,11 +215,11 @@ tar zxvf DEMO.tar.gz
 
 Run ETCHING with docker
 ```
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.3 etching \
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.4 etching \
 -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
 -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_1 -t 8
 ```
-Here, ```etching:1.3.3``` is ```REPOSITORY``` and ```TAG``` of ETCHING docker image.
+Here, ```etching:1.3.4``` is ```REPOSITORY``` and ```TAG``` of ETCHING docker image.
 
 Replace ```/path/to/DEMO``` with ```/your/data/path/```.
 
@@ -228,7 +228,7 @@ Note: Keep ```/work/``` in the above command line.
 
 Alternatively, you can run ETCHING inside docker container
 ```
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.3 /bin/bash
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.4 /bin/bash
 
 etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
 -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_2 -t 8

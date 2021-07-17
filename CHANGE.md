@@ -1,3 +1,9 @@
+# v1.3.4
+
+Debug ```etching``` and ```etching_filter```
+They did not run properly when ```-o``` option was not used.
+
+
 # v1.3.3
 
 ```--strand-aware``` and ```--fusion-window``` options added

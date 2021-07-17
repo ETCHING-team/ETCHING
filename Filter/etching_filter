@@ -34,7 +34,7 @@ function USAGE {
     echo -e
     echo -e "[Sample]"
     echo -e "-K  (int)   \tK-mer frequency cut-off for removing sequencing errors from"
-    echo -e "            \tsample sequencing reads [3]"
+    echo -e "            \tsample sequencing reads [5]"
     echo -e "            \tThe lesser, the more sensitive, and the more, the more specific."
     echo -e "--max-kmer (int)"
     echo -e "            \tExclude the k-mers counted more than this [10000]"
@@ -73,7 +73,7 @@ then
     exit -1
 fi
 
-PREFIX=filtered_read
+PREFIX=etching
 THREADS=8
 
 DATATYPE="W"
