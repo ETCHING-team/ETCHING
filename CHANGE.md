@@ -1,3 +1,6 @@
+# v1.3.5
+Debug in etching (line 1283)
+
 # v1.3.4
 
 Debug ```etching``` and ```etching_filter```

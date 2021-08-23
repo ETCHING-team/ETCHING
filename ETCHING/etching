@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.3.4 (released 2021.7.18.)"
+VERSION="ETCHING_v1.3.5 (released 2021.8.23.)"
 MODEL_VERSION="1.3.0"
 
 #--------------------------------------------------------------------
@@ -1280,7 +1280,7 @@ then
 
     OPTIONS=
 
-    if [ ${STRAND_AWARE} == ${DEF_STRAND_AWARE} ]
+    if [ ${STRAND_AWARE} == ${DEFA_STRAND_AWARE} ]
     then
 	if [ ${#OPTIONS} != 0 ]
 	then

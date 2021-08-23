@@ -31,7 +31,7 @@
 #include "Peak_memory_measure.hpp"
 #include "CPU_TIME_measure.hpp"
 
-const std::string version = "ETCHING_v1.3.4 (released 2021.7.18.)";
+const std::string version = "ETCHING_v1.3.5 (released 2021.8.23.)";
 const std::string PROGRAM = "Program: etching_caller";
 const std::string VERSION = "Version: " + version;
 const std::string CONTACT = "Contact:\n\tJang-il Sohn (sohnjangil@gmail.com)\n\tJin-Wu Nam (jwnam@hanyang.ac.kr)";
