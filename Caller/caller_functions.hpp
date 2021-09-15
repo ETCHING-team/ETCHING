@@ -17,10 +17,12 @@
 
 int check_concord ( const Position & Pos1, const Position & Pos2, const int & insert_size );
 int FindConcordant ( const Position & Pos_read , const Position & Pos_split , const Position & Pos_mate , const int & insert_size );
+int CheckDiscordant ( const Position & Pos_read , const Position & Pos_mate , const int & insert_size );
 std::string parse_SA_tag ( std::string & Tag );
 Position find_split ( const std::string & tag , const std::map < std::string , int > & id_ref_map );
 std::string mate_strand ( const std::string & tag );
 std::vector < BamTools::CigarOp > cigar_parse ( std::string cigar );
+Position Find_partner ( std::map < Position, std::map < std::string , int > > & BP_map, BamTools::BamAlignment Al, const int insert_size );
 std::string currentDate();
 std::string currentDateTime();
 

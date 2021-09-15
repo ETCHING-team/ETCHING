@@ -13,7 +13,6 @@ default:
 	cp Filter/etching_filter bin/
 	cp Filter/kmer_filter bin/
 	cp Filter/read_collector bin/
-	cp Filter/read_length_calc bin/
 	cp Filter/KMC3/kmc* bin/
 	cp Filter/fastq_check bin/
 	cp Filter/sort_fastq_mem_eff bin/
@@ -23,6 +22,7 @@ default:
 	cp Caller/etching_caller bin/
 	cp Caller/etching_typer bin/
 	cp Caller/somatic_filter bin/
+	cp Caller/target_filter bin/
 	cp Caller/extract_BP_read bin/
 	cp Sorter/etching_sorter bin/
 	cp Sorter/scorer_RandomForest bin/

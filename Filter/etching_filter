@@ -643,14 +643,15 @@ CHECK=$($SAMTOOLS sort 2>&1 | grep "\-o" | grep "final output to stdout")
 if [ ${#CHECK} == 0 ]
 then
     cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.bam -o ${PREFIX}.sort.bam"
-    echo $cmd
-    eval $cmd
 else
     cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.bam ${PREFIX}.sort"
-    echo $cmd
-    eval $cmd
 fi
+echo $cmd
+eval $cmd 2> /dev/null
 
+cmd="rm -f ${PREFIX}.bam"
+echo $cmd
+eval $cmd
 
 cmd="${SAMTOOLS} index ${PREFIX}.sort.bam"
 echo $cmd

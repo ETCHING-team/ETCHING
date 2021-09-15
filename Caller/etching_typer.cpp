@@ -55,9 +55,12 @@ int main ( int argc , char ** argv ){
   // Reading metainfo
   //
 
+  bool is_etching = 0 ;
+
   while ( std::getline ( fin , tmp ) ){
     if ( tmp.substr(0,2) == "##" ){
       metainfo.push_back(tmp);
+      if ( tmp.find("##source=ETCHING") != 0 ) is_etching = 1;
     }
     else break;
   }
@@ -69,10 +72,9 @@ int main ( int argc , char ** argv ){
   // fill VCF container
   //
 
-
   while ( std::getline ( fin , tmp ) ){
-    // vcf.parse_etching(tmp);
-    vcf.parse(tmp);
+    if ( is_etching) vcf.parse_etching(tmp);
+    else vcf.parse(tmp);
     container.insert(vcf);
   }
 
@@ -98,7 +100,7 @@ int main ( int argc , char ** argv ){
   // Typing SVs
   //
   
-  container_SV = typing_SV_general ( container );
+  container_SV = typing_SV ( container );
   
   /////////////////////////////////////////////////////////////////
   //

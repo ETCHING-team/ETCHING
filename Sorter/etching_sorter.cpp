@@ -87,7 +87,7 @@ std::string python_module_check(std::string prefix, std::string method){
 int main ( int argc , char ** argv ){
   if ( argc == 1 ){
     usage();
-    return 0;
+    return 1;
   }
 
   int opt;
@@ -118,7 +118,7 @@ int main ( int argc , char ** argv ){
     case 'p': ML_prefix=optarg; break; // prefix of ML model files
     // case 't': num_threads=atoi(optarg); break; // XGBoost
     // case 'Q': tagging=1; break; // Tagging SVs instead of ramoving low quality SVs.
-    default: std::cout << "ERROR!!! Check options!!!\n\n" ; usage(); return 0 ; 
+    default: std::cout << "ERROR!!! Check options!!!\n\n" ; usage(); return 2 ; 
     }
   }
   
@@ -127,7 +127,7 @@ int main ( int argc , char ** argv ){
     std::cout << "------------------------------------\n";
     std::cout << "\n";
     usage();
-    return 0;
+    return 3;
   }
 
   std::ifstream fin ( infile.c_str() );
@@ -137,7 +137,7 @@ int main ( int argc , char ** argv ){
     std::cout << "-------------------------------------------------\n";
     std::cout << "\n";
     usage();
-    return 0;
+    return 4;
   }
 
   fin.close();
@@ -151,7 +151,7 @@ int main ( int argc , char ** argv ){
     std::cout << "-----------------------------------------------------------------------------\n";
     std::cout << "\n";
     usage();
-    return 0;
+    return 5;
   }
 
   if ( alpha < 0 ){
@@ -162,13 +162,13 @@ int main ( int argc , char ** argv ){
 
   if ( python_version(prefix) != 3 ) {
     std::cout << "ERROR!!! You need python3.\n";
-    return 0;
+    return 6;
   }
   
   std::string module_check=python_module_check(prefix,method);
   if ( module_check.size() != 0 ){
     std::cout << "Python module fail: " << module_check << "\n";
-    return -1;
+    return 7;
   }
 
 
@@ -226,7 +226,7 @@ int main ( int argc , char ** argv ){
     }
     fin.close();
     
-    return 0;
+    return 8;
   }
 
   std::cout << "Removing false positives\n";

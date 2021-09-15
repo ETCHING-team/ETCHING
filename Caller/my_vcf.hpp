@@ -52,7 +52,6 @@ public:
   std::string sv_id_add;
   std::string ref;
   std::string alt;
-  // int qual;
   std::string qual;
   std::string filter;
   std::string info;
@@ -78,7 +77,7 @@ public:
   std::string mate_id; // for BND
   std::string svtype; // INS, DEL, DUP, INV, BND
   int svlen; // SV length
-  // std::string data_type;
+  std::string scoremethod;
 
   // features of first mate
   int cr; // number of Clipped Reads supporing the variation
@@ -136,7 +135,7 @@ public:
   VCF_CLASS(const std::string input_file);
   ~VCF_CLASS();
 
-  std::string etching_version="ETCHING_v1.3.5 (released 2021.8.23.)";
+  std::string etching_version="ETCHING_v1.3.6 (2021.9.6.)";
   
   // Main container
   VCF_MAP vcf_map;
@@ -182,20 +181,12 @@ public:
   void fwrite_short(std::string);
   std::size_t size();
 
-  // void insert ( std::string chr1, int pos1, std::string chr2, int pos2, std::string sv_id, std::string mate_id, std::string strand, std::string svtype);
   void insert ( std::string chr1, int pos1, std::string chr2, int pos2, std::string sv_id, std::string mate_id, std::string strand, int sr_val, std::string svtype);
 
 
   void insert ( VCF vcf );
 
-  // void find_mate();
-  // void clean_unmate();
-
-
   void calc_features(const std::string input_bam, const int read_length, const int insert_size, const int confi_window);
-  void calc_features_general(const std::string input_bam, const int read_length, const int insert_size, const int confi_window);
-
-  //`void fill_mate_feature();
   
   void add_features_in_id();
 
@@ -213,8 +204,6 @@ double return_depdif(Position Pos, std::vector < double > & dep_vec, int Size, d
 void copy_info ( VCF_CLASS & source , VCF_CLASS & target );
 
 VCF_CLASS typing_SV(VCF_CLASS & source);
-VCF_CLASS typing_SV_general(VCF_CLASS & source);
-VCF_CLASS typing_SV_manta ( VCF_CLASS & input );
 
 void calc_features(const std::string input_bam, std::vector < VCF_CLASS > & container_vec,
 		   const int read_length, const int insert_size, const int confi_window) ;

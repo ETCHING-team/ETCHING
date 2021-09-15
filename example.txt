@@ -22,11 +22,19 @@ $ etching -1 tumor_1.fq -2 tumor_2.fq -bc normal.sort.bam \
 
 ----------------------------------------------------------------------------------------------------------
 
-If you want to use pre-made k-mer table (31-mer only), use --kmer-table option
-$ etching -1 tumor_1.fq -2 tumor_2.fq --kmer-table tumor_specific_kmer_table.txt
-  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_4 -t 8
+If you have a bed file of target regions, use --target-filter
+$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
+  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_1 -t 8\
+  --target-filter target_regions.bed
 
-k-mer table must be like:
+----------------------------------------------------------------------------------------------------------
+
+If you want to use pre-made k-mer table (31-mer only), use --kmer-table
+$ etching -1 tumor_1.fq -2 tumor_2.fq \
+  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_4 -t 8\
+  --kmer-table tumor_specific_kmer_table.txt
+
+k-mer (31-mer) table must be like:
 AACCTAACCTAACCTAACCTAACCTAACCTG 14
 AACCTAACCTAACCTAACCTAACCTAACCAA 12
 AACCTAACCTAACCTAACCTAACCTAACCAC 6

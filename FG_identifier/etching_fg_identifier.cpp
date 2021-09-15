@@ -18,10 +18,12 @@ void fg_identifier_usage(){
 	    << "\n"
 	    << "[Options]\n"
 	    << "-f (string)\tField name [gene_name]\n"
-	    << "--strand-aware\tPredict FGs connecting nearest genes to a BP-pair awaring strand\n"
-	    << "              \t[Default: NONE (all possible gene-pairs both sides of each BP-pair)]\n"
 	    << "-w (int)   \tWindow size for fusion-gene prediction [10000]\n"
 	    << "--fusion-window (int)\n"
+	    << "           \tWindow size to detect fusion-gene [10000]\n"
+	    << "--strand-aware\n"
+	    << "           \tPredict FGs connecting nearest genes to a BP-pair awaring strand\n"
+            << "           \t[Default: NONE (all possible gene-pairs both sides of each BP-pair)]\n\n"
 	    << "-h         \tPrint this message\n";
 }
 
@@ -82,11 +84,17 @@ int main ( int argc , char ** argv ){
   }
 
   std::string bp_pair = infile + ".bp_pair" ;
-  // bp_pair += ".bp_pair";
   std::string gene_list = annotation + ".gene_list" ;
-  // gene_list += ".gene_list";
 
-  
+  std::string SW[2];
+  SW[0]="NO";
+  SW[1]="YES";
+
+  std::cerr << "[Input file: " << infile << "]\n";
+  std::cerr << "[Annotation: " << annotation << "]\n";
+  std::cerr << "[Field name: " << fieldName<< "]\n";
+  std::cerr << "[Window size: " << window << "]\n";
+  std::cerr << "[Strand-ware: " << SW[strand_aware] << "]\n";
 
   std::ifstream fin( infile.c_str() );
   if ( fin.good() ){

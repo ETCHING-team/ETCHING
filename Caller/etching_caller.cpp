@@ -38,6 +38,7 @@ int main(int argc, char ** argv){
   int insert_size = 500; // -I insert_size
   bool typing = 1 ;
   bool scanall = 1 ; 
+  bool rescue = 0 ;
 
   int step=1;
 
@@ -50,27 +51,21 @@ int main(int argc, char ** argv){
 
 
   // while ( (opt = getopt ( argc, argv, "b:o:g:t:BS:i:D:P:T:I:O:c:r:a:f:x:q:e:C:R:A:F:X:Q:E:h" ) ) != -1 ){
-  while ( (opt = getopt ( argc, argv, "b:o:g:n:BS:i:AD:P:T:I:O:c:r:a:f:x:q:e:C:R:A:F:X:Q:E:h" ) ) != -1 ){
+  while ( (opt = getopt ( argc, argv, "b:o:g:BS:i:ARD:P:I:O:c:h" ) ) != -1 ){
     switch ( opt ) {
     case 'b': input_bam=optarg; break;
     case 'o': prefix=optarg; break;
     case 'g': genome=optarg; break;
-
-    // case 't': num_threads = atoi(optarg); break;
-    // case 'n': normal_bam = optarg; break;
     case 'B': typing = 0; break;
-    case 'S': step = atoi(optarg); if ( step < 1 || step > 3) {      caller_usage(); return 0; } break;
+    case 'S': step = atoi(optarg); if ( step < 1 || step > 3) { caller_usage(); return 0; } break;
     case 'i': infile_pref = optarg; break;
     case 'A': scanall = 1; break;
-
+    case 'R': rescue = 1; break;
     case 'D': seqdep = std::stod(optarg,&sz); break;
     case 'P': purity = std::stod(optarg,&sz); break;
-    // case 'T': data_type = optarg; break;
     case 'I': insert_size = atoi(optarg); break;
     case 'O': read_orientation = optarg; break;
-
     case 'c': confile = optarg; break;
-
     case 'h': caller_usage(); return 0 ;
 
     default: std::cout << "\tInvalid option\n"; caller_usage(); return 1;
@@ -101,7 +96,7 @@ int main(int argc, char ** argv){
   }
   if ( read_orientation != "FR" && read_orientation != "RF" ) {
     std::cout << "------------------------------------------------------------------------------\n";
-    std::cout << "ERROR!!! In option -r : Read-orientation must be one of FR or RF.\n";
+    std::cout << "ERROR!!! In option -O : Read-orientation must be one of FR or RF.\n";
     std::cout << "------------------------------------------------------------------------------\n\n";
     caller_usage();
     return 0;
@@ -120,16 +115,6 @@ int main(int argc, char ** argv){
     caller_usage();
     return 0;
   }
-  // if ( data_type.size() > 0 ){
-  //   if ( data_type != "WGS" &&  data_type != "WES" &&  data_type != "PANEL" &&  data_type != "wgs" &&
-  // 	 data_type != "wes" &&  data_type != "panel" &&  data_type != "Panel" ){
-  //     std::cout << "------------------------------------------------------------------------------\n";
-  //     std::cout << "ERROR!!! In option -T : Data type must be one of WGS, WES, or PANEL.\n";
-  //     std::cout << "------------------------------------------------------------------------------\n\n";
-  //     caller_usage();
-  //     return 0;
-  //   }
-  // } 
   
   std::ifstream fin ( input_bam.c_str() );
   if ( !fin.good() ) {
@@ -150,15 +135,6 @@ int main(int argc, char ** argv){
     return 0;
   }
   fin.close();
-
-  // if ( data_type == "wgs" ) data_type = "WGS";
-  // if ( data_type == "wes" ) data_type = "WES";
-  // if ( data_type == "panel" || data_type == "Panel" ) data_type = "PANEL";
-
-  // if ( data_type == "" && seqdep == 0 ) seqdep = 50;
-  // if ( data_type == "WGS" && seqdep == 0 ) seqdep = 50;
-  // if ( data_type == "WES" && seqdep == 0 ) seqdep = 100;
-  // if ( data_type == "PANEL" && seqdep == 0 ) seqdep = 500;
 
   //////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -182,33 +158,14 @@ int main(int argc, char ** argv){
   std::cout << "Input bam file:       -b " << input_bam << "\n";
   std::cout << "Prefix of output:     -o " << prefix << "\n";
   std::cout << "Reference genome:     -g " << genome << "\n";
+  std::cout << "Insert-size:          -I " << insert_size << "\n";
+  std::cout << "Read-orientation:     -O " << read_orientation << "\n";
+  if ( typing == 0 ) std::cout << "BND only:             -B " << "Print only BND" << "\n";
+  //if ( scanall ) std::cout << "Scan all split-read:  -A " << "\n";
+  if ( rescue )  std::cout << "Rescue SVs:           -R " << "\n";
   std::cout << "\n";
-  // std::cout << "[Data information]\n";
-  // std::cout << "Sequencing depth:     -D " << seqdep << "\n";
-  // std::cout << "Tumor purity:         -P " << purity << "\n";
-  // std::cout << "Data type:            -T " << data_type << "\n";
-  // std::cout << "Insert-size:          -I " << insert_size << "\n";
-  // std::cout << "Read-orientation:     -O " << read_orientation << "\n";
-  // std::cout << "\n";
-  // std::cout << "[Procedure options]\n";
-  // if ( normal_bam.size() > 0 ){
-  // std::cout << "Normal bam file:      -n " << normal_bam << "\n";
-  // }
-  // if ( typing == 0 ){ 
-  // std::cout << "BND only:             -B " << "Print only BND" << "\n";
-  // }
-  // std::cout << "Starting step:        -S " << Step << "\n";
-  // if ( Step > 1 )
-  // std::cout << "Prefix of input:      -i " << infile_pref << "\n";
-  // if ( scanall ) 
-  // std::cout << "Scan all split-read:  -A " << "Yes" << "\n";
-  // std::cout << "\n";
   std::cout << "===============================================================\n";
 
-
-
-
-  // std::cout << "===============================================================\n";
   //////////////////////////////////////////////////////////////////////////////////////////////
   //
   // Step 1
@@ -216,8 +173,7 @@ int main(int argc, char ** argv){
 
   if ( Step ==1 ){
     std::string bp_file;
-    // find_path ( input_bam, normal_bam, prefix, insert_size, scanall);
-    find_path ( input_bam, prefix, insert_size, scanall);
+    find_path ( input_bam, prefix, insert_size, scanall, rescue);
     Step ++ ;
 
   }
@@ -232,8 +188,6 @@ int main(int argc, char ** argv){
     if (step == 1 ) {
       infile_pref = prefix ;
     }
-    
-    // bp_to_vcf ( genome, input_bam, infile_pref,	prefix,	insert_size, typing, read_orientation, purity, seqdep, data_type);
     bp_to_vcf ( genome, input_bam, infile_pref,	prefix,	insert_size, typing, read_orientation, purity, seqdep);
 
     Step ++;

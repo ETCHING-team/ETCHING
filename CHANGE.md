@@ -1,5 +1,12 @@
+# v1.3.6
+
+--target-filter and --miscall-kmer-cutoff options were added.
+
+
 # v1.3.5
-Debug in etching (line 1283)
+
+Bug fixed (etching line 1283)
+
 
 # v1.3.4
 
