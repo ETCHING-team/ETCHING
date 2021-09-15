@@ -143,13 +143,10 @@ int main ( int argc , char ** argv ){
   std::cerr << "[Reading vcf: " << infile_vcf << "]\n";
   fin.open ( infile_vcf );
   while ( std::getline ( fin , tmp ) ){
-    std::cout << tmp << "\n";
-    if ( tmp[1] != '#' ){
-      break;
+    if ( tmp[0] == '#' ){
+      std::cout << tmp << "\n";
     }
-  }
-  while ( std::getline ( fin , tmp ) ){
-    if ( is_in_target ( tmp , target_region ) ) {
+    else if ( is_in_target ( tmp , target_region ) ) {
       std::cout << tmp << "\n";
     }
   }
