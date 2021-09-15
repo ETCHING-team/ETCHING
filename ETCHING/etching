@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.3.6 (2021.9.14.)"
+VERSION="ETCHING_v1.3.6a (2021.9.15.)"
 MODEL_VERSION=1.3.0
 
 #--------------------------------------------------------------------
@@ -1199,16 +1199,27 @@ then
 	    exit 1028
 	fi
 	
-	cmd="ln -sf ${TF_PREFIX}.BND.etching_sorter.SF.vcf ${TF_PREFIX}.BND.final.vcf" ; echo $cmd ; eval $cmd
-	cmd="ln -sf ${TF_PREFIX}.SV.etching_sorter.SF.vcf ${TF_PREFIX}.SV.final.vcf" ; echo $cmd ; eval $cmd
+	cmd="ln -sf ${TF_PREFIX}.BND.etching_sorter.SF.vcf ${PREFIX}.BND.final.vcf" ; echo $cmd ; eval $cmd
+	cmd="ln -sf ${TF_PREFIX}.SV.etching_sorter.SF.vcf ${PREFIX}.SV.final.vcf" ; echo $cmd ; eval $cmd
     else
-	cmd="ln -sf ${TF_PREFIX}.BND.etching_sorter.vcf ${TF_PREFIX}.BND.final.vcf" ; echo $cmd ; eval $cmd
-	cmd="ln -sf ${TF_PREFIX}.SV.etching_sorter.vcf ${TF_PREFIX}.SV.final.vcf" ; echo $cmd ; eval $cmd
+	cmd="ln -sf ${TF_PREFIX}.BND.etching_sorter.vcf ${PREFIX}.BND.final.vcf" ; echo $cmd ; eval $cmd
+	cmd="ln -sf ${TF_PREFIX}.SV.etching_sorter.vcf ${PREFIX}.SV.final.vcf" ; echo $cmd ; eval $cmd
     fi
-    OUTPUT_1="${TF_PREFIX}.BND.unfiltered.vcf"
-    OUTPUT_2="${TF_PREFIX}.SV.unfiltered.vcf"
-    OUTPUT_3="${TF_PREFIX}.BND.final.vcf"
-    OUTPUT_4="${TF_PREFIX}.SV.final.vcf"
+
+    if [ ! -f ${PREFIX}.SV.unfiltered.vcf ]
+    then
+	cmd="ln -sf ${TF_PREFIX}.SV.unfiltered.vcf ${PREFIX}.SV.unfiltered.vcf" ; echo $cmd ; eval $cmd
+    fi
+
+    if [ ! -f ${PREFIX}.BND.unfiltered.vcf ]
+    then
+	cmd="ln -sf ${TF_PREFIX}.BND.unfiltered.vcf ${PREFIX}.BND.unfiltered.vcf" ; echo $cmd ; eval $cmd
+    fi
+
+    OUTPUT_1="${PREFIX}.BND.unfiltered.vcf"
+    OUTPUT_2="${PREFIX}.SV.unfiltered.vcf"
+    OUTPUT_3="${PREFIX}.BND.final.vcf"
+    OUTPUT_4="${PREFIX}.SV.final.vcf"
     echo
 fi
 
@@ -1247,7 +1258,7 @@ then
     echo "# [FG_IDENTIFIER]"
     DATE="# [$(date)]";echo ${DATE}
     
-    cmd="etching_fg_identifier -i ${OUTPUT_3} -a ${ANNOTATION} ${OPTIONS} > ${TF_PREFIX}.fusion_gene.txt 2> logs/ETCHING_FG_IDENTIFIER.log"
+    cmd="etching_fg_identifier -i ${OUTPUT_3} -a ${ANNOTATION} ${OPTIONS} > ${PREFIX}.fusion_gene.txt 2> logs/ETCHING_FG_IDENTIFIER.log"
     echo $cmd
     eval $cmd
 
@@ -1305,9 +1316,9 @@ then
     exit 1033
 fi
 
-if [ -f ${WORKDIR}/${TF_PREFIX}.fusion_gene.txt ]
+if [ -f ${WORKDIR}/${PREFIX}.fusion_gene.txt ]
 then
-    cmd="cp ${WORKDIR}/${TF_PREFIX}.fusion_gene.txt ./"
+    cmd="cp ${WORKDIR}/${PREFIX}.fusion_gene.txt ./"
     echo $cmd
     eval $cmd
     STATUS=$(echo $?)
@@ -1326,9 +1337,9 @@ echo "# ${OUTPUT_2}"
 echo "# ${OUTPUT_3}"
 echo "# ${OUTPUT_4}"
 
-if [ -f ${TF_PREFIX}.fusion_gene.txt ]
+if [ -f ${PREFIX}.fusion_gene.txt ]
 then
-    echo "# ${TF_PREFIX}.fusion_gene.txt"
+    echo "# ${PREFIX}.fusion_gene.txt"
 fi
 
 echo
