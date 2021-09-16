@@ -1,6 +1,6 @@
 # ETCHING
 
-### Version 1.3.6a
+### Version 1.3.6b
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
@@ -25,36 +25,83 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
 
 
 * g++ (>=4.7.0), make, gawk, BWA, samtools
-* Python3 (>=3.6.1, <4) with pandas, numpy, scikit-learn, skranger, and xgboost modules
+* Python3 (>=3.6.1, <3.8) with pandas, numpy, scikit-learn (0.23.2), skranger (<=0.3), and xgboost modules
 
 ### Simple guide for Linux desktop beginners to install requirements.
 
 #### Fedora
 ```
 sudo yum install -y gawk gcc gcc-c++ make cmake bwa samtools
-pip3 install pandas numpy scikit-learn skranger xgboost
+
+pip3 install --upgrade pip
+pip3 install numpy pandas joblib scipy Cython xgboost
+
+wget https://github.com/scikit-learn/scikit-learn/archive/refs/tags/0.23.2.tar.gz
+tar zxvf 0.23.2.tar.gz
+cd scikit-learn-0.23.2
+python3 setup.py install
+
+wget https://github.com/crflynn/skranger/releases/download/0.1.1/skranger-0.1.1.tar.gz
+tar zxvf skranger-0.1.1.tar.gz
+cd skranger-0.1.1
+python3 setpu.py install
 ```
 
 #### CentOS 8
 ```
 sudo yum install -y epel-release
 sudo yum install -y gawk gcc gcc-c++ make cmake bwa samtools
+
 wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py
-pip3 install pandas numpy scikit-learn skranger xgboost
+pip3 install numpy pandas joblib scipy Cython xgboost
+
+
+wget https://github.com/scikit-learn/scikit-learn/archive/refs/tags/0.23.2.tar.gz
+tar zxvf 0.23.2.tar.gz
+cd scikit-learn-0.23.2
+python3 setup.py install
+
+wget https://github.com/crflynn/skranger/releases/download/0.1.1/skranger-0.1.1.tar.gz
+tar zxvf skranger-0.1.1.tar.gz
+cd skranger-0.1.1
+python3 setpu.py install
 ```
 
 #### CentOS 7
 ```
 sudo yum install -y epel-release
 sudo yum install -y gawk gcc gcc-c++ make cmake3 bwa samtools
+
 wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py
-pip3 install pandas numpy scikit-learn skranger xgboost
+pip3 install numpy pandas joblib scipy Cython xgboost
+
+wget https://github.com/scikit-learn/scikit-learn/archive/refs/tags/0.23.2.tar.gz
+tar zxvf 0.23.2.tar.gz
+cd scikit-learn-0.23.2
+python3 setup.py install
+
+wget https://github.com/crflynn/skranger/releases/download/0.1.1/skranger-0.1.1.tar.gz
+tar zxvf skranger-0.1.1.tar.gz
+cd skranger-0.1.1
+python3 setpu.py install
 ```
 
 #### Ubuntu 20.04
 ```
 sudo apt install -y gawk gcc g++ make cmake bwa samtools python3-pip
-pip3 install pandas numpy scikit-learn skranger xgboost
+
+pip3 install --upgrade pip
+pip3 install numpy pandas joblib scipy Cython xgboost
+
+wget https://github.com/scikit-learn/scikit-learn/archive/refs/tags/0.23.2.tar.gz
+tar zxvf 0.23.2.tar.gz
+cd scikit-learn-0.23.2
+python3 setup.py install
+
+wget https://github.com/crflynn/skranger/releases/download/0.1.1/skranger-0.1.1.tar.gz
+tar zxvf skranger-0.1.1.tar.gz
+cd skranger-0.1.1
+python3 setpu.py install
 ```
 
 #### Ubuntu 14.04, 16.04, and 18.04
@@ -88,7 +135,17 @@ python3 get-pip.py
 echo "export PATH=${HOME}/.local/bin:\$PATH" >> ~/.bashrc
 source ~/.bashrc 
 
-pip3 install pandas numpy scikit-learn skranger xgboost
+pip3 install numpy pandas joblib scipy Cython xgboost
+
+wget https://github.com/scikit-learn/scikit-learn/archive/refs/tags/0.23.2.tar.gz
+tar zxvf 0.23.2.tar.gz
+cd scikit-learn-0.23.2
+python3 setup.py install
+
+wget https://github.com/crflynn/skranger/releases/download/0.1.1/skranger-0.1.1.tar.gz
+tar zxvf skranger-0.1.1.tar.gz
+cd skranger-0.1.1
+python3 setpu.py install
 ```
 
 
@@ -202,7 +259,7 @@ Output should be like below
 
 |REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
 |:---|:---|:---|:---|:---|
-|etching|1.3.6a|16647cac9a99|40 hours ago|4.3 GB|
+|etching|1.3.6b|16647cac9a99|40 hours ago|4.3 GB|
 
 ### Demo for docker user
 
@@ -215,11 +272,11 @@ tar zxvf DEMO.tar.gz
 
 Run ETCHING with docker
 ```
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.6a \
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.6b \
 etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
 -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_1 -t 8
 ```
-Here, ```etching:1.3.6a``` is ```REPOSITORY``` and ```TAG``` of ETCHING docker image.
+Here, ```etching:1.3.6b``` is ```REPOSITORY``` and ```TAG``` of ETCHING docker image.
 
 Replace ```/path/to/DEMO``` with ```/your/data/path/```.
 
@@ -228,7 +285,7 @@ Note: Keep ```/work/``` in the above command line.
 
 Alternatively, you can run ETCHING inside docker container
 ```
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.6a /bin/bash
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.6b /bin/bash
 
 etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
 -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_2 -t 8

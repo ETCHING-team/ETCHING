@@ -2,6 +2,14 @@
 
 --target-filter and --miscall-kmer-cutoff options were added.
 
+1.3.6a
+File names of final result modified
+
+1.3.6b
+etching debug (line 882)
+Indentation error fixed (Sorter/scorer_XGBoost)
+README updated
+
 
 # v1.3.5
 
