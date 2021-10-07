@@ -512,6 +512,10 @@ then
     DATE="[$(date)]";echo ${DATE}
 
     let HALF=(${THREADS}/2 + 1)
+    
+    cmd="mkdir -p logs"
+    echo $cmd
+    eval $cmd
 
     cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq 2> logs/${PREFIX}_bwa_mem.log | samtools view -@ ${HALF} -Sbh - > ${PREFIX}.bam"
     echo $cmd
@@ -544,7 +548,11 @@ else
 	echo
 	echo "[Read_collector (bam2fastq mode)]"
 	DATE="[$(date)]";echo ${DATE}
-	
+
+	cmd="mkdir -p logs"
+	echo $cmd
+	eval $cmd
+
 	BAM_INPUT=$(grep "\.bam$" sample.list | head -n 1 )
 	BAM_PREFIX=$(echo $BAM_INPUT | sed 's/\.bam$//g' | gawk -F "/" '{print $NF}')
 
