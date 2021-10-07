@@ -13,23 +13,30 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
 
  
 
-### Change history of recent versions
-
-#### 1.3.6
-
-**c**. Virtual environment is implemented to solve dependencies. Simple installation guide.
-
-**b**. etching debug (line 882). Indentation error fixed (Sorter/scorer_XGBoost). README updated.
-
-**a**. File names of final result modified
+## Change history of recent versions
 
 #### v1.3.6
 
 --target-filter and --miscall-kmer-cutoff options were added.
 
+**a**. File names of final result modified
+
+**b**. etching debug (line 882). Indentation error fixed (Sorter/scorer_XGBoost). README updated.
+
+**c**. Virtual environment is implemented to solve dependencies. Simple installation guide.
+
+
+
 #### v1.3.5
 
 Bug fixed (etching line 1283)
+
+
+
+#### v1.3.4
+
+Debug ```etching``` and ```etching_filter```
+They did not run properly when ```-o``` option was not used.
 
 
 
