@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.3.6b (2021.9.17.)"
+VERSION="ETCHING_v1.3.6c (2021.10.6.)"
 MODEL_VERSION=1.3.0
 
 #--------------------------------------------------------------------
@@ -77,6 +77,8 @@ function USAGE {
     echo -e "\t-S  (string)\t/path/to/samtools"
     echo -e "\t-B  (string)\t/path/to/bwa"
     echo -e "\t-E          \tStore k-mer database files."
+    echo -e "\t--ETCHING_HOME (string)"
+    echo -e "\t            \tSet ETCHING_HOME, which is /path/to/ETCHING/"
     #echo -e "\t--rescue    \tRescue SVs not supported by split-reads"
     echo -e 
     echo -e "[About ETCHING]"
@@ -144,18 +146,23 @@ function EXAMPLE {
 
 function ABS_PATH (){
     INPUT=$1
-    if [ ${#INPUT} != 0 ] 
+    if [ -f ${INPUT} ] 
     then
 	INPUT_DIR=$(ls ${INPUT} | awk -F "/" 'NF{NF-=1};1' | sed 's/ /\//g')
 	if [ ${#INPUT_DIR} != 0 ]
 	then
-	    cd ${INPUT_DIR}
-	    INPUT_DIR=$PWD
-	    cd - > /dev/null
+	    INPUT_DIR=$(ABS_PATH ${INPUT_DIR})
 	    INPUT_FILE=$(ls ${INPUT} | rev | cut -d'/' -f 1 | rev)
 	    INPUT=${INPUT_DIR}/${INPUT_FILE}
 	else
 	    INPUT=$PWD/$INPUT
+	fi
+    else
+	if [ -d ${INPUT} ]
+	then
+	    cd $INPUT
+	    INPUT=$PWD
+	    cd - > /dev/null
 	fi
     fi
     echo $INPUT
@@ -168,6 +175,9 @@ then
     USAGE
     exit 0
 fi
+
+
+
 
 PREDIR=$PWD
 
@@ -222,6 +232,8 @@ STRAND_AWARE=0
 FUSION_WINDOW=$DEFA_FUSION_WINDOW
 
 TARGET_FILTER=
+
+
 
 while [ ${#1} != 0 ]; do
     case $1 in
@@ -284,7 +296,7 @@ while [ ${#1} != 0 ]; do
 	    then
 		echo "ERROR!!!"
 		echo "--target-filter option: There is no file: ${TARGET_FILTER}"
-		exit 56
+		exit 1
 	    fi
             ;;
         --max-kmer ) shift
@@ -352,6 +364,10 @@ while [ ${#1} != 0 ]; do
 	    REMOVE_MISCALL=0
 	    ;;
 
+	--ETCHING_HOME ) shift
+	    ETCHING_HOME=$1
+	    ;;
+
 
 
         -a | --annotation ) shift
@@ -377,7 +393,7 @@ while [ ${#1} != 0 ]; do
         -v | --version ) 
 	    echo -e $VERSION
 	    echo -e "ML model version: ${MODEL_VERSION}"
-            exit
+            exit 0
             ;;
 
 
@@ -385,7 +401,7 @@ while [ ${#1} != 0 ]; do
 	    echo "ERROR!!! Unavailable option: $1"
 	    echo "-------------------------------"
 	    USAGE
-	    exit 1
+	    exit -1
 	    ;;
     esac
     shift
@@ -401,6 +417,18 @@ done
 echo "# [ETCHING START]"
 DATE="# [$(date)]"
 echo ${DATE}
+
+#############################
+#
+# Checking bash environment
+#
+
+if [ ${#ETCHING_HOME} == 0 ]
+then
+    echo "ERROR!!! Please set ETCHING_HOME"
+    exit -1
+fi
+ETCHING_HOME=$(ABS_PATH $ETCHING_HOME)
 
 #############################
 #
@@ -493,20 +521,6 @@ then
 fi
 
 
-
-#############################
-#
-# Setting sequencing data type
-#
-#if [ ! ${DATATYPE} == "W" ] && [ ! ${DATATYPE} == "P" ]
-#then
-#    echo "ERROR!!! -T must be used with W or P."
-#    echo "---------------------------"
-#    USAGE
-#    exit 12
-#fi
-
-
 #############################
 #
 # CHECK ORIENTATION
@@ -589,37 +603,36 @@ fi
 #
 # Convert to absolute path if relative path
 #
+if [ ${#ETCHING_HOME} == 0 ]
+then
+    echo "ERROR!!! You did not set ETCHING_HOME, which is /path/to/ETCHING/."
+    exit -1
+fi
+PRESENT_PATH=$PWD 
 
+####################################
+#
+# Enter etching virtual enrironment
+#
 
-DIR=$(echo $0 | sed 's/etching$//g')
-cd $DIR
-PATH=$PWD:$PATH
-DIR=$PWD
-cd - > /dev/null
-
-PRESENT_PATH=$PWD
-
+echo
+echo "# Load virtual environment"
+echo "ETCHING_HOME=$ETCHING_HOME"
+cmd="source \${ETCHING_HOME}/bin/etching_venv"
+echo $cmd
+eval $cmd
 
 #############################
 # 
 # Check machine learning paths and files
 #
 
-ETCHING_ML_PATH=$DIR/ETCHING_ML_model
-
-
 if [ ${#ML_PATH} != 0 ]
 then
-    cd ${ML_PATH}
-    ML_PATH=$PWD
-    cd - > /dev/null
+    ML_PATH=$(ABS_PATH $ML_PATH)
 else
-    ML_PATH=${DIR}/ETCHING_ML_model
+    ML_PATH=${ETCHING_HOME}/bin/ETCHING_ML_model
 fi
-
-cd $ML_PATH
-ML_PATH=$PWD
-cd - > /dev/null
 
 if [ $ALGOR == "-R" ]
 then
@@ -660,7 +673,7 @@ do
     
     if [ ${#CHECK} == 0 ]
     then
-	echo "ERROR!!! We cannot find ${i}. Please check PATH."
+	echo "ERROR!!! We cannot find ${i}. Please check ETCHING_HOME."
 	echo "."
 	exit 19
     fi
@@ -693,7 +706,7 @@ do
     if [ ${#CHECK} == 0 ]
     then
 	echo "ERROR!!!"
-	echo "KMC3 was not install properly."
+	echo "We cannot find KMC3."
 	exit 21
     fi
 done
@@ -709,7 +722,7 @@ fi
 if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!!"
-    echo "bwa was not found"
+    echo "We cannot find bwa."
     exit 22
 else
     MAPPER=$CHECK
@@ -726,7 +739,7 @@ fi
 if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!!"
-    echo "samtools was not installed"
+    echo "We cannot find samtools."
     exit 23
 else
     SAMTOOLS=$CHECK
@@ -787,6 +800,8 @@ then
     WORKDIR=${PREFIX}
 fi
 
+# Make working directory
+echo
 cmd="mkdir -p ${WORKDIR}"
 echo $cmd
 eval $cmd
@@ -795,33 +810,33 @@ STATUS=$(echo $?)
 if (( STATUS != 0 ))
 then
     echo "Failed: ${STATUS}: $cmd"
-    exit 1001
+    exit 24
 fi
-
-cd $WORKDIR
-WORKDIR=$PWD
-cd - > /dev/null
 
 cmd="cd $WORKDIR"
 echo $cmd
 eval $cmd
 
+WORKDIR=$(ABS_PATH ${WORKDIR})
+
 STATUS=$(echo $?)
 if (( STATUS != 0 ))
 then
     echo "Failed: ${STATUS}: $cmd"
-    exit 1002
+    exit 25
 fi
 
 cmd="mkdir -p logs"
 echo $cmd
 eval $cmd
 
+LOGDIR=$(ABS_PATH logs)
+
 STATUS=$(echo $?)
 if (( STATUS != 0 ))
 then
     echo "Failed: ${STATUS}: $cmd"
-    exit 1003
+    exit 25
 fi
 
 
@@ -922,14 +937,14 @@ fi
 
 if [[ ${NO_FILTER} -eq 0 ]]
 then 
-    cmd="etching_filter ${REQUIRED} ${OPTIONS} > logs/ETCHING_FILTER.log 2>&1"
+    cmd="etching_filter ${REQUIRED} ${OPTIONS} > ${LOGDIR}/ETCHING_FILTER.log 2>&1"
     echo $cmd
     eval $cmd
     STATUS=$(echo $?)
     if (( STATUS != 0 ))
     then
 	echo "Failed: ${STATUS}: $cmd"
-	exit 1004
+	exit 26
     fi
 else
     echo "# [Skipped by --no-filter]"
@@ -963,7 +978,7 @@ else
     then
 	OPTIONS="-b ${BAM} ${BASIC_OPTIONS}"
     else
-	cmd="${MAPPER} mem -t ${THREADS} ${GENOME} ${FIRST} ${SECOND} 2> logs/${PREFIX}_bwa_mem.log | ${SAMTOOLS} view -@ ${THREADS} -Sbh - > ${PREFIX}.bam"
+	cmd="${MAPPER} mem -t ${THREADS} ${GENOME} ${FIRST} ${SECOND} 2> ${LOGDIR}/${PREFIX}_bwa_mem.log | ${SAMTOOLS} view -@ ${THREADS} -Sbh - > ${PREFIX}.bam"
 	echo $cmd
 	eval $cmd
 
@@ -971,11 +986,11 @@ else
 	if (( STATUS != 0 ))
 	then
 	    echo "Failed: ${STATUS}: $cmd"
-	    exit 1008
+	    exit 27
 	fi
 
-	CHECK=$($SAMTOOLS sort 2>&1 | grep "\-o" | grep "final output to stdout" | awk '$1=="-o"')
-	if [ ${#CHECK} == 0 ]
+	CHECK=$($SAMTOOLS sort 2>&1 | grep "\-o" | grep "final output to stdout" | wc -l )
+	if (( CHECK == ))
 	then
 	    cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.bam -o ${PREFIX}.sort.bam"
 	else
@@ -988,7 +1003,7 @@ else
 	if (( STATUS != 0 ))
 	then
 	    echo "Failed: ${STATUS}: $cmd"
-	    exit 1009
+	    exit 28
 	fi
 	
 	cmd="rm -f ${PREFIX}.bam"
@@ -999,7 +1014,7 @@ else
     fi
 fi
 
-cmd="etching_caller ${OPTIONS} > logs/ETCHING_CALLER.log 2>&1"
+cmd="etching_caller ${OPTIONS} > ${LOGDIR}/ETCHING_CALLER.log 2>&1"
 echo $cmd
 eval $cmd
 
@@ -1007,22 +1022,22 @@ STATUS=$(echo $?)
 if (( STATUS != 0 ))
 then
     echo "Failed: ${STATUS}: $cmd"
-    exit 1006
+    exit 29
 fi
 
 ##############################33333
 
 if [ ${#TARGET_FILTER} != 0 ]
 then
-    echo >> logs/ETCHING_CALLER.log
-    echo "# [Select SVs on target regions]" >> logs/ETCHING_CALLER.log
+    echo >> ${LOGDIR}/ETCHING_CALLER.log
+    echo "# [Select SVs on target regions]" >> ${LOGDIR}/ETCHING_CALLER.log
     TF_PREFIX=${PREFIX}.TF
-    cmd="target_filter ${PREFIX}.SV.vcf ${TARGET_FILTER} > ${TF_PREFIX}.SV.vcf 2>> logs/ETCHING_CALLER.log"
+    cmd="target_filter ${PREFIX}.SV.vcf ${TARGET_FILTER} > ${TF_PREFIX}.SV.vcf 2>> ${LOGDIR}/ETCHING_CALLER.log"
     echo $cmd
     eval $cmd
-    echo >> logs/ETCHING_CALLER.log
-    echo "# [Select SVs on target regions]" >> logs/ETCHING_CALLER.log
-    cmd="target_filter ${PREFIX}.BND.vcf ${TARGET_FILTER} > ${TF_PREFIX}.BND.vcf 2>> logs/ETCHING_CALLER.log"
+    echo >> ${LOGDIR}/ETCHING_CALLER.log
+    echo "# [Select SVs on target regions]" >> ${LOGDIR}/ETCHING_CALLER.log
+    cmd="target_filter ${PREFIX}.BND.vcf ${TARGET_FILTER} > ${TF_PREFIX}.BND.vcf 2>> ${LOGDIR}/ETCHING_CALLER.log"
     echo $cmd
     eval $cmd
 else
@@ -1037,7 +1052,7 @@ echo
 echo "# [SORTER]"
 DATE="# [$(date)]";echo ${DATE}
 
-cmd="etching_sorter -i ${TF_PREFIX}.BND.vcf -o ${TF_PREFIX}.BND -c $CUTOFF -m ${ML_PATH} $ALGOR -p ${ML_PREFIX} > logs/ETCHING_SORTER.log"
+cmd="etching_sorter -i ${TF_PREFIX}.BND.vcf -o ${TF_PREFIX}.BND -c $CUTOFF -m ${ML_PATH} $ALGOR -p ${ML_PREFIX} > ${LOGDIR}/ETCHING_SORTER.log"
 echo $cmd
 eval $cmd 
 
@@ -1045,10 +1060,11 @@ STATUS=$(echo $?)
 if (( STATUS != 0 ))
 then
     echo "Failed: ${STATUS}: $cmd"
-    exit 1012
+    exit 30
 fi
 
-cmd="etching_sorter -i ${TF_PREFIX}.SV.vcf -o ${TF_PREFIX}.SV -c $CUTOFF -m ${ML_PATH} $ALGOR -p ${ML_PREFIX} >> logs/ETCHING_SORTER.log"
+
+cmd="etching_sorter -i ${TF_PREFIX}.SV.vcf -o ${TF_PREFIX}.SV -c $CUTOFF -m ${ML_PATH} $ALGOR -p ${ML_PREFIX} >> ${LOGDIR}/ETCHING_SORTER.log"
 echo $cmd
 eval $cmd 
 
@@ -1056,7 +1072,7 @@ STATUS=$(echo $?)
 if (( STATUS != 0 ))
 then
     echo "Failed: ${STATUS}: $cmd"
-    exit 1013
+    exit 31
 fi
 
 #######################################################################################################################
@@ -1080,7 +1096,7 @@ then
     if [ ${REMOVE_MISCALL} -eq 1 ]
     then
 
-	cmd="extract_BP_read ${TF_PREFIX}.BND.etching_sorter.vcf ${PREFIX}.sort.bam ${TF_PREFIX}.BP_reads.fastq 2>> logs/ETCHING_SORTER.log"
+	cmd="extract_BP_read ${TF_PREFIX}.BND.etching_sorter.vcf ${PREFIX}.sort.bam ${TF_PREFIX}.BP_reads.fastq 2>> ${LOGDIR}/ETCHING_SORTER.log"
 	echo $cmd
 	eval $cmd
 
@@ -1088,7 +1104,7 @@ then
 	if (( STATUS != 0 ))
 	then
 	    echo "Failed: ${STATUS}: $cmd"
-	    exit 1018
+	    exit 31
 	fi
 
 	cmd="mkdir -p tmp_BP_reads_xxx"
@@ -1099,7 +1115,7 @@ then
 	if (( STATUS != 0 ))
 	then
 	    echo "Failed: ${STATUS}: $cmd"
-	    exit 1019
+	    exit 32
 	fi
 
 	MAXCOUNT=255
@@ -1108,7 +1124,7 @@ then
 	    MAXCOUNT=$MISCALL_KMERCUTOFF
 	fi
 
-	cmd="kmc -t${THREADS} -cs${MAXCOUNT} -ci${MISCALL_KMERCUTOFF} -k31 -v -fq ${TF_PREFIX}.BP_reads.fastq ${TF_PREFIX}.BP_reads tmp_BP_reads_xxx >> logs/ETCHING_SORTER.log 2>&1"
+	cmd="kmc -t${THREADS} -cs${MAXCOUNT} -ci${MISCALL_KMERCUTOFF} -k31 -v -fq ${TF_PREFIX}.BP_reads.fastq ${TF_PREFIX}.BP_reads tmp_BP_reads_xxx >> ${LOGDIR}/ETCHING_SORTER.log 2>&1"
 	echo $cmd
 	eval $cmd
 
@@ -1116,7 +1132,7 @@ then
 	if (( STATUS != 0 ))
 	then
 	    echo "Failed: ${STATUS}: $cmd"
-	    exit 1020
+	    exit 33
 	fi
 
 	cmd="rm -rf ${TF_PREFIX}.BP_reads.fastq tmp_BP_reads_xxx"
@@ -1127,7 +1143,7 @@ then
 	if (( STATUS != 0 ))
 	then
 	    echo "Failed: ${STATUS}: $cmd"
-	    exit 1021
+	    exit 34
 	fi
 	
 	cmd="kmc_dump ${TF_PREFIX}.BP_reads ${TF_PREFIX}.BP_reads.kmer_table.txt"
@@ -1138,7 +1154,7 @@ then
 	if (( STATUS != 0 ))
 	then
 	    echo "Failed: ${STATUS}: $cmd"
-	    exit 1022
+	    exit 35
 	fi
 
 	#############################################################################################################################################################################
@@ -1153,7 +1169,7 @@ then
 	    fi
 	fi
 
-	cmd="etching_filter ${INPUT} --kmer-table ${TF_PREFIX}.BP_reads.kmer_table.txt -p ${TF_PREFIX}.BP_reads -t ${THREADS} -g ${GENOME} >> logs/ETCHING_SORTER.log 2>&1"
+	cmd="etching_filter ${INPUT} --kmer-table ${TF_PREFIX}.BP_reads.kmer_table.txt -p ${TF_PREFIX}.BP_reads -t ${THREADS} -g ${GENOME} >> ${LOGDIR}/ETCHING_SORTER.log 2>&1"
 	echo $cmd
 	eval $cmd
 
@@ -1161,12 +1177,12 @@ then
 	if (( STATUS != 0 ))
 	then
 	    echo "Failed: ${STATUS}: $cmd"
-	    exit 1023
+	    exit 36
 	fi
 
 	#############################################################################################################################################################################
 
-	cmd="etching_caller -B -b ${TF_PREFIX}.BP_reads.sort.bam -o ${TF_PREFIX}.miscall -g ${GENOME} >> logs/ETCHING_SORTER.log 2>&1 "
+	cmd="etching_caller -B -b ${TF_PREFIX}.BP_reads.sort.bam -o ${TF_PREFIX}.miscall -g ${GENOME} >> ${LOGDIR}/ETCHING_SORTER.log 2>&1 "
 	echo $cmd
 	eval $cmd
 
@@ -1174,10 +1190,10 @@ then
 	if (( STATUS != 0 ))
 	then
 	    echo "Failed: ${STATUS}: $cmd"
-	    exit 1026
+	    exit 37
 	fi
 
-	cmd="somatic_filter ${TF_PREFIX}.BND.etching_sorter.vcf ${TF_PREFIX}.miscall.BND.vcf ${TF_PREFIX}.BP_reads.sort.bam > ${TF_PREFIX}.BND.etching_sorter.SF.vcf 2>> logs/ETCHING_SORTER.log"
+	cmd="somatic_filter ${TF_PREFIX}.BND.etching_sorter.vcf ${TF_PREFIX}.miscall.BND.vcf ${TF_PREFIX}.BP_reads.sort.bam > ${TF_PREFIX}.BND.etching_sorter.SF.vcf 2>> ${LOGDIR}/ETCHING_SORTER.log"
 	echo $cmd
 	eval $cmd 
 
@@ -1185,10 +1201,10 @@ then
 	if (( STATUS != 0 ))
 	then
 	    echo "Failed: ${STATUS}: $cmd"
-	    exit 1027
+	    exit 38
 	fi
 
-	cmd="somatic_filter ${TF_PREFIX}.SV.etching_sorter.vcf ${TF_PREFIX}.miscall.BND.vcf ${TF_PREFIX}.BP_reads.sort.bam > ${TF_PREFIX}.SV.etching_sorter.SF.vcf 2>> logs/ETCHING_SORTER.log"
+	cmd="somatic_filter ${TF_PREFIX}.SV.etching_sorter.vcf ${TF_PREFIX}.miscall.BND.vcf ${TF_PREFIX}.BP_reads.sort.bam > ${TF_PREFIX}.SV.etching_sorter.SF.vcf 2>> ${LOGDIR}/ETCHING_SORTER.log"
 	echo $cmd
 	eval $cmd 
 
@@ -1196,7 +1212,7 @@ then
 	if (( STATUS != 0 ))
 	then
 	    echo "Failed: ${STATUS}: $cmd"
-	    exit 1028
+	    exit 39
 	fi
 	
 	cmd="ln -sf ${TF_PREFIX}.BND.etching_sorter.SF.vcf ${PREFIX}.BND.final.vcf" ; echo $cmd ; eval $cmd
@@ -1258,7 +1274,7 @@ then
     echo "# [FG_IDENTIFIER]"
     DATE="# [$(date)]";echo ${DATE}
     
-    cmd="etching_fg_identifier -i ${OUTPUT_3} -a ${ANNOTATION} ${OPTIONS} > ${PREFIX}.fusion_gene.txt 2> logs/ETCHING_FG_IDENTIFIER.log"
+    cmd="etching_fg_identifier -i ${OUTPUT_3} -a ${ANNOTATION} ${OPTIONS} > ${PREFIX}.fusion_gene.txt 2> ${LOGDIR}/ETCHING_FG_IDENTIFIER.log"
     echo $cmd
     eval $cmd
 
@@ -1266,7 +1282,7 @@ then
     if (( STATUS != 0 ))
     then
 	echo "Failed: ${STATUS}: $cmd"
-	exit 1029
+	exit 40
     fi
 
 fi
@@ -1282,7 +1298,7 @@ then
     if (( STATUS != 0 ))
     then
 	echo "Failed: ${STATUS}: $cmd"
-	exit 1031
+	exit 41
     fi
 
 fi
@@ -1294,7 +1310,7 @@ STATUS=$(echo $?)
 if (( STATUS != 0 ))
 then
     echo "Failed: ${STATUS}: $cmd"
-    exit 1032
+    exit 42
 fi
 
 #######################################################################################################################
@@ -1313,7 +1329,7 @@ STATUS=$(echo $?)
 if (( STATUS != 0 ))
 then
     echo "Failed: ${STATUS}: $cmd"
-    exit 1033
+    exit 43
 fi
 
 if [ -f ${WORKDIR}/${PREFIX}.fusion_gene.txt ]
@@ -1325,7 +1341,7 @@ then
     if (( STATUS != 0 ))
     then
 	echo "Failed: ${STATUS}: $cmd"
-	exit 1034
+	exit 44
     fi
 fi
 
@@ -1344,5 +1360,9 @@ fi
 
 echo
 
+deactivate
+
 echo "# [Finished]"
 DATE="# [$(date)]";echo ${DATE}
+
+exit 0

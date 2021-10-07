@@ -1,4 +1,4 @@
-version=$(g++ --version | head -n 1 | gawk '{print $3}' | gawk -F "." '{print $1}')
+version=$(g++ --version | head -n 1 | awk '{print $3}' | awk -F "." '{print $1}')
 
 libversion=
 
@@ -11,7 +11,7 @@ fi
 
 if (( version == 4 ))
 then
-    subversion=$(g++ --version | head -n 1 | gawk '{print $3}' | gawk -F "." '{print $2}')
+    subversion=$(g++ --version | head -n 1 | awk '{print $3}' | awk -F "." '{print $2}')
     if (( subversion < 7 ))
     then
 	echo "[Requirement]"
@@ -19,6 +19,10 @@ then
 	exit -1
     else
 	libversion="4.7.0"
+	cd lib
+	ln -sf ${libversion}/*.so ./
+	cd ..
+	exit 0
     fi
 fi
 
@@ -32,3 +36,5 @@ libversion="${version}.1.0"
 cd lib
 ln -sf ${libversion}/*.so ./
 cd ..
+
+exit 0

@@ -1,6 +1,6 @@
 # ETCHING
 
-### Version 1.3.6b
+### Version 1.3.6c
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
@@ -11,204 +11,158 @@ http://big.hanyang.ac.kr/ETCHING/
 
 The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Processor).
 
+ 
+
+### Change history of recent versions
+
+#### 1.3.6
+
+**c**. Virtual environment is implemented to solve dependencies. Simple installation guide.
+
+**b**. etching debug (line 882). Indentation error fixed (Sorter/scorer_XGBoost). README updated.
+
+**a**. File names of final result modified
+
+#### v1.3.6
+
+--target-filter and --miscall-kmer-cutoff options were added.
+
+#### v1.3.5
+
+Bug fixed (etching line 1283)
 
 
 
-## Requirement
+*See CHANGE.md for older updates.*
+
+
+
+
+# Requirements
 
 ### System
 
-* 64-bit LINUX with >=64GB RAM (at least >=16GB).
+* 64-bit LINUX with >=32GB RAM (at least >=16GB).
 * Tested on Fedora workstation, Centos, and Ubuntu
 
 ### Software
 
 
-* g++ (>=4.7.0), make, gawk, BWA, samtools
-* Python3 (>=3.6.1, <3.8) with pandas, numpy, scikit-learn (0.23.2), skranger (<=0.3), and xgboost modules
+* Required to compile
 
-### Simple guide for Linux desktop beginners to install requirements.
+  * gcc, g++ (>=4.7.0), make, Python3 (3.6, 3.7, or 3.8)
+  * python3-venv (Ubuntu/Debian/Mint)
 
-#### Fedora
-```
-sudo yum install -y gawk gcc gcc-c++ make cmake bwa samtools
+* Required to run
 
-pip3 install --upgrade pip
-pip3 install numpy pandas joblib scipy Cython xgboost
+  * BWA, samtools
 
-wget https://github.com/scikit-learn/scikit-learn/archive/refs/tags/0.23.2.tar.gz
-tar zxvf 0.23.2.tar.gz
-cd scikit-learn-0.23.2
-python3 setup.py install
+* Optional (but recommended)
 
-wget https://github.com/crflynn/skranger/releases/download/0.1.1/skranger-0.1.1.tar.gz
-tar zxvf skranger-0.1.1.tar.gz
-cd skranger-0.1.1
-python3 setpu.py install
-```
-
-#### CentOS 8
-```
-sudo yum install -y epel-release
-sudo yum install -y gawk gcc gcc-c++ make cmake bwa samtools
-
-wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py
-pip3 install numpy pandas joblib scipy Cython xgboost
+  * pyenv
 
 
-wget https://github.com/scikit-learn/scikit-learn/archive/refs/tags/0.23.2.tar.gz
-tar zxvf 0.23.2.tar.gz
-cd scikit-learn-0.23.2
-python3 setup.py install
 
-wget https://github.com/crflynn/skranger/releases/download/0.1.1/skranger-0.1.1.tar.gz
-tar zxvf skranger-0.1.1.tar.gz
-cd skranger-0.1.1
-python3 setpu.py install
+# Guide to ETCHING
+
+We prepared a simple guide for CentOS/Fedora or Ubuntu/Debian/Mint users. You can skip this this step if all requirements were installed.
+
+*Note: We tested this guide on Fedora32/33/34, CentOS7/8, Ubuntu16.04/18.04/20.04, Mint19/20, Debian11, and MX linux.*
+
+## 1. Requirements
+
+- #### CentOS/Fedora (or other Red Hat-based linux distros)
+
+```bash
+# Required programs 
+sudo yum install -y epel-release # CentOS
+sudo yum install -y gcc gcc-c++ make bwa samtools
 ```
 
-#### CentOS 7
-```
-sudo yum install -y epel-release
-sudo yum install -y gawk gcc gcc-c++ make cmake3 bwa samtools
+- #### Ubuntu/Debian/Mint (or other Debian-based distros)
 
-wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py
-pip3 install numpy pandas joblib scipy Cython xgboost
+```bash
+## Required programs 
+sudo apt install -y gcc g++ make bwa samtools
 
-wget https://github.com/scikit-learn/scikit-learn/archive/refs/tags/0.23.2.tar.gz
-tar zxvf 0.23.2.tar.gz
-cd scikit-learn-0.23.2
-python3 setup.py install
-
-wget https://github.com/crflynn/skranger/releases/download/0.1.1/skranger-0.1.1.tar.gz
-tar zxvf skranger-0.1.1.tar.gz
-cd skranger-0.1.1
-python3 setpu.py install
+# You can skip this if you will use pyenv.
+# Unless, python3-venv should be installed.
+sudo apt install -y python3-venv
 ```
 
-#### Ubuntu 20.04
-```
-sudo apt install -y gawk gcc g++ make cmake bwa samtools python3-pip
 
-pip3 install --upgrade pip
-pip3 install numpy pandas joblib scipy Cython xgboost
 
-wget https://github.com/scikit-learn/scikit-learn/archive/refs/tags/0.23.2.tar.gz
-tar zxvf 0.23.2.tar.gz
-cd scikit-learn-0.23.2
-python3 setup.py install
+### * Optional: `pyenv`
 
-wget https://github.com/crflynn/skranger/releases/download/0.1.1/skranger-0.1.1.tar.gz
-tar zxvf skranger-0.1.1.tar.gz
-cd skranger-0.1.1
-python3 setpu.py install
-```
+Highly recommended if the default version of your Python3 is >=3.9 or <=3.5.
 
-#### Ubuntu 14.04, 16.04, and 18.04
-```
-sudo apt install -y gawk gcc g++ make bwa samtools
-
-# Check cmake version
-cmake --version
-
-# If cmake is <3.13 or not installed, 
-wget https://github.com/Kitware/CMake/releases/download/v3.13.0/cmake-3.13.0.tar.gz
-tar zxvf cmake-3.13.0.tar.gz
-cd cmake-3.13.0 
-./bootstrap && make && sudo make install 
-cd ..
-
-# Check python3 version
-python3 --version
-
-# If python3 is <3.6,
-sudo add-apt-repository ppa:deadsnakes/ppa
+```bash
+# dependencies of pyenv
+# For Fedora/CentOS
+sudo yum install make gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel tk-devel libffi-devel xz-devel
+# For Ubuntu/Debian/Mint
 sudo apt-get update
-sudo apt-get install -y python3.6
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
+sudo apt install make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 
-# Install recent version of pip3 and python modules
-wget https://bootstrap.pypa.io/get-pip.py
-python3 get-pip.py
-
-# Ubuntu 14.04
-echo "export PATH=${HOME}/.local/bin:\$PATH" >> ~/.bashrc
-source ~/.bashrc 
-
-pip3 install numpy pandas joblib scipy Cython xgboost
-
-wget https://github.com/scikit-learn/scikit-learn/archive/refs/tags/0.23.2.tar.gz
-tar zxvf 0.23.2.tar.gz
-cd scikit-learn-0.23.2
-python3 setup.py install
-
-wget https://github.com/crflynn/skranger/releases/download/0.1.1/skranger-0.1.1.tar.gz
-tar zxvf skranger-0.1.1.tar.gz
-cd skranger-0.1.1
-python3 setpu.py install
+# Install pyenv
+curl https://pyenv.run | bash
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+echo 'eval "$(pyenv init --path)"' >> ~/.bashrc
+exec $SHELL
 ```
 
 
 
-## Installation of ETCHING
+## 2. Installation
 
-```
+Once, requirements were solved, you can install ETCHING as follows.
+
+```bash
 # Download ETCHING
-git clone https://github.com/ETCHING-team/ETCHING.git
+git clone --depth=1 https://github.com/ETCHING-team/ETCHING.git
 
-# Compile
-cd etching
+# Move to /path/to/ETCHING
+cd ETCHING
+
+# Optional for pyenv users
+pyenv install 3.7.12 # any version from 3.6.0 to 3.8.12
+pyenv local 3.7.12
+
+# Compile and install ETCHING
 make
-
-ETCHING_PATH=$PWD
-
-# Installation
-# Do either
-echo "export PATH=$ETCHING_PATH/bin:\$PATH" >> ~/.bashrc
-echo "export LD_LIBRARY_PATH=$ETCHING_PATH/lib:\$LD_LIBRARY_PATH" >> ~/.bashrc
-source ~/.bashrc
-
-# or 
-sudo cp -ar $ETCHING_PATH/bin/* /usr/bin
-sudo cp $ETCHING_PATH/lib/*.so /usr/lib
-```
-If you want to see usage, 
-
-```
-etching -h
+echo "export ETCHING_HOME=$PWD" >> ~/.bashrc
+echo "export PATH=$PWD/bin" >> ~/.bashrc
+exec $SHELL
 ```
 
-If you need some example,
-```
-etching --example
-```
+As long as you keep `/path/to/ETCHING/lib`, virtual environment automatically sets `LD_LIBRARY_PATH` while running ETCHING.
 
 
 
-## Demo
+## 3. DEMO
 
-After installation, you can download and run demo
+```bash
+# Change directory
+cd /wherever/you/want/
 
-```
 # Download and decompress DEMO
 wget http://big.hanyang.ac.kr/ETCHING/DEMO.tar.gz
 tar zxvf DEMO.tar.gz
+cd DEMO
 
 # Run demo
-cd DEMO
-etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
--g small_genome.fa -a small_genome.gtf -f demo_PGK -o example -t 8
+etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example -t 8
 ```
 
 
 
-## Pan-Genome k-mer set
+# Pan-Genome k-mer set
 
-If you have no matched normal data, PGK must be helpful to select tumor specific reads.
+If you have no matched normal data, our pan-genome k-mer set (PGK) will be helpful to select tumor specific reads. 
 
-You can download pan-genome k-mer set (PGK) from our website.
-
-```
+```bash
 # Move to etching directory
 cd /somewhere/you/want/
 
@@ -225,26 +179,27 @@ ls PGK
 
 Alternatively, you can make your own k-mer set as follows:
 
-```
+```bash
 make_pgk -i reference.list -o my_pgk -v dbSNP.vcf -g hg19.fa
+deactivate
 ```
 
+Here, ```reference.list``` is a file of file names of reference genomes in fasta format.
 
 
 
-## Docker
 
-### Installation of docker
-```
-sudo snap install docker     # version 19.03.13, or
-sudo apt  install docker.io  # version 20.10.2-0ubuntu1~20.04.2
-sudo usermod -a -G docker $USER
-```
 
-### ETCHING on a ship (for docker users)
 
-Download our docker image using ```wget``` from our website (http://big.hanyang.ac.kr/ETCHING/download.html)
-```
+# ETCHING on a ship (docker)
+
+### Requirement
+
+docker 
+
+### Download docker image
+
+```bash
 # Download ETCHING docker image
 wget http://big.hanyang.ac.kr/ETCHING/etching_docker.tar
 
@@ -255,28 +210,26 @@ docker load -i etching_docker.tar
 docker images
 ```
 
-Output should be like below
+You can see like this
 
 |REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
 |:---|:---|:---|:---|:---|
-|etching|1.3.6b|16647cac9a99|40 hours ago|4.3 GB|
+|etching|1.3.6|16647cac9a99|40 hours ago|4.3 GB|
 
 ### Demo for docker user
 
 Download our DEMO
-```
+```bash
 # Download and decompress DEMO
 wget http://big.hanyang.ac.kr/ETCHING/DEMO.tar.gz
 tar zxvf DEMO.tar.gz
 ```
 
 Run ETCHING with docker
+```bash
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.6 etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_1 -t 8
 ```
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.6b \
-etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
--g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_1 -t 8
-```
-Here, ```etching:1.3.6b``` is ```REPOSITORY``` and ```TAG``` of ETCHING docker image.
+Here, ```etching:1.3.6``` is ```REPOSITORY``` and ```TAG``` of ETCHING docker image.
 
 Replace ```/path/to/DEMO``` with ```/your/data/path/```.
 
@@ -284,17 +237,18 @@ Note: Keep ```/work/``` in the above command line.
 
 
 Alternatively, you can run ETCHING inside docker container
-```
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.6b /bin/bash
+```bash
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.6 /bin/bash
 
-etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
--g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_2 -t 8
+etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_2 -t 8
 ```
+
+
 
 ----------------------------------------------------------------------------------
 
 
-## Contributors
+# Contributors
 
 Jang-il Sohn, Min-Hak Choi, Dohun Yi, A. Vipin Menon, and Jin-Wu Nam
 
@@ -303,7 +257,7 @@ Bioinformatic and Genomics Lab., Hanyang University, Seoul 04763, Korea
 ----------------------------------------------------------------------------------
 
 
-## Contact
+# Contact
 
 If you have any issues, please contact us
 

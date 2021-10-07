@@ -1,4 +1,5 @@
 default:
+	bash checkreq.sh
 	bash libconf.sh
 	cd lib/zlib && make
 	cd lib/gzstream && make
@@ -32,6 +33,7 @@ default:
 	cp FG_identifier/etching_fg_identifier bin/
 	cp -ar ETCHING_ML_model bin/
 	bash decomp.sh
+	bash build_etching_venv.sh
 
 all: library default
 
