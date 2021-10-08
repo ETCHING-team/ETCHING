@@ -57,12 +57,12 @@ They did not run properly when ```-o``` option was not used.
 
 * Required to compile
 
-  * gcc, g++ (>=4.7.0), make, Python3 (3.6, 3.7, or 3.8)
+  * gcc, g++ (>=4.7.0), make, Python3 (3.6, 3.7, or 3.8), pyenv
   * python3-venv (Ubuntu/Debian/Mint)
 
 * Required to run
 
-  * BWA, samtools, pyenv
+  * BWA, samtools
 
 
 
