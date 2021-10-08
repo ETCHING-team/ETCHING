@@ -62,11 +62,7 @@ They did not run properly when ```-o``` option was not used.
 
 * Required to run
 
-  * BWA, samtools
-
-* Optional (but recommended)
-
-  * pyenv
+  * BWA, samtools, pyenv
 
 
 
@@ -99,9 +95,7 @@ sudo apt install -y python3-venv
 
 
 
-### * Optional: `pyenv`
-
-Highly recommended if the default version of your Python3 is >=3.9 or <=3.5.
+### `pyenv`
 
 ```bash
 # dependencies of pyenv
