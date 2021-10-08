@@ -95,7 +95,7 @@ sudo apt install -y python3-venv
 
 
 
-### `pyenv`
+### Install `pyenv`
 
 ```bash
 # dependencies of pyenv
