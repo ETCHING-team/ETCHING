@@ -140,7 +140,7 @@ pyenv local 3.7.12
 # Compile and install ETCHING
 make
 echo "export ETCHING_HOME=$PWD" >> ~/.bashrc
-echo "export PATH=$PWD/bin" >> ~/.bashrc
+echo "export PATH=$PWD/bin:\$PATH" >> ~/.bashrc
 exec $SHELL
 ```
 
