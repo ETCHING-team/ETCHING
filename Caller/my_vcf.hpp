@@ -135,7 +135,7 @@ public:
   VCF_CLASS(const std::string input_file);
   ~VCF_CLASS();
 
-  std::string etching_version="ETCHING_v1.3.6 (2021.9.6.)";
+  std::string etching_version="ETCHING_v1.3.7 (2021.10.26.)";
   
   // Main container
   VCF_MAP vcf_map;

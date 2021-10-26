@@ -52,8 +52,7 @@ cleanall: clean
 	cd Caller && make cleanall
 	cd Sorter && make cleanall
 	cd FG_identifier && make cleanall
-	rm -rf bin
 	cd lib/gzstream && make clean
 	cd lib/zlib && make clean
 	cd lib/bamtools && make clean
-	rm -f lib/lib*
+	rm -rf bin lib/lib* lib/python* lib64 get-pip.py .python-version pyvenv.cfg

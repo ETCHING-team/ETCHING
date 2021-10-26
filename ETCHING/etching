@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.3.6c (2021.10.6.)"
+VERSION="ETCHING_v1.3.7 (2021.10.26.)"
 MODEL_VERSION=1.3.0
 
 #--------------------------------------------------------------------
@@ -144,6 +144,7 @@ function EXAMPLE {
     echo -e
 }
 
+
 function ABS_PATH (){
     INPUT=$1
     if [ -f ${INPUT} ] 
@@ -166,6 +167,36 @@ function ABS_PATH (){
 	fi
     fi
     echo $INPUT
+}
+
+
+function CHECK_ETCHING (){
+    # CHECKING REQUIRED PROGRAMS
+    for i in extract_BP_read somatic_filter target_filter cut_by_score etching etching_caller etching_fg_identifier etching_filter etching_sorter etching_typer fastq_check kmc kmc_dump kmc_tools kmer_filter match_pair read_collector scorer_RandomForest scorer_XGBoost sort_fastq_mem_eff 
+    do
+	CHECK=$(which ${i})
+	
+	if [ ${#CHECK} == 0 ]
+	then
+	    echo "ERROR!!! We cannot find ${i}. Please check \$ETCHING_HOME or use \"etching\" script in /path/to/ETCHING/bin/etching"
+	    exit 19
+	fi
+    done
+
+    # CHECKING LD_LIBRARY_PATH
+    for i in etching_caller etching_sorter etching_fg_identifier read_collector fastq_check
+    do
+	CHECK=$(${i} 2> library_check.txt)
+	CHECK=$(cat library_check.txt)
+	if [ ${#CHECK} != 0 ]
+	then
+	    cat library_check.txt
+	    echo "Please check \${ETCHING_HOME}/lib or \$LD_LIBRARY_PATH"
+	    exit 20
+	fi
+    done
+
+
 }
 
 #####################################
@@ -418,6 +449,9 @@ echo "# [ETCHING START]"
 DATE="# [$(date)]"
 echo ${DATE}
 
+
+#PRESENT_PATH=$PWD 
+
 #############################
 #
 # Checking bash environment
@@ -425,18 +459,51 @@ echo ${DATE}
 
 if [ ${#ETCHING_HOME} == 0 ]
 then
-    echo "ERROR!!! Please set ETCHING_HOME"
+    ETCHING_BIN=$(ABS_PATH $0 | sed "s|/etching||")
+    echo ${ETCHING_BIN}
+    ETCHING_HOME=${ETCHING_BIN}/..
+fi
+
+ETCHING_HOME=$(ABS_PATH $ETCHING_HOME)
+
+####################################
+#
+# Enter etching virtual enrironment
+#
+
+
+ETCHING_VENV=${ETCHING_HOME}/bin/etching_venv
+if [ ! -f ${ETCHING_VENV} ]
+then
+    echo "ERROR!!! We cannot find etching_venv in ${ETCHING_BIN}."
+    echo ${ETCHING_VENV}
     exit -1
 fi
-ETCHING_HOME=$(ABS_PATH $ETCHING_HOME)
+
+
+echo
+echo "# Load virtual environment"
+cmd="source ${ETCHING_VENV}"
+echo $cmd
+eval $cmd
+
+
+# Check if ETCHING_VENV was loaded properly
+CHECK_ETCHING
+
 
 #############################
 #
 # Checking required options
 #
+first=$FIRST
+second=$SECOND
+bam=$BAM
 
 if [ ${#FIRST} != 0 ] && [ ${#SECOND} != 0 ]
 then
+    FIRST=$(ABS_PATH $FIRST)
+    SECOND=$(ABS_PATH $SECOND)
     if [ ! -f ${FIRST} ]
     then
 	echo "ERROR!!! Ther is no ${FIRST}".
@@ -448,7 +515,7 @@ then
         echo "ERROR!!! Ther is no ${SECOND}".
 	exit 3
     fi
-
+    
     if [ ${#BAM} != 0 ]
     then
 	echo "ERROR!!! Do not use -1, -2 and -b at a same time."
@@ -467,6 +534,7 @@ then
 	exit 6
     fi
 else
+    BAM=$(ABS_PATH $BAM)
     if [ ${#BAM} != 0 ]
     then
 	if [ ! -f ${BAM} ]
@@ -539,8 +607,13 @@ fi
 # Checking control sample options
 #
 
+first_cont=$FIRST_CONT
+second_cont=$SECOND_CONT
+bam_cont=$BAM_CONT
+
 if [ ${#FIRST_CONT} != 0 ]
 then
+    FIRST_CONT=$(ABS_PATH $FIRST_CONT)
     if [ ! -f ${FIRST_CONT} ]
     then
 	echo "ERROR!!! Ther is no ${FIRST_CONT}".
@@ -550,6 +623,7 @@ fi
 
 if [ ${#SECOND_CONT} != 0 ]
 then
+    SECOND_CONT=$(ABS_PATH $SECOND_CONT)
     if [ ! -f ${SECOND_CONT} ]
     then
 	echo "ERROR!!! Ther is no ${SECOND_CONT}".
@@ -560,6 +634,7 @@ fi
 
 if [ ${#BAM_CONT} != 0 ]
 then
+    BAM_CONT=$(ABS_PATH $BAM_CONT)
     if [ ! -f ${BAM_CONT} ]
     then
         echo "ERROR!!! Ther is no ${BAM_CONT}".
@@ -598,29 +673,6 @@ then
     ALGOR="-X"
 fi
 
-
-#############################
-#
-# Convert to absolute path if relative path
-#
-if [ ${#ETCHING_HOME} == 0 ]
-then
-    echo "ERROR!!! You did not set ETCHING_HOME, which is /path/to/ETCHING/."
-    exit -1
-fi
-PRESENT_PATH=$PWD 
-
-####################################
-#
-# Enter etching virtual enrironment
-#
-
-echo
-echo "# Load virtual environment"
-echo "ETCHING_HOME=$ETCHING_HOME"
-cmd="source \${ETCHING_HOME}/bin/etching_venv"
-echo $cmd
-eval $cmd
 
 #############################
 # 
@@ -662,41 +714,6 @@ do
     fi
 done
 
-
-#############################
-#
-# CHECKING REQUIRED PROGRAMS
-#
-for i in extract_BP_read somatic_filter target_filter cut_by_score etching etching_caller etching_fg_identifier etching_filter etching_sorter etching_typer fastq_check kmc kmc_dump kmc_tools kmer_filter match_pair read_collector scorer_RandomForest scorer_XGBoost sort_fastq_mem_eff 
-do
-    CHECK=$(which ${i})
-    
-    if [ ${#CHECK} == 0 ]
-    then
-	echo "ERROR!!! We cannot find ${i}. Please check ETCHING_HOME."
-	echo "."
-	exit 19
-    fi
-
-done
-
-
-
-#############################
-#
-# CHECKING REQUIRED LD_LIBRARY_PATH
-#
-for i in etching_caller etching_sorter etching_fg_identifier read_collector fastq_check
-do
-    CHECK=$(${i} 2> library_check.txt)
-    CHECK=$(cat library_check.txt)
-    if [ ${#CHECK} != 0 ]
-    then
-	cat library_check.txt
-	echo "Please check LD_LIBRARY_PATH"
-	exit 20
-    fi
-done
 
 
 for i in kmc kmc_tools kmc_dump
@@ -748,24 +765,8 @@ fi
 
 #######################################################################################
 #
-# make path absolute
+# make absolute path for filter, annotation, genome, and kmer table
 #
-
-first=$FIRST
-second=$SECOND
-bam=$BAM
-
-FIRST=$(ABS_PATH $FIRST)
-SECOND=$(ABS_PATH $SECOND)
-BAM=$(ABS_PATH $BAM)
-
-first_cont=$FIRST_CONT
-second_cont=$SECOND_CONT
-bam_cont=$BAM_CONT
-
-FIRST_CONT=$(ABS_PATH $FIRST_CONT)
-SECOND_CONT=$(ABS_PATH $SECOND_CONT)
-BAM_CONT=$(ABS_PATH $BAM_CONT)
 
 FILTER_PRE=${FILTER}.kmc_pre
 FILTER_SUF=${FILTER}.kmc_suf
@@ -1048,31 +1049,51 @@ fi
 #
 # SORTER
 #
-echo
-echo "# [SORTER]"
-DATE="# [$(date)]";echo ${DATE}
 
-cmd="etching_sorter -i ${TF_PREFIX}.BND.vcf -o ${TF_PREFIX}.BND -c $CUTOFF -m ${ML_PATH} $ALGOR -p ${ML_PREFIX} > ${LOGDIR}/ETCHING_SORTER.log"
-echo $cmd
-eval $cmd 
+SVNUMBER_CALLER=$(grep -v "#" ${TF_PREFIX}.SV.vcf | wc -l | awk '{print $1}')
 
-STATUS=$(echo $?)
-if (( STATUS != 0 ))
+OUTPUT_1=""
+OUTPUT_2=""
+OUTPUT_3=""
+OUTPUT_4=""
+
+if (( SVNUMBER_CALLER == 0 ))
 then
-    echo "Failed: ${STATUS}: $cmd"
-    exit 30
-fi
-
-
-cmd="etching_sorter -i ${TF_PREFIX}.SV.vcf -o ${TF_PREFIX}.SV -c $CUTOFF -m ${ML_PATH} $ALGOR -p ${ML_PREFIX} >> ${LOGDIR}/ETCHING_SORTER.log"
-echo $cmd
-eval $cmd 
-
-STATUS=$(echo $?)
-if (( STATUS != 0 ))
-then
-    echo "Failed: ${STATUS}: $cmd"
-    exit 31
+    OUTPUT_1="${TF_PREFIX}.BND.vcf"
+    OUTPUT_2="${TF_PREFIX}.SV.vcf"
+    OUTPUT_3=""
+    OUTPUT_4=""
+else
+    echo
+    echo "# [SORTER]"
+    DATE="# [$(date)]";echo ${DATE}
+    
+    cmd="etching_sorter -i ${TF_PREFIX}.BND.vcf -o ${TF_PREFIX}.BND -c $CUTOFF -m ${ML_PATH} $ALGOR -p ${ML_PREFIX} > ${LOGDIR}/ETCHING_SORTER.log"
+    echo $cmd
+    eval $cmd 
+    
+    STATUS=$(echo $?)
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit 30
+    fi
+    
+    
+    cmd="etching_sorter -i ${TF_PREFIX}.SV.vcf -o ${TF_PREFIX}.SV -c $CUTOFF -m ${ML_PATH} $ALGOR -p ${ML_PREFIX} >> ${LOGDIR}/ETCHING_SORTER.log"
+    echo $cmd
+    eval $cmd 
+    
+    STATUS=$(echo $?)
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit 31
+    fi
+    OUTPUT_1="${TF_PREFIX}.BND.unfiltered.vcf"
+    OUTPUT_2="${TF_PREFIX}.SV.unfiltered.vcf"
+    OUTPUT_3="${TF_PREFIX}.BND.final.vcf"
+    OUTPUT_4="${TF_PREFIX}.SV.final.vcf"
 fi
 
 #######################################################################################################################
@@ -1080,7 +1101,10 @@ fi
 # Remove miscall
 #
 
+SVNUMBER_SORTER=$(grep -v "#" ${TF_PREFIX}.SV.vcf | wc -l | awk '{print $1}')
+
 CHECK=
+
 if [ ${#FIRST_CONT} != 0 ] && [ ${#SECOND_CONT} != 0 ]
 then
     CHECK=1
@@ -1091,152 +1115,155 @@ then
     CHECK=1
 fi
 
-if [[ $CHECK -eq 1 ]]
+if (( SVNUMBER_CALLER * SVNUMBER_SORTER > 0 ))
 then
-    if [ ${REMOVE_MISCALL} -eq 1 ]
+    if [[ $CHECK -eq 1 ]]
     then
-
-	cmd="extract_BP_read ${TF_PREFIX}.BND.etching_sorter.vcf ${PREFIX}.sort.bam ${TF_PREFIX}.BP_reads.fastq 2>> ${LOGDIR}/ETCHING_SORTER.log"
-	echo $cmd
-	eval $cmd
-
-	STATUS=$(echo $?)
-	if (( STATUS != 0 ))
+	if [ ${REMOVE_MISCALL} -eq 1 ]
 	then
-	    echo "Failed: ${STATUS}: $cmd"
-	    exit 31
-	fi
-
-	cmd="mkdir -p tmp_BP_reads_xxx"
-	echo $cmd
-	eval $cmd
-
-	STATUS=$(echo $?)
-	if (( STATUS != 0 ))
-	then
-	    echo "Failed: ${STATUS}: $cmd"
-	    exit 32
-	fi
-
-	MAXCOUNT=255
-	if (( MISCALL_KMERCUTOFF > 255 ))
-	then
-	    MAXCOUNT=$MISCALL_KMERCUTOFF
-	fi
-
-	cmd="kmc -t${THREADS} -cs${MAXCOUNT} -ci${MISCALL_KMERCUTOFF} -k31 -v -fq ${TF_PREFIX}.BP_reads.fastq ${TF_PREFIX}.BP_reads tmp_BP_reads_xxx >> ${LOGDIR}/ETCHING_SORTER.log 2>&1"
-	echo $cmd
-	eval $cmd
-
-	STATUS=$(echo $?)
-	if (( STATUS != 0 ))
-	then
-	    echo "Failed: ${STATUS}: $cmd"
-	    exit 33
-	fi
-
-	cmd="rm -rf ${TF_PREFIX}.BP_reads.fastq tmp_BP_reads_xxx"
-	echo $cmd
-	eval $cmd
-
-	STATUS=$(echo $?)
-	if (( STATUS != 0 ))
-	then
-	    echo "Failed: ${STATUS}: $cmd"
-	    exit 34
-	fi
-	
-	cmd="kmc_dump ${TF_PREFIX}.BP_reads ${TF_PREFIX}.BP_reads.kmer_table.txt"
-	echo $cmd
-	eval $cmd
-
-	STATUS=$(echo $?)
-	if (( STATUS != 0 ))
-	then
-	    echo "Failed: ${STATUS}: $cmd"
-	    exit 35
-	fi
-
-	#############################################################################################################################################################################
-
-	if [ ${#FIRST_CONT} != 0 ] && [ ${#SECOND_CONT} != 0 ]
-	then
-	    INPUT="-1 ${FIRST_CONT} -2 ${SECOND_CONT}"
-	else 
-	    if [ ${#BAM_CONT} != 0 ]
+	    
+	    cmd="extract_BP_read ${TF_PREFIX}.BND.etching_sorter.vcf ${PREFIX}.sort.bam ${TF_PREFIX}.BP_reads.fastq 2>> ${LOGDIR}/ETCHING_SORTER.log"
+	    echo $cmd
+	    eval $cmd
+	    
+	    STATUS=$(echo $?)
+	    if (( STATUS != 0 ))
 	    then
-		INPUT="-b ${BAM_CONT} -F "
+		echo "Failed: ${STATUS}: $cmd"
+		exit 31
 	    fi
+
+	    cmd="mkdir -p tmp_BP_reads_xxx"
+	    echo $cmd
+	    eval $cmd
+
+	    STATUS=$(echo $?)
+	    if (( STATUS != 0 ))
+	    then
+		echo "Failed: ${STATUS}: $cmd"
+		exit 32
+	    fi
+
+	    MAXCOUNT=255
+	    if (( MISCALL_KMERCUTOFF > 255 ))
+	    then
+		MAXCOUNT=$MISCALL_KMERCUTOFF
+	    fi
+
+	    cmd="kmc -t${THREADS} -cs${MAXCOUNT} -ci${MISCALL_KMERCUTOFF} -k31 -v -fq ${TF_PREFIX}.BP_reads.fastq ${TF_PREFIX}.BP_reads tmp_BP_reads_xxx >> ${LOGDIR}/ETCHING_SORTER.log 2>&1"
+	    echo $cmd
+	    eval $cmd
+
+	    STATUS=$(echo $?)
+	    if (( STATUS != 0 ))
+	    then
+		echo "Failed: ${STATUS}: $cmd"
+		exit 33
+	    fi
+
+	    cmd="rm -rf ${TF_PREFIX}.BP_reads.fastq tmp_BP_reads_xxx"
+	    echo $cmd
+	    eval $cmd
+
+	    STATUS=$(echo $?)
+	    if (( STATUS != 0 ))
+	    then
+		echo "Failed: ${STATUS}: $cmd"
+		exit 34
+	    fi
+	    
+	    cmd="kmc_dump ${TF_PREFIX}.BP_reads ${TF_PREFIX}.BP_reads.kmer_table.txt"
+	    echo $cmd
+	    eval $cmd
+
+	    STATUS=$(echo $?)
+	    if (( STATUS != 0 ))
+	    then
+		echo "Failed: ${STATUS}: $cmd"
+		exit 35
+	    fi
+
+	    #############################################################################################################################################################################
+
+	    if [ ${#FIRST_CONT} != 0 ] && [ ${#SECOND_CONT} != 0 ]
+	    then
+		INPUT="-1 ${FIRST_CONT} -2 ${SECOND_CONT}"
+	    else 
+		if [ ${#BAM_CONT} != 0 ]
+		then
+		    INPUT="-b ${BAM_CONT} -F "
+		fi
+	    fi
+
+	    cmd="etching_filter ${INPUT} --kmer-table ${TF_PREFIX}.BP_reads.kmer_table.txt -p ${TF_PREFIX}.BP_reads -t ${THREADS} -g ${GENOME} >> ${LOGDIR}/ETCHING_SORTER.log 2>&1"
+	    echo $cmd
+	    eval $cmd
+
+	    STATUS=$(echo $?)
+	    if (( STATUS != 0 ))
+	    then
+		echo "Failed: ${STATUS}: $cmd"
+		exit 36
+	    fi
+
+	    #############################################################################################################################################################################
+
+	    cmd="etching_caller -B -b ${TF_PREFIX}.BP_reads.sort.bam -o ${TF_PREFIX}.miscall -g ${GENOME} >> ${LOGDIR}/ETCHING_SORTER.log 2>&1 "
+	    echo $cmd
+	    eval $cmd
+
+	    STATUS=$(echo $?)
+	    if (( STATUS != 0 ))
+	    then
+		echo "Failed: ${STATUS}: $cmd"
+		exit 37
+	    fi
+
+	    cmd="somatic_filter ${TF_PREFIX}.BND.etching_sorter.vcf ${TF_PREFIX}.miscall.BND.vcf ${TF_PREFIX}.BP_reads.sort.bam > ${TF_PREFIX}.BND.etching_sorter.SF.vcf 2>> ${LOGDIR}/ETCHING_SORTER.log"
+	    echo $cmd
+	    eval $cmd 
+
+	    STATUS=$(echo $?)
+	    if (( STATUS != 0 ))
+	    then
+		echo "Failed: ${STATUS}: $cmd"
+		exit 38
+	    fi
+
+	    cmd="somatic_filter ${TF_PREFIX}.SV.etching_sorter.vcf ${TF_PREFIX}.miscall.BND.vcf ${TF_PREFIX}.BP_reads.sort.bam > ${TF_PREFIX}.SV.etching_sorter.SF.vcf 2>> ${LOGDIR}/ETCHING_SORTER.log"
+	    echo $cmd
+	    eval $cmd 
+
+	    STATUS=$(echo $?)
+	    if (( STATUS != 0 ))
+	    then
+		echo "Failed: ${STATUS}: $cmd"
+		exit 39
+	    fi
+	    
+	    cmd="ln -sf ${TF_PREFIX}.BND.etching_sorter.SF.vcf ${PREFIX}.BND.final.vcf" ; echo $cmd ; eval $cmd
+	    cmd="ln -sf ${TF_PREFIX}.SV.etching_sorter.SF.vcf ${PREFIX}.SV.final.vcf" ; echo $cmd ; eval $cmd
+	else
+	    cmd="ln -sf ${TF_PREFIX}.BND.etching_sorter.vcf ${PREFIX}.BND.final.vcf" ; echo $cmd ; eval $cmd
+	    cmd="ln -sf ${TF_PREFIX}.SV.etching_sorter.vcf ${PREFIX}.SV.final.vcf" ; echo $cmd ; eval $cmd
 	fi
 
-	cmd="etching_filter ${INPUT} --kmer-table ${TF_PREFIX}.BP_reads.kmer_table.txt -p ${TF_PREFIX}.BP_reads -t ${THREADS} -g ${GENOME} >> ${LOGDIR}/ETCHING_SORTER.log 2>&1"
-	echo $cmd
-	eval $cmd
-
-	STATUS=$(echo $?)
-	if (( STATUS != 0 ))
+	if [ ! -f ${PREFIX}.SV.unfiltered.vcf ]
 	then
-	    echo "Failed: ${STATUS}: $cmd"
-	    exit 36
+	    cmd="ln -sf ${TF_PREFIX}.SV.unfiltered.vcf ${PREFIX}.SV.unfiltered.vcf" ; echo $cmd ; eval $cmd
 	fi
 
-	#############################################################################################################################################################################
-
-	cmd="etching_caller -B -b ${TF_PREFIX}.BP_reads.sort.bam -o ${TF_PREFIX}.miscall -g ${GENOME} >> ${LOGDIR}/ETCHING_SORTER.log 2>&1 "
-	echo $cmd
-	eval $cmd
-
-	STATUS=$(echo $?)
-	if (( STATUS != 0 ))
+	if [ ! -f ${PREFIX}.BND.unfiltered.vcf ]
 	then
-	    echo "Failed: ${STATUS}: $cmd"
-	    exit 37
+	    cmd="ln -sf ${TF_PREFIX}.BND.unfiltered.vcf ${PREFIX}.BND.unfiltered.vcf" ; echo $cmd ; eval $cmd
 	fi
 
-	cmd="somatic_filter ${TF_PREFIX}.BND.etching_sorter.vcf ${TF_PREFIX}.miscall.BND.vcf ${TF_PREFIX}.BP_reads.sort.bam > ${TF_PREFIX}.BND.etching_sorter.SF.vcf 2>> ${LOGDIR}/ETCHING_SORTER.log"
-	echo $cmd
-	eval $cmd 
-
-	STATUS=$(echo $?)
-	if (( STATUS != 0 ))
-	then
-	    echo "Failed: ${STATUS}: $cmd"
-	    exit 38
-	fi
-
-	cmd="somatic_filter ${TF_PREFIX}.SV.etching_sorter.vcf ${TF_PREFIX}.miscall.BND.vcf ${TF_PREFIX}.BP_reads.sort.bam > ${TF_PREFIX}.SV.etching_sorter.SF.vcf 2>> ${LOGDIR}/ETCHING_SORTER.log"
-	echo $cmd
-	eval $cmd 
-
-	STATUS=$(echo $?)
-	if (( STATUS != 0 ))
-	then
-	    echo "Failed: ${STATUS}: $cmd"
-	    exit 39
-	fi
-	
-	cmd="ln -sf ${TF_PREFIX}.BND.etching_sorter.SF.vcf ${PREFIX}.BND.final.vcf" ; echo $cmd ; eval $cmd
-	cmd="ln -sf ${TF_PREFIX}.SV.etching_sorter.SF.vcf ${PREFIX}.SV.final.vcf" ; echo $cmd ; eval $cmd
-    else
-	cmd="ln -sf ${TF_PREFIX}.BND.etching_sorter.vcf ${PREFIX}.BND.final.vcf" ; echo $cmd ; eval $cmd
-	cmd="ln -sf ${TF_PREFIX}.SV.etching_sorter.vcf ${PREFIX}.SV.final.vcf" ; echo $cmd ; eval $cmd
+	OUTPUT_1="${PREFIX}.BND.unfiltered.vcf"
+	OUTPUT_2="${PREFIX}.SV.unfiltered.vcf"
+	OUTPUT_3="${PREFIX}.BND.final.vcf"
+	OUTPUT_4="${PREFIX}.SV.final.vcf"
+	echo
     fi
-
-    if [ ! -f ${PREFIX}.SV.unfiltered.vcf ]
-    then
-	cmd="ln -sf ${TF_PREFIX}.SV.unfiltered.vcf ${PREFIX}.SV.unfiltered.vcf" ; echo $cmd ; eval $cmd
-    fi
-
-    if [ ! -f ${PREFIX}.BND.unfiltered.vcf ]
-    then
-	cmd="ln -sf ${TF_PREFIX}.BND.unfiltered.vcf ${PREFIX}.BND.unfiltered.vcf" ; echo $cmd ; eval $cmd
-    fi
-
-    OUTPUT_1="${PREFIX}.BND.unfiltered.vcf"
-    OUTPUT_2="${PREFIX}.SV.unfiltered.vcf"
-    OUTPUT_3="${PREFIX}.BND.final.vcf"
-    OUTPUT_4="${PREFIX}.SV.final.vcf"
-    echo
 fi
 
 #######################################################################################################################
@@ -1244,7 +1271,10 @@ fi
 # FG_IDENTIFIER
 #
 
-if [ ${#annotation} != 0 ]
+OUTPUT_5=""
+
+
+if [ ${#annotation} != 0 ] && [ -f ./${OUTPUT_3} ]
 then
 
     OPTIONS=
@@ -1284,11 +1314,17 @@ then
 	echo "Failed: ${STATUS}: $cmd"
 	exit 40
     fi
-
+    OUTPUT_5=${PREFIX}.fusion_gene.txt
 fi
+
+#######################################################################################################################
+#
+# Remove k-mer DB if it was supposed to be removed
+#
 
 if [[ ${#STORE_KMC} -eq 0 ]]
 then
+    echo 
     echo "# [Remove k-mer database to save storage]"
     cmd="rm -f *kmc_pre *kmc_suf"
     echo $cmd
@@ -1303,6 +1339,11 @@ then
 
 fi
 
+#######################################################################################################################
+#
+# return to previous directory
+#
+
 cmd="cd ${PREDIR}"
 echo $cmd
 eval $cmd
@@ -1314,7 +1355,6 @@ then
 fi
 
 #######################################################################################################################
-#############################
 #
 # COPY RESULTS
 #
@@ -1322,40 +1362,47 @@ fi
 echo
 echo "# [RESULTS]"
 
-cmd="cp ${WORKDIR}/${OUTPUT_1} ${WORKDIR}/${OUTPUT_2} ${WORKDIR}/${OUTPUT_3} ${WORKDIR}/${OUTPUT_4} ./"
-echo $cmd
-eval $cmd
-STATUS=$(echo $?)
-if (( STATUS != 0 ))
-then
-    echo "Failed: ${STATUS}: $cmd"
-    exit 43
-fi
 
-if [ -f ${WORKDIR}/${PREFIX}.fusion_gene.txt ]
-then
-    cmd="cp ${WORKDIR}/${PREFIX}.fusion_gene.txt ./"
-    echo $cmd
-    eval $cmd
-    STATUS=$(echo $?)
-    if (( STATUS != 0 ))
+for i in $OUTPUT_1 $OUTPUT_2 $OUTPUT_3 $OUTPUT_4 $OUTPUT_5
+do
+    if [ -f ${WORKDIR}/${i} ]
     then
-	echo "Failed: ${STATUS}: $cmd"
-	exit 44
+	cmd="cp ${WORKDIR}/${OUTPUT_}${i} ./"
+	echo $cmd
+	eval $cmd
+	STATUS=$(echo $?)
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit 43
+	fi
     fi
-fi
+done
+
 
 echo
 
-echo "# [Final results]"
-echo "# ${OUTPUT_1}"
-echo "# ${OUTPUT_2}"
-echo "# ${OUTPUT_3}"
-echo "# ${OUTPUT_4}"
+LN1=$(grep -v "#" ${OUTPUT_1} | wc -l | awk '{print $1}')
+LN2=$(grep -v "#" ${OUTPUT_2} | wc -l | awk '{print $1}')
 
-if [ -f ${PREFIX}.fusion_gene.txt ]
+echo "# [Final results]"
+echo "# ${OUTPUT_1} : Number of detected SVs : $LN1"
+echo "# ${OUTPUT_2} : Number of detected SVs : $LN2"
+if [ -f ./${OUTPUT_3} ] 
 then
-    echo "# ${PREFIX}.fusion_gene.txt"
+    LN3=$(grep -v "#" ${OUTPUT_3} | wc -l | awk '{print $1}')
+    echo "# ${OUTPUT_3} : Number of detected SVs : $LN3"
+fi
+if [ -f ./${OUTPUT_4} ] 
+then
+    LN4=$(grep -v "#" ${OUTPUT_4} | wc -l | awk '{print $1}')
+    echo "# ${OUTPUT_4} : Number of detected SVs : $LN4"
+fi
+
+if [ -f ./${OUTPUT_5} ]
+then
+    LNfg=$(grep -v "#" ${OUTPUT_5} | wc -l | awk '{print $1}')
+    echo "# ${OUTPUT_5} : Number of detected fusion-genes : $LNfg"
 fi
 
 echo

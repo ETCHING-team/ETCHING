@@ -1,4 +1,8 @@
-### 1.3.7c
+### 1.3.7
+
+Debug to stop if etching_caller predicted no SV, or etching_sorter removed all SVs.
+
+### 1.3.6c
 
 virtual environment is implemented in etching pipeline to solve dependencies.
 

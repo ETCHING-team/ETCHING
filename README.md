@@ -1,6 +1,6 @@
 # ETCHING
 
-### Version 1.3.6c
+### Version 1.3.7
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
@@ -15,6 +15,11 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
 
 ## Change history of recent versions
 
+#### v1.3.7
+
+Debug to stop if etching_caller predicted no SV, or etching_sorter removed all SVs.
+
+
 #### v1.3.6
 
 --target-filter and --miscall-kmer-cutoff options were added.
@@ -26,11 +31,9 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
 **c**. Virtual environment is implemented to solve dependencies. Simple installation guide.
 
 
-
 #### v1.3.5
 
 Bug fixed (etching line 1283)
-
 
 
 #### v1.3.4
@@ -39,10 +42,7 @@ Debug ```etching``` and ```etching_filter```
 They did not run properly when ```-o``` option was not used.
 
 
-
 *See CHANGE.md for older updates.*
-
-
 
 
 # Requirements
@@ -215,7 +215,7 @@ You can see like this
 
 |REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
 |:---|:---|:---|:---|:---|
-|etching|1.3.6|16647cac9a99|40 hours ago|4.3 GB|
+|etching|1.3.7|16647cac9a99|40 hours ago|4.3 GB|
 
 ### Demo for docker user
 
@@ -228,9 +228,9 @@ tar zxvf DEMO.tar.gz
 
 Run ETCHING with docker
 ```bash
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.6 etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_1 -t 8
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.7 etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_1 -t 8
 ```
-Here, ```etching:1.3.6``` is ```REPOSITORY``` and ```TAG``` of ETCHING docker image.
+Here, ```etching:1.3.7``` is ```REPOSITORY``` and ```TAG``` of ETCHING docker image.
 
 Replace ```/path/to/DEMO``` with ```/your/data/path/```.
 
@@ -239,7 +239,7 @@ Note: Keep ```/work/``` in the above command line.
 
 Alternatively, you can run ETCHING inside docker container
 ```bash
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.6 /bin/bash
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.7 /bin/bash
 
 etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_2 -t 8
 ```

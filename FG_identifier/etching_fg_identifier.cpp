@@ -102,14 +102,14 @@ int main ( int argc , char ** argv ){
   }
   else {
     std::cout << "ERROR!!! Please check input file: " << infile << "\n";
-    return 0;
+    return -1;
   }
   fin.close();
 
   fin.open( annotation.c_str() );
   if ( ! fin.good() ){
     std::cout << "ERROR!!! Please check input file: " << annotation << "\n";
-    return 0;
+    return 1;
   }
   fin.close();
 
