@@ -1,6 +1,6 @@
 # ETCHING
 
-### Version 1.3.7
+### Version 1.3.7a
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
@@ -18,6 +18,8 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
 #### v1.3.7
 
 Debug to stop if etching_caller predicted no SV, or etching_sorter removed all SVs.
+
+**a**. Debug to exit if etching_filter stopped abnormally
 
 
 #### v1.3.6
@@ -202,10 +204,10 @@ docker
 
 ```bash
 # Download ETCHING docker image
-wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.3.7.docker.saved.tar
+wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.3.7a.docker.saved.tar
 
 # Load the image
-docker load -i ETCHING_v1.3.7.docker.saved.tar
+docker load -i ETCHING_v1.3.7a.docker.saved.tar
 
 # Check the image
 docker images
@@ -215,7 +217,7 @@ You can see like this
 
 |REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
 |:---|:---|:---|:---|:---|
-|etching|v1.3.7|63ffc48504f0|40 hours ago|3.26GB|
+|etching|v1.3.7a|63ffc48504f0|40 hours ago|3.26GB|
 
 ### Demo for docker user
 
@@ -228,9 +230,9 @@ tar zxvf DEMO.tar.gz
 
 Run ETCHING with docker
 ```bash
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.7 etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_1 -t 8
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.7a etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_1 -t 8
 ```
-Here, ```etching:1.3.7``` is ```REPOSITORY``` and ```TAG``` of ETCHING docker image.
+Here, ```etching:1.3.7a``` is ```REPOSITORY``` and ```TAG``` of ETCHING docker image.
 
 Replace ```/path/to/DEMO``` with ```/your/data/path/```.
 
@@ -239,7 +241,7 @@ Note: Keep ```/work/``` in the above command line.
 
 Alternatively, you can run ETCHING inside docker container
 ```bash
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.7 /bin/bash
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.3.7a /bin/bash
 
 etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -o example_2 -t 8
 ```

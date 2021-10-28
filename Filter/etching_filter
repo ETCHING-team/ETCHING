@@ -173,7 +173,7 @@ while [ "$1" != "" ]; do
 	    ;;
 
         -h | --help ) USAGE
-            exit 0
+            exit -1
             ;;
 
 	-S | --samtools ) shift
@@ -458,6 +458,13 @@ then
     cmd="cat filter_fq.list filter_bam.list > filter_seq.list"
     echo $cmd
     eval $cmd
+
+    STATUS=$(echo $?)
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit -1
+    fi
     
     KMC_DIR=$(which ${KMC} | sed 's/\/kmc$//g')
 
@@ -469,9 +476,14 @@ then
 	cmd="${KMER_FILTER} -i sample.list -c filter_seq.list -a $FILTER -p $PREFIX -t ${THREADS} -l ${KMER_SIZE} -T ${DATATYPE} -M $MAXK ${CUTOFF} -D ${KMC_DIR}"
     fi
     echo $cmd
-    eval $cmd &
+    eval $cmd
 
-    wait 
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit -1
+    fi
+
     KMER_TABLE=${PREFIX}.kmer_table.txt
 else
     echo "[Skip kmer_filter and use ${KMER_TABLE}]"
@@ -491,12 +503,23 @@ then
     cmd="${READ_COLLECTOR} -f $KMER_TABLE -1 ${FIRST} -2 ${SECOND} -p ${PREFIX} -t ${THREADS} -l ${KMER_SIZE}"
     echo $cmd
     eval $cmd 2> /dev/null
-
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit -1
+    fi
+    
     echo 
     echo "[Remove unmatched reads]"
     cmd="${MATCH_PAIR} ${PREFIX}_1.fastq ${PREFIX}_2.fastq"
     echo $cmd
     eval $cmd
+
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit -1
+    fi
     
     cmd="mv ${PREFIX}_1.fastq_idmatched ${PREFIX}_1.fastq"
     echo $cmd
@@ -520,6 +543,11 @@ then
     cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq 2> logs/${PREFIX}_bwa_mem.log | samtools view -@ ${HALF} -Sbh - > ${PREFIX}.bam"
     echo $cmd
     eval $cmd
+    if (( STATUS != 0 ))
+    then
+	echo "Failed: ${STATUS}: $cmd"
+	exit -1
+    fi
 
 else
     #############################
@@ -536,6 +564,12 @@ else
 	cmd="ln -s ${BAM_INPUT} bam_input.bam"
 	echo $cmd
 	eval $cmd
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit -1
+	fi
+
 	cmd="${READ_COLLECTOR} -f $KMER_TABLE -b bam_input.bam -p ${PREFIX} -t $THREADS -l ${KMER_SIZE} "
 	if [ ${FAST_BAM} == 1 ]
 	then
@@ -543,6 +577,11 @@ else
 	fi
 	echo $cmd
 	eval $cmd 2> /dev/null
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit -1
+	fi
 
     else
 	echo
@@ -561,31 +600,58 @@ else
 	cmd="${SAMTOOLS} fastq -n $BAM_INPUT -1 ${BAM_PREFIX}_1.fastq -2 ${BAM_PREFIX}_2.fastq -@ ${THREADS}"
 	echo $cmd
 	eval $cmd
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit -1
+	fi
 
-	cmd="${READ_COLLECTOR} -f $KMER_TABLE -1 ${BAM_PREFIX}_1.fastq -p ${BAM_PREFIX}_1.filtered -t ${HALF} > logs/read_collector_1.log"
-	echo $cmd
-	eval $cmd 2> /dev/null &
-	cmd="${READ_COLLECTOR} -f $KMER_TABLE -1 ${BAM_PREFIX}_2.fastq -p ${BAM_PREFIX}_2.filtered -t ${HALF} > logs/read_collector_2.log"
-	echo $cmd
-	eval $cmd 2> /dev/null &
+	cmd1="${READ_COLLECTOR} -f $KMER_TABLE -1 ${BAM_PREFIX}_1.fastq -p ${BAM_PREFIX}_1.filtered -t ${HALF} > logs/read_collector_1.log"
+	echo $cmd1
+	eval $cmd1 2> /dev/null &
+	cmd2="${READ_COLLECTOR} -f $KMER_TABLE -1 ${BAM_PREFIX}_2.fastq -p ${BAM_PREFIX}_2.filtered -t ${HALF} > logs/read_collector_2.log"
+	echo $cmd2
+	eval $cmd2 2> /dev/null &
 	wait
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd1"
+	    echo "Failed: ${STATUS}: $cmd2"
+	    exit -1
+	fi
 
 	cmd="gawk 'NR % 4 == 1' ${BAM_PREFIX}_1.filtered.fastq ${BAM_PREFIX}_2.filtered.fastq > ${BAM_PREFIX}.filtered.id"
 	echo $cmd
 	eval $cmd
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit -1
+	fi
 	
 	cmd="rm -f ${BAM_PREFIX}_1.filtered.fastq ${BAM_PREFIX}_2.filtered.fastq"
 	echo $cmd
 	eval $cmd	
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit -1
+	fi
 
-	cmd="${READ_COLLECTOR} -f ${BAM_PREFIX}.filtered.id -1 ${BAM_PREFIX}_1.fastq -t $HALF -p ${PREFIX}_1.filtered >> logs/read_collector_1.log"
-	echo $cmd
-	eval $cmd 2> /dev/null &
-	cmd="${READ_COLLECTOR} -f ${BAM_PREFIX}.filtered.id -1 ${BAM_PREFIX}_2.fastq -t $HALF -p ${PREFIX}_2.filtered >> logs/read_collector_2.log"
-	echo $cmd
-	eval $cmd 2> /dev/null &
+	cmd1="${READ_COLLECTOR} -f ${BAM_PREFIX}.filtered.id -1 ${BAM_PREFIX}_1.fastq -t $HALF -p ${PREFIX}_1.filtered >> logs/read_collector_1.log"
+	echo $cmd1
+	eval $cmd1 2> /dev/null &
+	cmd2="${READ_COLLECTOR} -f ${BAM_PREFIX}.filtered.id -1 ${BAM_PREFIX}_2.fastq -t $HALF -p ${PREFIX}_2.filtered >> logs/read_collector_2.log"
+	echo $cmd2
+	eval $cmd2 2> /dev/null &
 	wait
-
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd1"
+	    echo "Failed: ${STATUS}: $cmd2"
+	    exit -1
+	fi
+	
 	cmd="rm -f ${BAM_PREFIX}_1.fastq ${BAM_PREFIX}_2.fastq"
 	echo $cmd
 	eval $cmd
@@ -594,6 +660,11 @@ else
 	cmd="${MATCH_PAIR} ${PREFIX}_1.filtered.fastq ${PREFIX}_2.filtered.fastq"
 	echo $cmd
 	eval $cmd
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit -1
+	fi
 
 	cmd="mv ${PREFIX}_1.filtered.fastq_idmatched ${PREFIX}_1.filtered.fastq"
 	echo $cmd
@@ -608,13 +679,19 @@ else
 	# Sort
 	#
 
-	cmd="sort_fastq_mem_eff ${PREFIX}_1.filtered.fastq ${PREFIX}_1.sort.fastq 4"
-	echo $cmd
-	eval $cmd &
-	cmd="sort_fastq_mem_eff ${PREFIX}_2.filtered.fastq ${PREFIX}_2.sort.fastq 4"
-	echo $cmd
-	eval $cmd &
+	cmd1="sort_fastq_mem_eff ${PREFIX}_1.filtered.fastq ${PREFIX}_1.sort.fastq 4"
+	echo $cmd1
+	eval $cmd1 &
+	cmd2="sort_fastq_mem_eff ${PREFIX}_2.filtered.fastq ${PREFIX}_2.sort.fastq 4"
+	echo $cmd2
+	eval $cmd2 &
 	wait 
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd1"
+	    echo "Failed: ${STATUS}: $cmd2"
+	    exit -1
+	fi
 
 	cmd="rm -f ${PREFIX}_1.filtered.fastq ${PREFIX}_2.filtered.fastq"
 	echo $cmd
@@ -641,6 +718,11 @@ else
 	cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq 2> logs/${PREFIX}_bwa_mem.log | samtools view -Sbh -@ ${HALF} - > ${PREFIX}.bam"
 	echo $cmd
 	eval $cmd
+	if (( STATUS != 0 ))
+	then
+	    echo "Failed: ${STATUS}: $cmd"
+	    exit -1
+	fi
 
     fi
 fi    
@@ -656,6 +738,11 @@ else
 fi
 echo $cmd
 eval $cmd 2> /dev/null
+if (( STATUS != 0 ))
+then
+    echo "Failed: ${STATUS}: $cmd"
+    exit -1
+fi
 
 cmd="rm -f ${PREFIX}.bam"
 echo $cmd
@@ -664,6 +751,11 @@ eval $cmd
 cmd="${SAMTOOLS} index ${PREFIX}.sort.bam"
 echo $cmd
 eval $cmd
+if (( STATUS != 0 ))
+then
+    echo "Failed: ${STATUS}: $cmd"
+    exit -1
+fi
 
 echo
 echo "[END]"

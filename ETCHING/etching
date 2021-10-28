@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="ETCHING_v1.3.7 (2021.10.26.)"
+VERSION="ETCHING_v1.3.7a (2021.10.29.)"
 MODEL_VERSION=1.3.0
 
 #--------------------------------------------------------------------
@@ -767,24 +767,31 @@ fi
 # make absolute path for filter, annotation, genome, and kmer table
 #
 
-FILTER_PRE=${FILTER}.kmc_pre
-FILTER_SUF=${FILTER}.kmc_suf
-
-if [ -d FILTER_PRE ]
-then
-    FILTER_PRE=$(ABS_PATH $FILTER_PRE)
-fi
-
-if [ -d FILTER_SUF ]
-then
-    FILTER_SUF=$(ABS_PATH $FILTER_SUF)
-fi
-
 if [ ${#FILTER} != 0 ]
 then
     filter=$FILTER
-    FILTER=$(ls ${FILTER_PRE} | sed 's/.kmc_pre$//1')
+
+    FILTER_PRE=${FILTER}.kmc_pre
+    FILTER_SUF=${FILTER}.kmc_suf
+
+    FILTER_PRE=$(ABS_PATH $FILTER_PRE)
+    FILTER_SUF=$(ABS_PATH $FILTER_SUF)
+
+    if [ ! -f $FILTER_PRE ]
+    then
+        echo "ERROR!!!"
+        echo "We cannot find $FILTER_PRE"
+        exit -1
+    fi
+
+    if [ ! -f $FILTER_SUF ]
+    then
+        echo "ERROR!!!"
+        echo "We cannot find $FILTER_SUF"
+	exit -1
+    fi
 fi
+
 
 if [[ $((${#first_cont} + ${#second_cont} + ${#bam_cont} + ${#FILTER})) -eq 0 ]]
 then 
