@@ -19,7 +19,7 @@ The demo is complete within 10 min on a desktop (AMD Ryzen 7 3700X 8-Core Proces
 
 Debug to stop if etching_caller predicted no SV, or etching_sorter removed all SVs.
 
-**a**. Debug to exit if etching_filter stopped abnormally
+**a**. Debug to exit if etching_filter stopped abnormally, and to set -f properly in etching (line 793-4)
 
 
 #### v1.3.6
