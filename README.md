@@ -57,7 +57,7 @@ They did not run properly when ```-o``` option was not used.
 
 * Required to compile
 
-  * gcc, g++ (>=4.7.0), make, Python3 (3.6, 3.7, or 3.8), pyenv
+  * gcc, g++ (>=4.7.0), make, Python3 (3.6, 3.7, or 3.8), pyenv, wget
   * python3-venv (Ubuntu/Debian/Mint)
 
 * Required to run
@@ -79,14 +79,14 @@ We prepared a simple guide for CentOS/Fedora or Ubuntu/Debian/Mint users. You ca
 ```bash
 # Required programs 
 sudo yum install -y epel-release # CentOS
-sudo yum install -y gcc gcc-c++ make bwa samtools
+sudo yum install -y gcc gcc-c++ make bwa samtools wget
 ```
 
 - #### Ubuntu/Debian/Mint (or other Debian-based distros)
 
 ```bash
 ## Required programs 
-sudo apt install -y gcc g++ make bwa samtools
+sudo apt install -y gcc g++ make bwa samtools wget
 
 # You can skip this if you will use pyenv.
 # Unless, python3-venv should be installed.
@@ -202,10 +202,10 @@ docker
 
 ```bash
 # Download ETCHING docker image
-wget http://big.hanyang.ac.kr/ETCHING/etching_docker.tar
+wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.3.7.docker.saved.tar
 
 # Load the image
-docker load -i etching_docker.tar
+docker load -i ETCHING_v1.3.7.docker.saved.tar
 
 # Check the image
 docker images
@@ -215,7 +215,7 @@ You can see like this
 
 |REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
 |:---|:---|:---|:---|:---|
-|etching|1.3.7|16647cac9a99|40 hours ago|4.3 GB|
+|etching|v1.3.7|63ffc48504f0|40 hours ago|3.26GB|
 
 ### Demo for docker user
 
