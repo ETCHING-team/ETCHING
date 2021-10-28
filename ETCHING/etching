@@ -459,7 +459,7 @@ echo ${DATE}
 
 if [ ${#ETCHING_HOME} == 0 ]
 then
-    ETCHING_BIN=$(ABS_PATH $0 | sed "s|etching$||")
+    ETCHING_BIN=$(ABS_PATH $0 | sed "s|/etching$||")
     ETCHING_HOME=${ETCHING_BIN}/..
 fi
 
