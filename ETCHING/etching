@@ -790,6 +790,8 @@ then
         echo "We cannot find $FILTER_SUF"
 	exit -1
     fi
+
+    FILTER=$(echo $FILTER_PRE | sed "s/.kmc_pre$//")
 fi
 
 
