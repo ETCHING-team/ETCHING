@@ -19,9 +19,9 @@ mv ${ETCHING_BIN}/activate ${ETCHING_BIN}/etching_venv
 mv ${ETCHING_BIN}/activate.csh ${ETCHING_BIN}/etching_venv.csh
 mv ${ETCHING_BIN}/activate.fish ${ETCHING_BIN}/etching_venv.fish
 
-sed -i "s/VIRTUAL_ENV=.*/VIRTUAL_ENV=${ETCHING_HOME}/g" ${ETCHING_BIN}/etching_venv
-sed -i "s/setenv VIRTUAL_ENV.*/setenv VIRTUAL_ENV ${ETCHING_HOME}/g" ${ETCHING_BIN}/etching_venv.csh
-sed -i "s/set -gx VIRTUAL_ENV.*/set -gx VIRTUAL_ENV ${ETCHING_HOME} \$PATH/g" ${ETCHING_BIN}/etching_venv.fish
+sed -i "s|VIRTUAL_ENV=.*|VIRTUAL_ENV=${ETCHING_HOME}|g" ${ETCHING_BIN}/etching_venv
+sed -i "s|setenv VIRTUAL_ENV.*|setenv VIRTUAL_ENV ${ETCHING_HOME}|g" ${ETCHING_BIN}/etching_venv.csh
+sed -i "s|set -gx VIRTUAL_ENV.*|set -gx VIRTUAL_ENV ${ETCHING_HOME} \$PATH|g" ${ETCHING_BIN}/etching_venv.fish
 
 echo "export LD_LIBRARY_PATH=${ETCHING_LIB}:\$LD_LIBRARY_PATH" >> ${ETCHING_BIN}/etching_venv
 echo "setenv LD_LIBRARY_PATH ${ETCHING_LIB}:\$LD_LIBRARY_PATH" >> ${ETCHING_BIN}/etching_venv.csh
