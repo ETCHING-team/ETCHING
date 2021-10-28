@@ -459,8 +459,7 @@ echo ${DATE}
 
 if [ ${#ETCHING_HOME} == 0 ]
 then
-    ETCHING_BIN=$(ABS_PATH $0 | sed "s|/etching||")
-    echo ${ETCHING_BIN}
+    ETCHING_BIN=$(ABS_PATH $0 | sed "s|etching$||")
     ETCHING_HOME=${ETCHING_BIN}/..
 fi
 
@@ -771,11 +770,21 @@ fi
 FILTER_PRE=${FILTER}.kmc_pre
 FILTER_SUF=${FILTER}.kmc_suf
 
-FILTER_PRE=$(ABS_PATH $FILTER_PRE)
-FILTER_SUF=$(ABS_PATH $FILTER_SUF)
+if [ -d FILTER_PRE ]
+then
+    FILTER_PRE=$(ABS_PATH $FILTER_PRE)
+fi
 
-filter=$FILTER
-FILTER=$(ls ${FILTER_PRE} | sed 's/.kmc_pre$//1')
+if [ -d FILTER_SUF ]
+then
+    FILTER_SUF=$(ABS_PATH $FILTER_SUF)
+fi
+
+if [ ${#FILTER} != 0 ]
+then
+    filter=$FILTER
+    FILTER=$(ls ${FILTER_PRE} | sed 's/.kmc_pre$//1')
+fi
 
 if [[ $((${#first_cont} + ${#second_cont} + ${#bam_cont} + ${#FILTER})) -eq 0 ]]
 then 
