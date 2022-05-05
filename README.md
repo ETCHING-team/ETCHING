@@ -118,7 +118,8 @@ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g Chr22.fa 
 
 # Pan-Genome k-mer set
 
-If you have no matched-normal data, you are highly recommended to use the pan-genome k-mer set2 (PGK2) to call somatic SVs. 
+The Pan-Genome k-mer(PGK) set is used to build PGK filter. Since we updated the PGK to PGK2, you can also download the PGK2 as below. 
+If you have no matched-normal data, you are highly recommended to use the PGK2 in stead of PGK to call somatic SVs. 
 
 ```bash
 # Move to etching directory
@@ -136,9 +137,9 @@ ls PGK2
 # Here, PGK2 is the name of k-mer set for ETCHING.
 ```
 
-Alternatively, you can make your own k-mer set.
+Alternatively, you can make your custom k-mer set.
 
-We recommand >=200 genomes to remove rare k-mers (<1% AF). 
+In the absence of matched-normal sample, we recommand to use >=200 genomes to build your custom k-mer set exlcuding rare k-mers (<1% allele frequency). 
 If you have 600 genomes, use ```-m 6``` option, which is the minimum frequency of k-mer to be included in your k-mer set.
 ```bash
 make_pgk -i 600_genome.list -m 6 -o my_pgk
