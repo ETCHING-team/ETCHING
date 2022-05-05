@@ -118,7 +118,7 @@ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g Chr22.fa 
 
 # Pan-Genome k-mer set
 
-If you have no matched normal data, our pan-genome k-mer set (PGK) will be helpful to select tumor specific reads. 
+If you have no matched-normal data, you are highly recommended to use the pan-genome k-mer set2 (PGK2) to call somatic SVs. 
 
 ```bash
 # Move to etching directory
@@ -221,7 +221,7 @@ https://github.com/ETCHING-team/etching_bench
 
 Jang-il Sohn, Min-Hak Choi, Dohun Yi, A. Vipin Menon, and Jin-Wu Nam
 
-Bioinformatic and Genomics Lab., Hanyang University, Seoul 04763, Korea
+Bioinformatic and Genomics Lab., Dept. of Life Science, Hanyang University, Seoul 04763, Korea
 
 ----------------------------------------------------------------------------------
 
