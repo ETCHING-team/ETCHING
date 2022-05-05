@@ -216,7 +216,7 @@ function ABS_PATH (){
 function CHECK_ETCHING (){
     # CHECKING REQUIRED PROGRAMS
     echo "CHECK ETCHING"
-    for i in cut_by_length cut_by_score etching etching_caller etching_fg_identifier etching_filter etching_make_training_table etching_merge_to_table etching_sorter etching_typer extract_BP_read fastq_check find_local_min_kmer_depth kmc kmc_dump kmc_tools kmer_filter make_pgk match_pair read_collector somatic_filter sort_fastq_mem_eff target_filter
+    for i in cut_by_length cut_by_score etching etching_caller etching_fg_identifier etching_filter etching_make_training_table etching_sorter etching_typer extract_BP_read fastq_check find_local_min_kmer_depth kmc kmc_dump kmc_tools kmer_filter make_pgk match_pair read_collector somatic_filter sort_fastq_mem_eff target_filter
     do
 	CHECK=$(which ${i})
 	
