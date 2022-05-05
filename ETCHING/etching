@@ -531,7 +531,7 @@ echo ${DATE}
 
 
 #PRESENT_PATH=$PWD 
-cd $(dirname ../../etching_release/bin/etching)
+cd $(dirname $0)
 
 export PATH=$PWD:$PATH
 export LD_LIBRARY_PATH=$PWD:$LD_LIBRARY_PATH
