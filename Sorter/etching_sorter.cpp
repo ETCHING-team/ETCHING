@@ -7,82 +7,28 @@
 #include "etching_sorter.hpp"
 #include <stdlib.h>
 #include <random>
+#include <sstream>
 
 void usage(){
   std::cout
     << "Usage:\tetching_sorter [options] -i input.vcf -o output_prefix [options]\n"
     << "\n"
     << "Required:\n"
-    << "\t" << "-i (string)\t" << "input vcf file (required)\n"
-    << "\t" << "-o (string)\t" << "Prefix of output vcf file (required)\n"
+    << "\t" << "-i (string)\t" << "input vcf file\n"
+    << "\t" << "-p (string)\t" << "Prefix of machine learning model files\n"
     << "\n"
     << "Options:\n"
+    << "\t" << "-o (string)\t" << "Prefix of output vcf file\n"
     << "\t" << "-c (double)\t" << "Cut-off parameter [0.4]\n"
+    << "\t" << "-t (int)   \t" << "Number of threads [8]\n"
     << "\t" << "-R         \t" << "Random Forest [default]\n"
     << "\t" << "-X         \t" << "XGBoost\n"
-    << "\t" << "-m         \t" << "Path to machine learning mode\n"
-    << "\t" << "-p (string)\t" << "Prefix of machine learning model files\n"
-    // << "\n"
-    // << "I/O option:\n"
-    // << "\t" << "-Q         \t" << "Tag SVs with \"PASS\" or \"LOWQUAL\" instead of removing low quality SVs [NONE]\n"
+    << "\t" << "NOTE: Machine learning method must be matched with model files.\n"
     << "\n";
 }
 
 
-int python_version(std::string prefix){
-  std::string fname = prefix + "python_version";
-  std::string command = "python3 --version > " + fname + " 2>&1";
-  system ( command.c_str() );
-  std::ifstream fin ( fname.c_str() );
-  std::string tmp;
-  fin >> tmp >> tmp;
-  tmp = tmp[0];
-  return atoi ( tmp.c_str() );
-}
-
-
-std::string python_module_check(std::string prefix, std::string method){
-  std::string output;
-
-  std::vector < std::string > pm;
-  std::vector < std::string > module;
-
-  pm.push_back("import pickle");
-  pm.push_back("import pandas");
-  pm.push_back("import numpy");
-  pm.push_back("from sklearn import metrics");
-  if ( method == "RandomForest")
-    pm.push_back("import skranger");
-  if ( method == "XGBoost")
-    pm.push_back("import xgboost");
-
-  module.push_back("pickle");
-  module.push_back("pandas");
-  module.push_back("numpy");
-  module.push_back("sklearn");
-  if ( method == "RandomForest")
-    module.push_back("skranger");
-  if ( method == "XGBoost")
-    module.push_back("xgboost");
-
-  for ( std::size_t i = 0 ; i < pm.size() ; i ++ ){
-    std::string fname = prefix + "python_module_check";
-    std::string command = "python3 -c '" + pm[i] + "' 2>&1 | wc -l > " + fname;
-    system ( command.c_str() );
-    std::ifstream fin ( fname.c_str() );
-    int count;
-    fin >> count;
-    fin.close();
-    if ( count > 0 ){
-      output = module[i];
-      break;
-    }
-  }
-
-  return output;
-}
-
-
+int make_score_file ( std::string, std::string, std::string, std::string);
   
 int main ( int argc , char ** argv ){
   if ( argc == 1 ){
@@ -95,30 +41,35 @@ int main ( int argc , char ** argv ){
   std::string infile;
   std::string prefix;
   std::string method;
-  std::string path;
+  std::string method_R;
+  std::string method_X;
+  std::string method_L;
   std::string ML_prefix;
 
-  // int num_threads(8);
+  int num_threads(8);
 
-  // int tagging=0;
-
-  double alpha=-1;
+  double cutoff=-1;
 
   std::size_t sz;
 
-  // while ( (opt = getopt ( argc, argv, "i:o:c:m:RXQ" ) ) != -1 ){
-  while ( (opt = getopt ( argc, argv, "i:o:c:m:t:RXp:" ) ) != -1 ){
+  while ( (opt = getopt ( argc, argv, "i:o:c:t:p:RXLh" ) ) != -1 ){
     switch ( opt ) {
     case 'i': infile=optarg; break; // infile name
     case 'o': prefix=optarg; break; // output prefix
-    case 'c': alpha=std::stod(optarg,&sz); break; // cutoff
-    case 'm': path=optarg; break; // path to machine learning model
-    case 'R': method+="RandomForest"; break; // Random Forest
-    case 'X': method+="XGBoost"; break; // XGBoost
+    case 'c': cutoff=std::stod(optarg,&sz); break; // cutoff
+    case 't': num_threads=atoi(optarg); break; // number of threads
     case 'p': ML_prefix=optarg; break; // prefix of ML model files
-    // case 't': num_threads=atoi(optarg); break; // XGBoost
-    // case 'Q': tagging=1; break; // Tagging SVs instead of ramoving low quality SVs.
-    default: std::cout << "ERROR!!! Check options!!!\n\n" ; usage(); return 2 ; 
+    case 'R': method_R="RandomForest"; break;
+    case 'X': method_X="XGBoost"; break;
+    case 'L': method_L="LightGBM"; break;
+    case 'h': usage() ; return 1;
+    default:
+      {
+	std::cout << "ERROR!!! Check options!!!\n\n";
+	std::cout << (char) opt << "\n\n";
+	usage();
+	return 2 ;
+      }
     }
   }
   
@@ -132,7 +83,7 @@ int main ( int argc , char ** argv ){
 
   std::ifstream fin ( infile.c_str() );
 
-  if ( ! fin ){
+  if ( ! fin.good() ){
     std::cout << "ERROR!!! There is no input file: " << infile << "\n";
     std::cout << "-------------------------------------------------\n";
     std::cout << "\n";
@@ -142,98 +93,184 @@ int main ( int argc , char ** argv ){
 
   fin.close();
 
-  if ( method.size() == 0 ){
-    method = "RandomForest";
-    //method = "XGBoost";
+  if ( ML_prefix.size() == 0 ){
+    std::cout << "ERROR!!! -m option is required (the prefix of machine learning model)\n";
+    std::cout << "---------------------------------------------------------------------\n";
+    std::cout << "\n";
+    usage();
+    return 4;
   }
-  else if (method == "RandomForestXGBoost" || method == "XGBoostRandomForest") {
-    std::cout << "ERROR!!! -R (Random Forest) and -X (XGBoost) can not be used at the same time\n";
+
+  if ( method_R.size() == 0 && method_X.size() == 0 && method_L.size() == 0 ){
+    method = "RandomForest";
+  }
+  else if ( method_R.size() != 0 && method_X.size() == 0 && method_L.size() == 0 ){
+    method = "RandomForest";
+  }
+  else if ( method_R.size() == 0 && method_X.size() != 0 && method_L.size() == 0 ){
+    method = "XGBoost";
+  }
+  else if ( method_R.size() == 0 && method_X.size() == 0 && method_L.size() != 0 ){
+    method = "LightGBM";
+  }
+  else {
+    std::cout << "ERROR!!! Please use only one of -R (Random Forest), or -X (XGBoost).\n";
     std::cout << "-----------------------------------------------------------------------------\n";
     std::cout << "\n";
     usage();
     return 5;
   }
 
-  if ( alpha < 0 ){
-    alpha = 0.4;
+
+  if ( cutoff < 0 ){
+    cutoff = 0.4;
   }
 
   if ( prefix.size() != 0 ) prefix += ".";
 
-  if ( python_version(prefix) != 3 ) {
-    std::cout << "ERROR!!! You need python3.\n";
-    return 6;
-  }
-  
-  std::string module_check=python_module_check(prefix,method);
-  if ( module_check.size() != 0 ){
-    std::cout << "Python module fail: " << module_check << "\n";
-    return 7;
-  }
-
-
-
-  if ( path.size()== 0 ) {
-    path = "${ETCHING_ML_PATH}";
-  }
 
   std::string outfile = prefix + "etching_sorter.vcf";
-  std::string feature_file = prefix + "feature_table.txt";
   std::string score_file = prefix + "score.txt";
 
   std::cout << "Method\t" << method << "\n";
-  std::cout << "Cut-off\t" << alpha << "\n";
+  std::cout << "Cut-off\t" << cutoff << "\n";
   std::cout << "Out-file\t" << outfile << "\n";
-  std::string echo="echo -e \"Path-to-model\\t" + path + "\"\n";
-  system ( echo.c_str() );
-  //std::cout << "Path-to-model\t" << path << "\n";
-
-  std::string command;
-
-  std::string err_fname = prefix + "score.err";
-
-  std::cout << "Calculating features\n";
-  calc_feature(infile,feature_file);
 
   std::cout << "Scoring_command:\t";
-  //command = "OMP_NUM_THREADS=4 python3 scorer_" + method + " " + feature_file + " " + score_file + " " + path + " > " + err_fname + " 2>&1" ;
-  if ( ML_prefix.size() == 0 ){
-    if ( method == "RandomForest" ){
-      ML_prefix = "etching_rf";
-    }
-    else if ( method == "XGBoost" ){
-      ML_prefix = "etching_xgb";
+  if ( method == "RandomForest" ){
+    std::cout << "Print feature file\n";
+    std::string feature_file = prefix + "feature_table.rf.txt";
+    print_rf_feature(infile,feature_file);
+
+    for ( int i = 1 ; i <= 10 ; i ++ ){
+      std::cout << "\n";
+      std::cout << "---------------------------------\n";
+      std::cout << "\n";
+      std::string model_file = ML_prefix + "_" + std::to_string(i) + ".forest";
+      std::string sub_prefix = prefix + "rf_" + std::to_string(i) ;
+      std::string command 
+	= "ranger --verbos --treetype 3 --splitrule 4 --nthreads " + std::to_string(num_threads)
+	+ " --outprefix " + sub_prefix 
+	+ " --file " + feature_file
+	+ " --predict " + model_file ;
+      std::cout << command << " 2>&1\n";
+      int status = system ( command.c_str() );
+      if ( status != 0 ){
+	std::cout << "\n";
+	std::cout << "---------------------------------\n";
+	std::cout << "\n";
+	std::cout << "ERROR!!! ranger did run properly.\n";
+	exit(EXIT_FAILURE);
+      }
     }
   }
-  command = "scorer_" + method + " " + feature_file + " " + score_file + " " + path + " " + ML_prefix + " > " + err_fname + " 2>&1" ;
-  echo="echo \"" + command + "\"";
-
-  system ( echo.c_str() );
-  system ( command.c_str() );
-
-  std::string check_none;
-  fin.open(err_fname.c_str());
-  while ( fin >> check_none );
-  fin.close();
-
-  if ( check_none != "None" ){
-    std::cout << "ERROR!!! Python module of etching_sorter did not run properly\n";
-
-    std::string output;
-    fin.open(err_fname.c_str());
-    while ( std::getline ( fin , output) ){
-      std::cout << output << "\n";
+  else if ( method == "XGBoost" ){
+    std::string config_file = prefix + "xgb.conf";
+    std::ofstream fout ( config_file.c_str() );
+    fout << "task=pred\nbooster=gbtree\nobjective=binary:logistic\neta=0.2\ngamma=3\nmax_depth=30\nnum_round=500\nsave_period=0\n";
+    fout.close();
+    std::cout << "Print feature file\n";
+    std::string feature_file = prefix + "feature_table.xgb.txt";
+    print_xgb_feature(infile,feature_file);
+    for ( int i = 1 ; i <= 10 ; i ++ ){
+      std::cout << "\n";
+      std::cout << "---------------------------------\n";
+      std::cout << "\n";
+      std::string model_file = ML_prefix + "_" + std::to_string(i) + ".model";
+      std::string sub_prefix = prefix + "xgb_" + std::to_string(i) + ".prediction";
+      std::string command 
+	= "xgboost " + config_file + " "
+	+ "nthread=" + std::to_string(num_threads) + " "
+	+ "test:data=" + feature_file + " "
+	+ "model_in=" + model_file + " "
+	+ "name_pred=" + sub_prefix;
+      std::cout << command << " 2>&1 \n";
+      int status = system ( command.c_str() );
+      if ( status != 0 ){
+	std::cout << "\n";
+	std::cout << "---------------------------------\n";
+	std::cout << "\n";
+	std::cout << "ERROR!!! xgboost did run properly.\n";
+	exit(EXIT_FAILURE);
+      }
     }
-    fin.close();
-    
-    return 8;
   }
+
+
+  // TODO :: score.file :: format = ( score \t id ) with a header
+  int status;
+  status=make_score_file ( infile, score_file, prefix, method);
+  if (status != 0 ){
+    return status;
+  }
+
+
+  // TODO: error check
 
   std::cout << "Removing false positives\n";
-  // razor ( infile, score_file, outfile, alpha, method, tagging);
-  razor ( infile, score_file, prefix, alpha, method);
+  razor ( infile, score_file, prefix, cutoff, method);
 
   return 0;
 }
 
 
+int make_score_file ( std::string infile, std::string score_file, std::string prefix, std::string method){
+  std::vector < std::string > id_vec;
+  std::vector < double > score_sum_vec;
+  std::ifstream fin;
+  std::string tmp;
+  std::string id;
+
+  std::string prediction_prefix = prefix;
+  if ( method == "RandomForest" ){
+    prediction_prefix += "rf";
+  }
+  else if ( method == "XGBoost" ){
+    prediction_prefix += "xgb";
+  }
+
+  fin.open ( infile.c_str() );
+  while ( std::getline ( fin , tmp ) ){
+    if (tmp[1]!='#') break;
+  }
+
+  while ( std::getline ( fin , tmp ) ){
+    std::stringstream ss ( tmp );
+    ss >> id >> id >> id;
+    id_vec.push_back(id);
+  }
+  fin.close();
+
+  std::size_t Size=id_vec.size();
+  score_sum_vec.resize(Size,0);
+
+  for ( std::size_t i = 0 ; i < 10 ; i ++ ){
+    std::vector < double > score_vec;
+    std::string prediction = prediction_prefix + "_" + std::to_string(i+1) + ".prediction";
+    double score;
+    fin.open ( prediction.c_str() );
+    if ( method == "RandomForest" ) fin >> tmp ;
+    while ( fin >> score ){
+      score_vec.push_back(score);
+    }
+    fin.close();
+    std::size_t Size1=score_vec.size();
+    if ( Size != Size1 ){
+      std::cout << "ERROR!!! Number of SV is not matched with the number of score in etching_sorter." << "\n";
+      return 6;
+    }
+    for ( std::size_t j = 0 ; j < Size ; j ++ ){
+      score_sum_vec[j] += score_vec[j]/10;
+    }
+  }
+
+
+  std::ofstream fout ( score_file.c_str() );
+  fout << "Score\tID\n";
+  for ( std::size_t i = 0 ; i < Size ; i ++ ){
+    fout << score_sum_vec[i] << "\t" << id_vec[i] << "\n";
+  }
+  fout.close();
+
+  return 0;
+}

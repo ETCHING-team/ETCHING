@@ -24,17 +24,17 @@ int main ( int argc , char ** argv ){
     }
   }
 
-  std::string chr1;
-  std::string chr2;
-
-  int pos1;
-  int pos2;
-
-  const std::string chr2_key="CHR2";
-  const std::string pos2_key="END";
-
   while ( std::getline ( fin , line ) ){
     
+    std::string chr1;
+    std::string chr2;
+
+    int pos1;
+    int pos2;
+
+    const std::string chr2_key="CHR2";
+    const std::string pos2_key="END";
+
     std::stringstream line_ss ( line );
     std::string info;
 
@@ -69,7 +69,6 @@ int main ( int argc , char ** argv ){
       }
     }
 
-    
     if ( chr1 == chr2 ){
       int diff = pos2 - pos1;
       if ( diff < 0 ) diff *= -1;

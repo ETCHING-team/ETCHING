@@ -63,12 +63,6 @@ int main ( int argc , char ** argv ){
     }
     
     if ( score >= cutoff ){
-      std::string lowqual = "LOWQUAL";
-      std::size_t found = line.find ( lowqual );
-      if ( found != std::string::npos ){
-	std::string pass = "PASS";
-	line.replace ( found, lowqual.size(), pass );
-      }
       std::cout << line << "\n";
     }
   }

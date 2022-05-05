@@ -56,7 +56,7 @@ function USAGE {
     echo -e "[Others]"
     echo -e "-S  (string)\t/path/to/samtools [system]"
     echo -e "-B  (string)\t/path/to/bwa [system]"
-    echo -e "-E          \tStore k-mer database files [remove the files]"
+    #echo -e "-E          \tStore k-mer database files [remove the files]"
     echo -e 
     echo -e "[[Contact]]"
     echo -e "Please report bugs to"
@@ -324,12 +324,12 @@ done
 DIR=$(echo $0 | sed 's/etching_filter$//g')
 
 KMER_FILTER=kmer_filter
-CHECK=$(which ${KMER_FILTER}  )
+CHECK=$(which ${KMER_FILTER} 2> /dev/null )
 
 if [ ${#CHECK} == 0 ]
 then
     KMER_FILTER=${DIR}kmer_filter
-    CHECK=$(which ${KMER_FILTER}  )
+    CHECK=$(which ${KMER_FILTER} 2> /dev/null )
     
     if [ ${#CHECK} == 0 ]
     then
@@ -339,11 +339,11 @@ then
 fi
 
 READ_COLLECTOR=read_collector
-CHECK=$(which ${READ_COLLECTOR} )
+CHECK=$(which ${READ_COLLECTOR} 2> /dev/null )
 if [ ${#CHECK} == 0 ]
 then
     READ_COLLECTOR=${DIR}read_collector
-    CHECK=$(which ${READ_COLLECTOR} )
+    CHECK=$(which ${READ_COLLECTOR} 2> /dev/null )
     if [ ${#CHECK} == 0 ]
     then
 	echo "ERROR!!! read_collector was not found."
@@ -352,11 +352,11 @@ then
 fi
 
 MATCH_PAIR=match_pair
-CHECK=$(which ${MATCH_PAIR} )
+CHECK=$(which ${MATCH_PAIR} 2> /dev/null )
 if [ ${#CHECK} == 0 ]
 then
     MATCH_PAIR=${DIR}match_pair
-    CHECK=$(which ${MATCH_PAIR} )
+    CHECK=$(which ${MATCH_PAIR} 2> /dev/null )
     if [ ${#CHECK} == 0 ]
     then
         echo "ERROR!!! match_pair was not found."
@@ -365,11 +365,11 @@ then
 fi
 
 KMC=kmc
-CHECK=$(which $KMC)
+CHECK=$(which $KMC 2> /dev/null )
 if [ ${#CHECK} == 0 ]
 then
     KMC=${DIR}kmc
-    CHECK=$(which $KMC)
+    CHECK=$(which $KMC2 > /dev/null )
     if [ ${#CHECK} == 0 ]
     then
 	echo "ERROR!!! KMC3 was not found."
@@ -386,11 +386,11 @@ then
 fi
 
 KMC_TOOLS=kmc_tools
-CHECK=$(which $KMC_TOOLS  )
+CHECK=$(which $KMC_TOOLS 2> /dev/null )
 if [ ${#CHECK} == 0 ]
 then
     KMC_TOOLS=${DIR}kmc_tools
-    CHECK=$(which $KMC_TOOLS  )
+    CHECK=$(which $KMC_TOOLS 2> /dev/null )
     if [ ${#CHECK} == 0 ]
     then
 	echo "ERROR!!! KMC3 was not found"
@@ -399,11 +399,11 @@ then
 fi
 
 KMC_DUMP=kmc_dump
-CHECK=$(which $KMC_DUMP  )
+CHECK=$(which $KMC_DUMP 2> /dev/null )
 if [ ${#CHECK} == 0 ]
 then
     KMC_DUMP=${DIR}kmc_dump
-    CHECK=$(which $KMC_DUMP  )
+    CHECK=$(which $KMC_DUMP 2> /dev/null )
     if [ ${#CHECK} == 0 ]
     then
 	echo "ERROR!!! KMC3 was not found."
@@ -417,7 +417,7 @@ then
     MAPPER="bwa"
 fi
 
-CHECK=$(which $MAPPER)
+CHECK=$(which $MAPPER 2> /dev/null )
 if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!! bwa was not found"
@@ -430,7 +430,7 @@ then
     SAMTOOLS="samtools"
 fi
 
-CHECK=$(which $SAMTOOLS )
+CHECK=$(which $SAMTOOLS 2> /dev/null )
 if [ ${#CHECK} == 0 ]
 then
     echo "ERROR!!! samtools was not found"
@@ -466,7 +466,7 @@ then
 	exit -1
     fi
     
-    KMC_DIR=$(which ${KMC} | sed 's/\/kmc$//g')
+    KMC_DIR=$(which ${KMC} 2> /dev/null | sed 's/\/kmc$//g')
 
    
     if [ ${#FILTER} == 0 ]
@@ -509,26 +509,41 @@ then
 	exit -1
     fi
     
-    echo 
-    echo "[Remove unmatched reads]"
-    cmd="${MATCH_PAIR} ${PREFIX}_1.fastq ${PREFIX}_2.fastq"
+    #echo 
+    #echo "[Remove unmatched reads]"
+    #cmd="${MATCH_PAIR} ${PREFIX}_1.fastq ${PREFIX}_2.fastq"
+    #echo $cmd
+    #eval $cmd
+
+    #if (( STATUS != 0 ))
+    #then
+	#echo "Failed: ${STATUS}: $cmd"
+	#exit -1
+    #fi
+    
+    #cmd="mv ${PREFIX}_1.fastq_idmatched ${PREFIX}_1.fastq"
+    #echo $cmd
+    #eval $cmd &
+    #cmd="mv ${PREFIX}_2.fastq_idmatched ${PREFIX}_2.fastq"
+    #echo $cmd
+    #eval $cmd &
+    #wait
+
+    FASTP_THREADS=${THREADS}
+    if (( ${THREADS} > 16 ))
+    then
+	FASTP_THREADS=16
+    fi
+    echo
+    echo "[Preprocessing for filtered reads]"
+
+    cmd="mkdir -p logs"
     echo $cmd
     eval $cmd
 
-    if (( STATUS != 0 ))
-    then
-	echo "Failed: ${STATUS}: $cmd"
-	exit -1
-    fi
-    
-    cmd="mv ${PREFIX}_1.fastq_idmatched ${PREFIX}_1.fastq"
+    cmd="fastp -l 50 -5 -3 -w ${FASTP_THREADS} -i ${PREFIX}_1.fastq -I ${PREFIX}_2.fastq -o ${PREFIX}_prep_1.fastq -O ${PREFIX}_prep_2.fastq > logs/${PREFIX}_fastp.log 2>&1"
     echo $cmd
-    eval $cmd &
-    cmd="mv ${PREFIX}_2.fastq_idmatched ${PREFIX}_2.fastq"
-    echo $cmd
-    eval $cmd &
-    wait
-
+    eval $cmd
 
     echo
     echo "[Mapping]"
@@ -536,11 +551,7 @@ then
 
     let HALF=(${THREADS}/2 + 1)
     
-    cmd="mkdir -p logs"
-    echo $cmd
-    eval $cmd
-
-    cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq 2> logs/${PREFIX}_bwa_mem.log | samtools view -@ ${HALF} -Sbh - > ${PREFIX}.bam"
+    cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_prep_1.fastq ${PREFIX}_prep_2.fastq 2> logs/${PREFIX}_bwa_mem.log | samtools view -@ ${HALF} -Sbh - > ${PREFIX}.bam"
     echo $cmd
     eval $cmd
     if (( STATUS != 0 ))
@@ -705,6 +716,17 @@ else
 	eval $cmd &
 	wait
 
+	FASTP_THREADS=${THREADS}
+	if (( ${THREADS} > 16 ))
+	then
+	    FASTP_THREADS=16
+	fi
+	echo
+	echo "[Preprocessing for filtered reads]"
+	cmd="fastp -l 50 -5 -3 -i ${PREFIX}_1.fastq -I ${PREFIX}_2.fastq -o ${PREFIX}_prep_1.fastq -O ${PREFIX}_prep_2.fastq -w ${FASTP_THREADS}> logs/${PREFIX}_fastp.log 2>&1"
+	echo $cmd
+	eval $cmd
+
 	#############################
 	#
 	# Mapping
@@ -715,7 +737,7 @@ else
 
 	let HALF=(${THREADS}/2 + 1)
 	
-	cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_1.fastq ${PREFIX}_2.fastq 2> logs/${PREFIX}_bwa_mem.log | samtools view -Sbh -@ ${HALF} - > ${PREFIX}.bam"
+	cmd="${MAPPER} -t ${THREADS} ${GENOME} ${PREFIX}_prep_1.fastq ${PREFIX}_prep_2.fastq 2> logs/${PREFIX}_bwa_mem.log | samtools view -Sbh -@ ${HALF} - > ${PREFIX}.bam"
 	echo $cmd
 	eval $cmd
 	if (( STATUS != 0 ))

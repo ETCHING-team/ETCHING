@@ -32,9 +32,9 @@ int main ( int argc , char ** argv ){
 
   std::string tmp;
   std::vector < std::string > metainfo;
-  VCF vcf;
-  VCF_CLASS container;
-  VCF_CLASS container_SV;
+  VCF_LINE vcf_line;
+  VCF container;
+  VCF container_SV;
 
   int count = 0 ;
   
@@ -73,9 +73,9 @@ int main ( int argc , char ** argv ){
   //
 
   while ( std::getline ( fin , tmp ) ){
-    if ( is_etching) vcf.parse_etching(tmp);
-    else vcf.parse(tmp);
-    container.insert(vcf);
+    if ( is_etching) vcf_line.parse_etching(tmp);
+    else vcf_line.parse(tmp);
+    container.insert(vcf_line);
   }
 
   fin.close();

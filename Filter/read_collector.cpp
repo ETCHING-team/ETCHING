@@ -20,7 +20,7 @@ void read_collector_usage(){
 	    << "\n"
 	    << "Optional:\n"
 	    << "\t" << "-p <string>\t" << "Prefix of output files [filtered_read]\n"
-	    << "\t" << "-t <int>   \t" << "Number of threads [8]\n"
+	    << "\t" << "-t <int>   \t" << "Number of threads [16]\n"
 	    << "\t" << "-l <int>   \t" << "K-mer size (<=32) [31]\n"
 	    << "\t" << "           \t" << "-1 and -2 must be used simultaneously.\n"
 	    << "\t" << "-F         \t" << "Fast-bam mode for -b option\n"
@@ -29,7 +29,9 @@ void read_collector_usage(){
 }
 
 
-
+/**
+   @todo check if k-mer table is proper
+*/
 int count_column(std::string infile){
   int  numberOfColumns=1;
   bool previousWasSpace=false;
@@ -69,7 +71,7 @@ int main (int argc , char ** argv){
   std::string input_1;
   std::string input_2;
   std::string input_b;
-  int num_threads = 8;
+  int num_threads = 16;
   std::string prefix = "filtered_read";
   std::string kmer_table;
   bool fast_bam = 0 ;

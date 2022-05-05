@@ -1,12 +1,8 @@
-default: ../lib/libetching_caller.so etching_caller etching_typer somatic_filter target_filter extract_BP_read
+default: ../lib/libetching_caller.so etching_caller etching_typer target_filter extract_BP_read
 all: default
 
 etching_caller: ../lib/libetching_caller.so etching_caller.cpp etching_caller.hpp ../lib/zlib/*.lo
 	g++ -Wall -g -std=c++11 -fopenmp etching_caller.cpp -o etching_caller ../lib/zlib/*.lo -L../lib -letching_caller -I../lib/bamtools
-
-somatic_filter: somatic_filter.cpp
-	g++ -Wall -g -std=c++11 -c somatic_filter.cpp -o somatic_filter.o -I../lib/bamtools
-	g++ -Wall -g -std=c++11 -o somatic_filter somatic_filter.o ../lib/zlib/*.lo -L../lib -letching_caller -I../lib/bamtools
 
 target_filter: target_filter.cpp
 	g++ -Wall -g -std=c++11 -c target_filter.cpp -o target_filter.o -I../lib/bamtools
@@ -21,11 +17,11 @@ etching_typer: ../lib/libetching_caller.so etching_typer.cpp ../lib/zlib/*.lo
 	cd ../lib/bamtools ; make ; cd -
 
 clean:
-	rm -f etching_caller etching_typer somatic_filter target_filter extract_BP_read
+	rm -f etching_add_feature etching_caller etching_merge etching_typer extract_BP_read target_filter
 
 cleanlibrary: 
 	rm -f ../lib/libetching_caller.so
 
-cleanall: 
+cleanall: clean
 	rm -f *.lo *.o
 	rm -f ../lib/libetching_caller.so

@@ -1,4 +1,4 @@
-default: ../lib/libetching_filter.so ../lib/gzstream/gzstream.o read_collector kmer_filter fastq_check sort_fastq_mem_eff match_pair find_local_min_kmer_depth make_pgk
+default: ../lib/libetching_filter.so ../lib/gzstream/gzstream.o read_collector kmer_filter fastq_check sort_fastq_mem_eff match_pair find_local_min_kmer_depth make_pgk fastp
 	chmod a+x etching_filter
 
 all: default
@@ -22,6 +22,9 @@ match_pair: match_pair.cpp
 
 find_local_min_kmer_depth: find_local_min_kmer_depth.cpp
 	g++ -Wall -g -std=c++11 find_local_min_kmer_depth.cpp -o find_local_min_kmer_depth
+
+fastp:
+	wget http://opengene.org/fastp/fastp ; chmod a+x ./fastp
 
 
 

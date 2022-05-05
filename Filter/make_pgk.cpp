@@ -11,11 +11,14 @@ void usage(){
   std::cout << "Usage: make_pgk [options] -i reference_fasta.list [options]\n"
 	    << "\n"
 	    << "\t" << "-o <string>\t" << "Output prefix [PGK]\n"
-	    << "\t" << "-v <string>\t" << "SNV/indel vcf for control. For instace, dbSNP.vcf\n"
-	    << "\t" << "-g <string>\t" << "Reference genome for input vcf\n"
 	    << "\t" << "-l <int>   \t" << "k-mer length [31]\n"
-	    << "\t" << "-D <int>   \t" << "Directory of KMC-3 [null]\n"
-	    << "\t" << "-t <int>   \t" << "Number of threads [8]\n";
+	    << "\t" << "-m <int>   \t" << "Minimum frequency of k-mer [1]\n"
+	    << "\t" << "           \t" << "We recommand 1% of number of genomes\n"
+	    << "\t" << "           \t" << "Ex) -m 10 for 1000 genomes\n"
+	    << "\t" << "-M <int>   \t" << "Maximun frequency of k-mer [-1 (1e9)]\n"
+	    << "\t" << "-R <int>   \t" << "Maximun RAM in GB [12]\n"
+	    << "\t" << "-t <int>   \t" << "Number of threads [8]\n"
+	    << "\t" << "-D <int>   \t" << "Directory of KMC-3\n";
 }
 
 void printf_alt_kmer ( std::map < std::string , std::string > & genome , std::string & id , int & pos , std::string & alt , std::string & variant_id, std::string & REF, int & kl , int & count, std::ofstream & fout){
@@ -135,41 +138,44 @@ int main ( int argc, char ** argv ){
   std::string genome_file;
 
   int kl = 31;
-
+  int min_freq = 1;
+  int max_freq = -1;
+  
   std::string DIR;
   int num_threads=8;
   int maxRAM=12;
 
   int opt;
 
-  while ( (opt = getopt ( argc, argv, "i:o:v:g:l:D:t:m:h" ) ) != -1 ){
+  while ( (opt = getopt ( argc, argv, "i:o:l:m:M:D:t:R:h" ) ) != -1 ){
 
     switch ( opt ) {
       
     case 'i': fasta_list = optarg; break;
     case 'o': prefix = optarg; break;
       
-    case 'v': control_vcf = optarg; break;
-    case 'g': genome_file = optarg; break;
-      
     case 'l': kl = atoi(optarg); break;
+    case 'm': min_freq = atoi(optarg); break;
+    case 'M': max_freq = atoi(optarg); break;
 
     case 'D': DIR = optarg ; break;
     case 't': num_threads = atoi ( optarg ); break;
-    case 'm': maxRAM = atoi ( optarg ); break;
+    case 'R': maxRAM = atoi ( optarg ); break;
 
     case 'h': usage(); return 0 ;
       
-    default: std::cout << "\tInvalid option\n"; usage(); return 1;
+    default: std::cerr << "\tInvalid option\n"; usage(); return 1;
       
     }
   }
+
   
   // check options
   if ( fasta_list.size() == 0 ){
-    std::cout << "ERROR!!! -i option is required.\n";
+    std::cerr << "ERROR!!! -i option is required.\n";
     return -1;
   }
+
 
   
   // pop_back if DIR has "/" charactor at the tail
@@ -179,14 +185,13 @@ int main ( int argc, char ** argv ){
     }
   }
 
+
   // check kmc
   std::string kmc_path=DIR+"kmc > /dev/null";
   if ( system(kmc_path.c_str()) > 0 ){
-    std::cout << "ERROR!!! We cannot find kmc. Please set -D option for kmc, or install KMC-3.";
+    std::cerr << "ERROR!!! We cannot find kmc. Please set -D option for kmc, or install KMC-3.";
     return -1;
   }
-
-  return 0;
 
   std::string tmp;
 
@@ -199,7 +204,7 @@ int main ( int argc, char ** argv ){
   }
   fin.close();
 
-  std::cerr << "[Controls for filtration]\n";
+  std::cerr << "[List of genomes]\n";
   for ( auto i : genome_vec ){
     std::cerr << "\t" << i << "\n";
   }
@@ -234,8 +239,11 @@ int main ( int argc, char ** argv ){
   
   std::string output_log = prefix + ".log";
   command
-    = DIR + "kmc -k" + std::to_string(kl) + " -t" + std::to_string(num_threads) 
-    + " -m" + std::to_string ( maxRAM ) + " -v -ci1 -fm @" + updated_fasta_list_file + " " + prefix + " " + tmp_dir + " > " + output_log + " 2>&1" ;
+    = DIR + "kmc -k" + std::to_string(kl) + " -t" + std::to_string(num_threads)  + " -m" + std::to_string ( maxRAM ) + " -v -ci" + std::to_string(min_freq) ;
+  if ( max_freq > 0 ){
+    command += " -cx" + std::to_string(max_freq);
+  }
+  command += " -fm @" + updated_fasta_list_file + " " + prefix + " " + tmp_dir + " > " + output_log + " 2>&1" ;
   system(command.c_str());
 
   command = "rm -rf " + tmp_dir;

@@ -40,8 +40,6 @@ int main(int argc, char ** argv){
   bool scanall = 1 ; 
   bool rescue = 0 ;
 
-  int step=1;
-
   std::string read_orientation = "FR";
   // std::string data_type; // WGS, WTS, or PANEL
   
@@ -57,7 +55,6 @@ int main(int argc, char ** argv){
     case 'o': prefix=optarg; break;
     case 'g': genome=optarg; break;
     case 'B': typing = 0; break;
-    case 'S': step = atoi(optarg); if ( step < 1 || step > 3) { caller_usage(); return 0; } break;
     case 'i': infile_pref = optarg; break;
     case 'A': scanall = 1; break;
     case 'R': rescue = 1; break;
@@ -141,13 +138,6 @@ int main(int argc, char ** argv){
   // Program start
   //
 
-  int Step = step;
-
-
-  //////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // Printing parameters
-  //
   auto start = std::chrono::system_clock::now();
   std::time_t start_time = std::chrono::system_clock::to_time_t(start);
   
@@ -170,13 +160,9 @@ int main(int argc, char ** argv){
   //
   // Step 1
   //
+  
+  find_path ( input_bam, prefix, insert_size, scanall, rescue);
 
-  if ( Step ==1 ){
-    std::string bp_file;
-    find_path ( input_bam, prefix, insert_size, scanall, rescue);
-    Step ++ ;
-
-  }
 
   std::cout << "===============================================================\n";
   //////////////////////////////////////////////////////////////////////////////////////////////
@@ -184,14 +170,8 @@ int main(int argc, char ** argv){
   // Step 2
   //
 
-  if ( Step == 2){
-    if (step == 1 ) {
-      infile_pref = prefix ;
-    }
-    bp_to_vcf ( genome, input_bam, infile_pref,	prefix,	insert_size, typing, read_orientation, purity, seqdep);
-
-    Step ++;
-  }
+  infile_pref = prefix ;
+  bp_to_vcf ( genome, input_bam, infile_pref,	prefix,	insert_size, typing, read_orientation, purity, seqdep);
 
 
   //////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,3 +1,19 @@
+### 1.4.0
+
+Update with a graph theory of breakend, BND=(BP1,BP2), where BP=(chr,pos,dir).
+
+Machine learning modules for ranger and xgboost were replaced with cpp.
+
+Quality control module (fastq) was included in etching_filter
+
+New Pan-Genome K-mer set, PGK2 (based on 894 human genomes), was released (http://big.hanyang.ac.kr/ETCHING/).
+
+
+
+### 1.3.7a
+
+Debug to exit if etching_filter stopped abnormally, and to set -f properly in etching (line 793-4)
+
 ### 1.3.7
 
 Debug to stop if etching_caller predicted no SV, or etching_sorter removed all SVs.

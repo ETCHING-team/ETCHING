@@ -76,7 +76,7 @@ int main ( int argc , char ** argv ){
   std::string existing;
 
   int64_t maxRAM = 12;
-  int64_t num_threads = 8 ;
+  int64_t num_threads = 16 ;
 
   int64_t cutoff = 0 ;
   int64_t maxcount = 255 ;
@@ -223,7 +223,7 @@ int main ( int argc , char ** argv ){
     tmp = existing + ".kmc_suf";
     fin.open( tmp.c_str() );
     if ( ! fin ){
-      std::cerr << "ERROR!!! There is no " + existing+ ".kmc_pre.\n";
+      std::cerr << "ERROR!!! There is no " + existing+ ".kmc_suf.\n";
       return -1;
     }
   }
@@ -301,6 +301,10 @@ int main ( int argc , char ** argv ){
       }
       else if ( fastq_count != 0 && bam_count != 0){
 
+	/**
+	   @todo check if fasta format
+	 */
+	
 	std::ofstream fout;
 	fout.open("control_filter_fastq_file_list.txt");
 	for ( auto i : fastq_files ){
@@ -469,7 +473,7 @@ int main ( int argc , char ** argv ){
     system(command.c_str());
     
   }
-  else if ( fastq_count != 0 && bam_count != 0){
+  else if ( fastq_count != 0 && bam_count != 0){ /// @todo check this. BOTH?
 
     std::ofstream fout;
     fout.open("sample_fastq_file_list.txt");

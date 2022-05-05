@@ -10,11 +10,11 @@ sort_gtf: sort_gtf.cpp
 
 
 clean:
-	rm -f etching_fg_identifier sort_gtf
+	rm -f etching_fg_identifier sort_gtf 
 
 cleanlibrary:
 	rm -f ../lib/libfg_identifier.so
 
-cleanall: 
+cleanall: clean
 	rm -f ../lib/libfg_identifier.so
 	rm -f *.lo *.o

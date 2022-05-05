@@ -13,7 +13,10 @@
 
 using Position = std::pair < int , int > ;
 using Feature = std::map < std::string , double > ;
-using FEATURE = std::map < std::string , Feature > ;
+
+typedef int64_t pos_type;
+typedef std::tuple<pos_type,pos_type,pos_type> BP_type;
+typedef std::pair<BP_type,BP_type> BND_type;
 
 #endif
 

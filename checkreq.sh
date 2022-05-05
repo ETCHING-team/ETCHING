@@ -1,5 +1,20 @@
 #!/usr/bin/bash
 
+if [ $# -ne 1 ]
+then
+    echo "Usage: checkerq.sh all/default"
+    exit -1
+fi
+
+if [ $1 != "default" ]
+then
+    if [ $1 != "all" ]
+    then
+	echo "Usage: checkerq.sh all/default"
+	exit -1
+    fi
+fi
+
 # Check if awk is installed
 check_awk=$(which awk)
 if [ ${#check_awk} == 0 ]
@@ -8,7 +23,6 @@ then
 else
     echo "awk: OK"
 fi
-
 
 # Check if make is installed
 check_make=$(which make)
@@ -19,6 +33,30 @@ then
 else
     echo "make: OK"
 fi
+
+if [ $1 == "all" ]
+then
+    # Check if cmake >=3.14 installed
+    CMAKE_CHECK=$(cmake --version | head -n1 | awk '{print $3}' | awk -F "." '{if($1>=3 && $2>=14) print "YES"}')
+    if [ $CMAKE_CHECK == "YES" ]
+    then
+	echo "make: OK"
+    else
+	echo "ERROR!!! Required: cmake >=3.14 for make all"
+	exit -1
+    fi
+else
+    # Check if cmake >=3.0 installed
+    CMAKE_CHECK=$(cmake --version | head -n1 | awk '{print $3}' | awk -F "." '{if($1>=3) print "YES"}')
+    if [ $CMAKE_CHECK == "YES" ]
+    then
+	echo "make: OK"
+    else
+	echo "ERROR!!! Required: cmake >=3"
+	exit -1
+    fi
+fi
+
 
 # check g++ and its version
 check_gcc=$(which gcc)
@@ -43,63 +81,28 @@ fi
 version=0
 version=$(g++ --version | head -n 1 | awk '{print $3}' | awk -F "." '{print $1}')
 
-if (( version < 4 ))
+if [ $1 == "default" ]
 then
-    echo "Required: g++ >4.7.0"
-else
-    if (( version == 4 ))
+    if (( version < 6 ))
     then
-	subversion=$(g++ --version | head -n 1 | awk '{print $3}' | awk -F "." '{print $2}')
-	if (( subversion < 7 ))
+	echo "Required: g++ >=6.1.0"
+    else
+	echo -e "gcc/g++: OK"    
+    fi
+else
+    if [ $1 == "all" ]
+    then
+	if (( version < 6 ))
 	then
-	    echo "ERROR!!! Required: g++ >4.7.0"
-	    exit -1
+	    echo "Required: g++ >=7.1.0 for make all"
 	else
-	    echo -e "gcc/g++: OK"
+	    echo -e "gcc/g++: OK"    
 	fi
     else
-	echo -e "gcc/g++: OK"
+	echo "ERROR!!! in checkreq.sh"
+	exit -1
     fi
 fi
-
-
-# Check python3 version
-pv=$(python3 --version | awk '{print $2}')
-p3_1=$(echo $pv | awk -F "." '{print $1}')
-p3_2=$(echo $pv | awk -F "." '{print $2}')
-
-
-if (( p3_1 != 3 ))
-then
-    echo "ERROR!!! Required: Python3 (3.6, 3.7, or 3.8)"
-    echo "Your python version: $pv"
-    exit -1
-fi
-
-if (( p3_2 != 6 && p3_2 != 7 && p3_2 != 8))
-then
-    echo "ERROR!!! Required: Python3 (3.6, 3.7, or 3.8)"
-    echo "Your python version: $pv"
-    exit -1
-else
-    echo -e "Python3 (3.6-3.8): OK"
-fi
-
-
-# check python3-venv
-message=$(python3 -m venv etching_venv)
-rm -rf etching_venv
-check_venv=$(echo $message | grep "Failing command:" | wc -l)
-if (( check_venv !=0 ))
-then
-    echo "ERROR!!! \"python3 -m venv etching_venv\" exited abnormally. Please check it. "
-    echo "----------------------"
-    echo $message
-    exit -1
-else
-    echo -e "python3-venv: OK"
-fi
-
 
 # Check if bwa is installed
 check_bwa=$(which bwa)
