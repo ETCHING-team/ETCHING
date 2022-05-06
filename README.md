@@ -21,7 +21,7 @@ http://big.hanyang.ac.kr/ETCHING/
   * g++ >=6 (For full install, >=7)
   * cmake >=3 (For full install, >=3.14)
 
-* Quality control module (fastq) was included in etching_filter.
+* Quality control module (fastp) was included in ```etching_filter```.
 * New Pan-Genome K-mer set, PGK2 (based on 894 human genomes), was released (http://big.hanyang.ac.kr/ETCHING/).
 
 *See CHANGE.md for older updates.*
