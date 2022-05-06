@@ -187,7 +187,9 @@ tar zxvf DEMO.tar.gz
 
 Run ETCHING with docker
 ```bash
-docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.4.0 etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK -t 8
+docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.4.0 etching \
+-1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_genome.fa \
+-a small_genome.gtf -f /work/demo_PGK -t 8
 ```
 Here, ```etching:1.4.0``` is ```REPOSITORY``` and ```TAG``` of ETCHING docker image.
 
@@ -200,7 +202,8 @@ Alternatively, you can run ETCHING inside docker container
 ```bash
 docker run -i -t --rm -v /path/to/DEMO/:/work/ etching:1.4.0 /bin/bash
 
-etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_genome.fa -a small_genome.gtf -f /work/demo_PGK
+etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_genome.fa \
+-a small_genome.gtf -f /work/demo_PGK
 ```
 
 
