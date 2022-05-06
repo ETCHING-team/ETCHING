@@ -4,7 +4,7 @@ Update with a graph theory of breakend, BND=(BP1,BP2), where BP=(chr,pos,dir).
 
 Machine learning modules for ranger and xgboost were replaced with cpp.
 
-Quality control module (fastq) was included in etching_filter
+Quality control module (fastp) was included in ```etching_filter```
 
 New Pan-Genome K-mer set, PGK2 (based on 894 human genomes), was released (http://big.hanyang.ac.kr/ETCHING/).
 
