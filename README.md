@@ -7,7 +7,7 @@
 ETCHING takes about 3 hours for WGS data with 30X normal and 50X tumor on 30 threads on DELL 930 server.
 You can also find codes, k-mer set, and DEMO files in our website.
 
-http://big.hanyang.ac.kr/ETCHING/
+http://big.hanyang.ac.kr/ETCHING/download.html
 
  
 
@@ -22,7 +22,7 @@ http://big.hanyang.ac.kr/ETCHING/
   * cmake >=3 (For full install, >=3.14)
 
 * Quality control module (fastp) was included in ```etching_filter```.
-* New Pan-Genome K-mer set, PGK2 (based on 894 human genomes), was released (http://big.hanyang.ac.kr/ETCHING/).
+* New Pan-Genome K-mer set, PGK2 (based on 894 human genomes), was released (http://big.hanyang.ac.kr/ETCHING/download.html).
 
 *See CHANGE.md for older updates.*
 
