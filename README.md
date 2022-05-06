@@ -141,6 +141,7 @@ Alternatively, you can make your custom k-mer set.
 
 In the absence of matched-normal sample, we recommand to use >=200 genomes to build your custom k-mer set exlcuding rare k-mers (<1% allele frequency). 
 If you have 600 genomes, use ```-m 6``` option, which is the minimum frequency of k-mer to be included in your k-mer set.
+
 ```bash
 make_pgk -i 600_genome.list -m 6 -o my_pgk
 ```
@@ -160,10 +161,10 @@ docker
 
 ```bash
 # Download ETCHING docker image
-wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.4.0.docker.saved.tar
+wget http://big.hanyang.ac.kr/ETCHING/ETCHING_v1.4.0.docker.tar
 
 # Load the image
-docker load -i ETCHING_v1.4.0.docker.saved.tar
+docker load -i ETCHING_v1.4.0.docker.tar
 
 # Check the image
 docker images
