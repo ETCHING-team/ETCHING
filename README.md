@@ -27,6 +27,8 @@ http://big.hanyang.ac.kr/ETCHING/download.html
 *See CHANGE.md for older updates.*
 
 
+
+
 # Requirements
 
 ### System
@@ -52,6 +54,8 @@ We prepared a simple guide for CentOS/Fedora or Ubuntu/Debian/Mint users. You ca
 
 *Note: We tested this guide on Fedora32/33/34, CentOS7/8, Ubuntu16.04/18.04/20.04, Mint19/20, Debian11, and MX linux.*
 
+
+
 ## 1. Requirements
 
 - #### CentOS/Fedora (or other Red Hat-based linux distros)
@@ -67,6 +71,7 @@ sudo yum install -y gcc gcc-c++ make cmake bwa samtools wget
 ## Required programs 
 sudo apt install -y gcc g++ make cmake bwa samtools wget
 ```
+
 
 
 ## 2. Installation
@@ -149,13 +154,13 @@ Here, ```600_genome.list``` is a file of fasta files of reference genomes.
 
 
 
-
-
 # ETCHING on a ship (docker)
 
 ### Requirement
 
 docker 
+
+
 
 ### Download docker image
 
@@ -175,6 +180,8 @@ You can see like this
 |REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
 |:---|:---|:---|:---|:---|
 |etching|v1.4.0|63ffc48504f0|40 hours ago|3.26GB|
+
+
 
 ### Demo for docker user
 
@@ -207,7 +214,6 @@ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_gen
 ```
 
 
-----------------------------------------------------------------------------------
 
 
 # Related programs
@@ -215,28 +221,37 @@ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_gen
 ### Filtration tool for PacBio long-reads
 https://github.com/ETCHING-team/LR_Filter
 
+
+
 ### Benchmarking tool
 https://github.com/ETCHING-team/etching_bench
 
 
-----------------------------------------------------------------------------------
 
 
 # Contributors
 
 Jang-il Sohn, Min-Hak Choi, Dohun Yi, A. Vipin Menon, and Jin-Wu Nam
 
-Bioinformatic and Genomics Lab., Dept. of Life Science, Hanyang University, Seoul 04763, Korea
+Bioinformatics and Genomics Lab., Dept. of Life Science, Hanyang University, Seoul 04763, Korea
 
-----------------------------------------------------------------------------------
+
 
 
 # Contact
 
-If you have any issues, please contact us
+#### Principal investigator
 
-   Jang-il Sohn (sohnjangil@gmail.com)
+Jin-Wu Nam ([jwnam@hanyang.ac.kr]())
 
-   Jin-Wu Nam (jwnam@hanyang.ac.kr)
+
+
+##### If he is unavailable, please email one of
+
+Jang-il Sohn (sohnjangil@gmail.com)
+
+Min-hak Choi (choiminhak1004@gmail.com)
+
+Dohun Yi (kutarballoon@gmail.com)
 
 ----------------------------------------------------------------------------------
