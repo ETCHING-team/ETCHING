@@ -85,18 +85,20 @@ if [ $1 == "default" ]
 then
     if (( version < 6 ))
     then
-	echo "Required: g++ >=6.1.0"
+	echo "Required: g++ >=6 for default"
+	exit -1
     else
-	echo -e "gcc/g++: OK"    
+	echo -e "gcc/g++ >=6 for default: OK"    
     fi
 else
     if [ $1 == "all" ]
     then
-	if (( version < 6 ))
+	if (( version < 7 ))
 	then
-	    echo "Required: g++ >=7.1.0 for make all"
+	    echo "Required: g++ >=7 for full-installation"
+	    exit -1
 	else
-	    echo -e "gcc/g++: OK"    
+	    echo -e "gcc/g++ >=7 for full-installation: OK"    
 	fi
     else
 	echo "ERROR!!! in checkreq.sh"
