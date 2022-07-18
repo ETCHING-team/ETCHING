@@ -216,6 +216,24 @@ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g small_gen
 
 
 
+# ETCHING on Amazon Web Service
+
+ETCHING is also available on Amazon Web Service (AMI ID: ami-07c7a7d8934784df9; Region: us-east-1 (Northern Virginia)).
+```bash
+# Lunch EC2 instance from ETCHING AMI
+# And connect to EC2 instance
+ssh -i Your_Key ubuntu@Your_Instance_Address
+
+# Decompress
+tar zxvf ~/resources/DEMO.tar.gz 
+
+# Run demo
+cd ~/resources/DEMO
+bash example.sh
+```
+
+
+
 # Related programs
 
 ### Filtration tool for PacBio long-reads
