@@ -389,28 +389,28 @@ int main ( int argc , char ** argv ){
       system(command.c_str() );
     }
     else {
-      command = "ln -sf " + existing + ".kmc_pre filter.kmc_pre";
+      command = "ln -s " + existing + ".kmc_pre filter.kmc_pre";
       std::cerr << command << "\n"; 
       system(command.c_str() );
-      command = "ln -sf " + existing + ".kmc_suf filter.kmc_suf";
+      command = "ln -s " + existing + ".kmc_suf filter.kmc_suf";
       std::cerr << command << "\n"; 
       system(command.c_str() );
     }
   }
   else{
     if ( control_count !=0 && reference_count == 0 ){
-      command = "ln -sf control_filter.kmc_pre filter.kmc_pre";
+      command = "ln -s control_filter.kmc_pre filter.kmc_pre";
       std::cerr << command << "\n"; 
       system(command.c_str() );
-      command = "ln -sf control_filter.kmc_suf filter.kmc_suf";
+      command = "ln -s control_filter.kmc_suf filter.kmc_suf";
       std::cerr << command << "\n"; 
       system(command.c_str() );
     }
     else if ( control_count ==0 && reference_count != 0 ){
-      command = "ln -sf reference_filter.kmc_pre filter.kmc_pre";
+      command = "ln -s reference_filter.kmc_pre filter.kmc_pre";
       std::cerr << command << "\n"; 
       system(command.c_str() );
-      command = "ln -sf reference_filter.kmc_suf filter.kmc_suf";
+      command = "ln -s reference_filter.kmc_suf filter.kmc_suf";
       std::cerr << command << "\n"; 
       system(command.c_str() );
     }
