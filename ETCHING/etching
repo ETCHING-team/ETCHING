@@ -1408,21 +1408,21 @@ then
 	    fi
 	    
             ## make link for somatic filtered vcf files as final results
-	    cmd="ln -sf ${TF_PREFIX}.BND.etching_sorter.SF.vcf ${PREFIX}.BND.final.vcf" ; echo $cmd ; eval $cmd
-	    cmd="ln -sf ${TF_PREFIX}.SV.etching_sorter.SF.vcf ${PREFIX}.SV.final.vcf" ; echo $cmd ; eval $cmd
+	    cmd="ln -s ${TF_PREFIX}.BND.etching_sorter.SF.vcf ${PREFIX}.BND.final.vcf" ; echo $cmd ; eval $cmd
+	    cmd="ln -s ${TF_PREFIX}.SV.etching_sorter.SF.vcf ${PREFIX}.SV.final.vcf" ; echo $cmd ; eval $cmd
 	else
-	    cmd="ln -sf ${TF_PREFIX}.BND.etching_sorter.vcf ${PREFIX}.BND.final.vcf" ; echo $cmd ; eval $cmd
-	    cmd="ln -sf ${TF_PREFIX}.SV.etching_sorter.vcf ${PREFIX}.SV.final.vcf" ; echo $cmd ; eval $cmd
+	    cmd="ln -s ${TF_PREFIX}.BND.etching_sorter.vcf ${PREFIX}.BND.final.vcf" ; echo $cmd ; eval $cmd
+	    cmd="ln -s ${TF_PREFIX}.SV.etching_sorter.vcf ${PREFIX}.SV.final.vcf" ; echo $cmd ; eval $cmd
 	fi
 
 	if [ ! -f ${PREFIX}.SV.unfiltered.vcf ]
 	then
-	    cmd="ln -sf ${TF_PREFIX}.SV.unfiltered.vcf ${PREFIX}.SV.unfiltered.vcf" ; echo $cmd ; eval $cmd
+	    cmd="ln -s ${TF_PREFIX}.SV.unfiltered.vcf ${PREFIX}.SV.unfiltered.vcf" ; echo $cmd ; eval $cmd
 	fi
 
 	if [ ! -f ${PREFIX}.BND.unfiltered.vcf ]
 	then
-	    cmd="ln -sf ${TF_PREFIX}.BND.unfiltered.vcf ${PREFIX}.BND.unfiltered.vcf" ; echo $cmd ; eval $cmd
+	    cmd="ln -s ${TF_PREFIX}.BND.unfiltered.vcf ${PREFIX}.BND.unfiltered.vcf" ; echo $cmd ; eval $cmd
 	fi
 
 	OUTPUT_1="${PREFIX}.BND.unfiltered.vcf"
