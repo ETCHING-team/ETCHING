@@ -2,7 +2,7 @@
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
-For raw FASTQ whole genome sequencing (WGS) data, preprocessing and alignment steps normally take ~12 hours (or more), 
+For raw FASTQ whole genome sequencing (WGS) data, preprocessing and alignment steps normally take about 12 hours (or more), 
 and then SV prediction also take more than an hour (sometime days). ETCHING takes 2~3 hours for raw FASTQ (30X normal
 and 50X tumor) on 30 threads on DELL 930 server.
 
