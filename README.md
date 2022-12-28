@@ -1,15 +1,26 @@
-# ETCHING
-
-### Version 1.4.1
+# ETCHING-v1.4.1
 
 ### Efficient Detection of Chromosomal Rearrangements Using a Scalable k-mer Database of Multiple Reference Genomes and Variations
 
-ETCHING takes about 3 hours for WGS data with 30X normal and 50X tumor on 30 threads on DELL 930 server.
-You can also find codes, k-mer set, and DEMO files in our website.
+For raw FASTQ whole genome sequencing (WGS) data, preprocessing and alignment steps normally take ~12 hours (or more), 
+and then SV prediction also take more than an hour (sometime days). ETCHING takes 2~3 hours for raw FASTQ (30X normal
+and 50X tumor) on 30 threads on DELL 930 server.
 
-http://big.hanyang.ac.kr/ETCHING/download.html
+Matched normal sequencing data was essentially required to predict somatic SVs from tumor sequencing data. 
+However, ETCHING can predict somatic SVs without matched normal using a pan-genome k-mer set
+(PGK2, http://big.hanyang.ac.kr/ETCHING/download.html) based on 894 human genomes and assemblies.
 
- 
+You can also find and download our codes, PGK2, and DEMO files from our website.
+
+http://big.hanyang.ac.kr/ETCHING/
+
+## Announcement
+
+* Our manuscript was published in Nature Biomedical Engineering (https://doi.org/10.1038/s41551-022-00980-5).
+* The next version (ETCHING-v1.4.2) is coming soon.
+  * Comparing with the present version, it is 20% faster for FASTQ input.
+  * Since ETCHING was developed focusing on FASTQ input, it was not fast for aligned BAM. Now, it can predict SVs in an hour. 
+  * Additionally, we updated ETCHING to support CRAM. 
 
 ## Recent changes
 
