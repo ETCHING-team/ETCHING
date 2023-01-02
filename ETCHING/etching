@@ -1093,7 +1093,7 @@ else
 
 	## sorting bam file
 	CHECK=$($SAMTOOLS sort 2>&1 | grep "\-o" | grep "final output to stdout" | wc -l )
-	if (( CHECK == ))
+	if [[ "${CHECK}" -eq  0 ]]
 	then
 	    cmd="${SAMTOOLS} sort -@ ${THREADS} ${PREFIX}.bam -o ${PREFIX}.sort.bam"
 	else
