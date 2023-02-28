@@ -261,6 +261,12 @@ https://github.com/ETCHING-team/etching_bench
 
 
 
+# Citing ETCHING
+Sohn, Ji., Choi, MH., Yi, D. et al. Ultrafast prediction of somatic structural variations by filtering out reads matched to pan-genome k-mer sets. Nat. Biomed. Eng (2022). https://doi.org/10.1038/s41551-022-00980-5
+
+
+
+
 # Contributors
 
 Jang-il Sohn, Min-Hak Choi, Dohun Yi, A. Vipin Menon, and Jin-Wu Nam
