@@ -10,6 +10,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include <map>
 #include <set>
@@ -24,11 +25,11 @@ void read_gene_list(const std::string gene_list_file,
 		    std::map < std::string , std::map < Loci , std::string > > & gene_list_for,
 		    std::map < std::string , std::map < Loci , std::string > > & gene_list_rev);
 
-void find_fusion_gene ( std::map < int , std::map < Position , std::map < Position , std::string > > > & BP_pair,
+std::stringstream find_fusion_gene ( std::map < int , std::map < Position , std::map < Position , std::string > > > & BP_pair,
 			std::map < std::string , std::map < Loci , std::string > > & gene_list_for,
 			std::map < std::string , std::map < Loci , std::string > > & gene_list_rev,
 			std::set < std::string > & fusion_genes, int window, int strand_aware );
 
-int find_fg ( std::string BP_pair_file, std::string gene_list_file, int window, int strand_aware );
+std::stringstream find_fg ( std::string BP_pair_file, std::string gene_list_file, int window, int strand_aware );
 
 #endif

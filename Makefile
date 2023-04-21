@@ -1,15 +1,11 @@
 default: 
-	bash install.sh default
+	bash install.sh compile
 
 all:
-	bash install.sh all
+	bash install.sh compile
 
 clean:
 	bash install.sh clean
-
-cleanall:
-	bash install.sh cleanall
-
 
 
 

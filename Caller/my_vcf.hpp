@@ -22,6 +22,7 @@
 #include <api/BamReader.h>
 #include <api/BamWriter.h>
 
+#include "etching_info.hpp"
 #include "types.hpp"
 #include "caller_functions.hpp"
 
@@ -32,14 +33,13 @@ class VCF_LINE{
 private:
   void input_features(std::string feature_str);
   void input_features_2(std::string feature_str);
-  std::string cut_str(std::string & input, std::string key);
   
 public:
   VCF_LINE(){};
   VCF_LINE(std::string);
   ~VCF_LINE(){};
 
-  std::string parse(std::string);
+  void parse(std::string);
   void parse_etching(std::string);
 
   Feature parse_feature(std::string feature);
@@ -73,9 +73,10 @@ public:
   pos_type dir2;
 
   std::string strand;
-
+  
 
   std::string mate_id; // for BND
+  //std::string source_bnd; // Source BND of typed SV
   std::string svtype; // INS, DEL, DUP, INV, BND
   pos_type svlen; // SV length
   std::string scoremethod; // One of Random forest or XGBoost
@@ -251,8 +252,6 @@ public:
   VCF(const std::string input_file);
   ~VCF();
 
-  std::string etching_version="ETCHING_v1.3.6 (2021.9.6.)";
-  
   // Main container
   VCF_MAP vcf_map;
   

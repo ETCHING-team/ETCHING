@@ -17,7 +17,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <omp.h>
 #include <vector>
 #include <utility>
 #include <thread>
@@ -31,9 +30,6 @@
 using namespace std;
 
 int collector (string kmer_table, int kmer_size, string out_prefix, string read_file_1, string read_file_2, int gz_check, int NT);
-int collector_id_mode_single (string kmer_table, string out_prefix, string read_file_1, int gz_check, int NT);
-int collector_id_mode (string kmer_table, string out_prefix, string read_file_1, string read_file_2, int gz_check, int NT);
-int collector_bam (string kmer_table, int kmer_size, string out_prefix, string read_file_b, int NT, bool fast_bam);
 int collector_single (string kmer_table, int kmer_size, string out_prefix, string read_file_1, int gz_check, int NT);
    
 #endif

@@ -1,10 +1,27 @@
+### 1.4.2
+
+CRAM supported.
+
+BAM mode accelerated.
+
+Requirement changed
+
+g++ >=7 and cmake >=3.14 for compiling
+
+samtools >=1.13
+
+Unnecessary modules removed.
+
+Minor bugs fixed.
+
+
 ### 1.4.0
 
 Update with a graph theory of breakend, BND=(BP1,BP2), where BP=(chr,pos,dir).
 
 Machine learning modules for ranger and xgboost were replaced with cpp.
 
-Quality control module (fastp) was included in ```etching_filter```
+Quality control module (fastq) was included in etching_filter
 
 New Pan-Genome K-mer set, PGK2 (based on 894 human genomes), was released (http://big.hanyang.ac.kr/ETCHING/).
 

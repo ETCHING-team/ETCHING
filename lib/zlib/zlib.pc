@@ -1,4 +1,4 @@
-prefix=WD
+prefix=/usr/local
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 sharedlibdir=${libdir}

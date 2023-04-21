@@ -15,6 +15,8 @@
 #include <unistd.h>
 #include <map>
 
+#include "etching_info.hpp"
+
 #define NO_OF_FEATURE 6
 
 
@@ -201,16 +203,12 @@ void razor ( std::string infile, std::string score_file, std::string prefix, dou
   }
   fin.close();
 
-  std::string outfile = prefix + "etching_sorter.vcf";
+  std::string outfile=prefix + ".scored.vcf";
   std::ofstream fout ( outfile.c_str() );
-  
-  std::string scoredfile = prefix + "unfiltered.vcf";
-  std::ofstream fout_score ( scoredfile.c_str() );
 
   fin.open(infile);
   while ( std::getline(fin,tmp) ){
     fout << tmp <<"\n";
-    fout_score << tmp <<"\n";
     if ( tmp[1] != '#' ) break;
   }
 
@@ -226,22 +224,13 @@ void razor ( std::string infile, std::string score_file, std::string prefix, dou
     }
     vcf_content[5] = std::to_string(score_map[vcf_content[2]]);
     vcf_content[7] += ";SVSCORE=" + std::to_string(score_map[vcf_content[2]]) + ";SCOREMETHOD=" + method;
-    // vcf_content[7] += ";SCOREMETHOD=" + method;
     for ( int i = 0 ; i < 10 ; i ++ ){
-      fout_score << vcf_content[i] << "\t";
+      fout << vcf_content[i] << "\t";
     }
-    fout_score << vcf_content[10] << "\n";
-    if ( vcf_content[6] == "PASS" ){
-      for ( int i = 0 ; i < 10 ; i ++ ){
-	fout << vcf_content[i] << "\t";
-      }
-      fout << vcf_content[10] << "\n";
-    }
+    fout << vcf_content[10] << "\n";
   }
-
-  fin.close();
   fout.close();
-  fout_score.close();
+  fin.close();
 }
 
 #endif

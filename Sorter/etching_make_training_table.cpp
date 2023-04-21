@@ -4,13 +4,9 @@
 #include <fstream>
 #include <iostream>
 
-void etching_merge_to_table_usage(){
-  std::cout << "Usage: etching_merge_to_table etching_merge.vcf output_table.txt cutoff\n";
-}
-
 int main ( int argc , char ** argv ){
   if ( argc != 4 ){
-    etching_merge_to_table_usage();
+    std::cout << "Usage: etching_make_training_table etching_merge.vcf output_table.txt cutoff\n";
     return 1;
   }
 
@@ -22,7 +18,7 @@ int main ( int argc , char ** argv ){
 
   if ( ! fin ){
     std::cerr << "ERROR!!! There is no input file: " << infile << "\n";
-    etching_merge_to_table_usage();
+    std::cout << "Usage: etching_make_training_table etching_merge.vcf output_table.txt cutoff\n";
     return 1;
   }
 
@@ -40,8 +36,6 @@ int main ( int argc , char ** argv ){
   }
 
   std::string info_line;
-  // std::string svid;
-  // std::string svtype;
   std::string feature;
   std::string detect;
   std::vector < std::string > ev(10);
@@ -52,11 +46,6 @@ int main ( int argc , char ** argv ){
     for ( std::size_t i = 0 ; i < 7 ; i ++ ) std::getline ( ss , tmp1 , '\t' );
 
     std::getline ( ss , info_line , '\t' );
-    // std::string key("SVTYPE=");
-    // std::size_t found = info_line.find ( key );
-    // info_line=info_line.substr(found+key.size());
-    // std::stringstream iss ( info_line );
-    // std::getline ( iss , svtype , ';' );
 
     std::getline ( ss , tmp1 , '\t' );
     std::getline ( ss , tmp1 , '\t' );
@@ -81,11 +70,6 @@ int main ( int argc , char ** argv ){
 
       fout << feature << "\t" << detect << "\n";
     }
-    else{
-      // svid = "NONE";
-      // feature = "0\t0\t0\t0\t0\t0";
-    }
-
   }
 
   fin.close();

@@ -8,6 +8,8 @@
 #include "etching_caller.hpp"
 #include <chrono>
 #include <ctime>
+#include <unistd.h>
+#include <getopt.h>
 
 #include "CPU_TIME_measure.hpp"
 #include "Peak_memory_measure.hpp"
@@ -15,7 +17,7 @@
 int main(int argc, char ** argv){
 
   if(argc == 1 ){
-    caller_usage();
+    caller_usage(argc,argv);
     return 0 ;
   }
 
@@ -37,35 +39,54 @@ int main(int argc, char ** argv){
 
   int insert_size = 500; // -I insert_size
   bool typing = 1 ;
-  bool scanall = 1 ; 
-  bool rescue = 0 ;
+  bool scanall = 1 ; // deprecated
+  bool rescue = 0 ; // deprecated
 
   std::string read_orientation = "FR";
   // std::string data_type; // WGS, WTS, or PANEL
   
   std::size_t sz;
 
-  std::string confile;
+  bool print_only_bp_pairs=0;
 
+  while (1){
+    static struct option long_options[]=
+      {
+        {"input_bam",        required_argument, 0,   'b'},
+        {"prefix",           required_argument, 0,   'o'},
+        {"genome",           required_argument, 0,   'g'},
+        {"typing",           no_argument,       0,   'B'},
+        {"infile_pref",      required_argument, 0,   'i'},
+        //{"scanall",          required_argument, 0,   'A'},
+        //{"rescue",           no_argument, 0,         'R'},
+        {"seqdep",           no_argument, 0,         'D'},
+        {"purity",           required_argument, 0,   'P'},
+        {"insert_size",      required_argument, 0,   'I'},
+        {"read_orientation", required_argument, 0,   'O'},
+        {"bp-pair",          no_argument,       0,   'x'},
+        {"help",             no_argument,       0,   'h'},
+      };
 
-  // while ( (opt = getopt ( argc, argv, "b:o:g:t:BS:i:D:P:T:I:O:c:r:a:f:x:q:e:C:R:A:F:X:Q:E:h" ) ) != -1 ){
-  while ( (opt = getopt ( argc, argv, "b:o:g:BS:i:ARD:P:I:O:c:h" ) ) != -1 ){
+    int opt_ind=0;
+    //opt = getopt_long ( argc, argv, "b:o:g:BS:i:ARD:P:I:O:xh", long_options, &opt_ind);
+    opt = getopt_long ( argc, argv, "b:o:g:Bi:D:P:I:O:xh", long_options, &opt_ind);
+    if (opt==-1) break;
+
     switch ( opt ) {
     case 'b': input_bam=optarg; break;
     case 'o': prefix=optarg; break;
     case 'g': genome=optarg; break;
     case 'B': typing = 0; break;
     case 'i': infile_pref = optarg; break;
-    case 'A': scanall = 1; break;
-    case 'R': rescue = 1; break;
+      //case 'A': scanall = 1; break;
+      //case 'R': rescue = 1; break;
     case 'D': seqdep = std::stod(optarg,&sz); break;
     case 'P': purity = std::stod(optarg,&sz); break;
     case 'I': insert_size = atoi(optarg); break;
     case 'O': read_orientation = optarg; break;
-    case 'c': confile = optarg; break;
-    case 'h': caller_usage(); return 0 ;
-
-    default: std::cout << "\tInvalid option\n"; caller_usage(); return 1;
+    case 'x': print_only_bp_pairs = 1; break;
+    case 'h': caller_usage(argc,argv); return 0 ;
+    default: std::cout << "\tInvalid option\n"; caller_usage(argc,argv); return 1;
 
     }
   }
@@ -74,42 +95,42 @@ int main(int argc, char ** argv){
     std::cout << "------------------------------------------------------------------------------\n";
     std::cout << "ERROR!!! In option -i : Input bam file is required.\n";
     std::cout << "------------------------------------------------------------------------------\n\n";
-    caller_usage();
+    caller_usage(argc,argv);
     return 0;
   }
   if ( prefix.size() == 0 ){
     std::cout << "------------------------------------------------------------------------------\n";
     std::cout << "ERROR!!! In option -o : Prefix of output file is required.\n";
     std::cout << "------------------------------------------------------------------------------\n\n";
-    caller_usage();
+    caller_usage(argc,argv);
     return 0;
   }
   if ( genome.size() == 0 ){
     std::cout << "------------------------------------------------------------------------------\n";
     std::cout << "ERROR!!! In option -g : Reference genome file is required.\n";
     std::cout << "------------------------------------------------------------------------------\n\n";
-    caller_usage();
+    caller_usage(argc,argv);
     return 0;
   }
   if ( read_orientation != "FR" && read_orientation != "RF" ) {
     std::cout << "------------------------------------------------------------------------------\n";
     std::cout << "ERROR!!! In option -O : Read-orientation must be one of FR or RF.\n";
     std::cout << "------------------------------------------------------------------------------\n\n";
-    caller_usage();
+    caller_usage(argc,argv);
     return 0;
   }
   if ( purity <= 0 || purity > 1 ){
     std::cout << "------------------------------------------------------------------------------\n";
     std::cout << "ERROR!!! In option -P : Tumor purity must be from 0 to 1.\n";
     std::cout << "------------------------------------------------------------------------------\n\n";
-    caller_usage();
+    caller_usage(argc,argv);
     return 0;
   }
   if ( seqdep < 0 ){
     std::cout << "------------------------------------------------------------------------------\n";
     std::cout << "ERROR!!! In option -C : Sequencing coverage (or depth) must be greater then 0.\n";
     std::cout << "------------------------------------------------------------------------------\n\n";
-    caller_usage();
+    caller_usage(argc,argv);
     return 0;
   }
   
@@ -118,7 +139,7 @@ int main(int argc, char ** argv){
     std::cout << "------------------------------------------------------------------------------\n";
     std::cout << "ERROR!!! In option -b : No input bam file : " << input_bam << "\n";
     std::cout << "------------------------------------------------------------------------------\n\n";
-    caller_usage();
+    caller_usage(argc,argv);
     return 0;
   }
   fin.close();
@@ -128,7 +149,7 @@ int main(int argc, char ** argv){
     std::cout << "------------------------------------------------------------------------------\n";
     std::cout << "ERROR!!! In option -g : No reference genome file : " << genome << "\n";
     std::cout << "------------------------------------------------------------------------------\n\n";
-    caller_usage();
+    caller_usage(argc,argv);
     return 0;
   }
   fin.close();
@@ -150,10 +171,12 @@ int main(int argc, char ** argv){
   std::cout << "Reference genome:     -g " << genome << "\n";
   std::cout << "Insert-size:          -I " << insert_size << "\n";
   std::cout << "Read-orientation:     -O " << read_orientation << "\n";
-  if ( typing == 0 ) std::cout << "BND only:             -B " << "Print only BND" << "\n";
-  //if ( scanall ) std::cout << "Scan all split-read:  -A " << "\n";
-  if ( rescue )  std::cout << "Rescue SVs:           -R " << "\n";
-  std::cout << "\n";
+  if ( print_only_bp_pairs == 0 ){
+    if ( typing == 0 ) std::cout << "BND only:             -B " << "Print only BND" << "\n";
+    //if ( scanall ) std::cout << "Scan all split-read:  -A " << "\n";
+    //if ( rescue )  std::cout << "Rescue SVs:           -R " << "\n";
+    std::cout << "\n";
+  }
   std::cout << "===============================================================\n";
 
   //////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,9 +185,13 @@ int main(int argc, char ** argv){
   //
   
   find_path ( input_bam, prefix, insert_size, scanall, rescue);
-
-
+  
   std::cout << "===============================================================\n";
+
+  if ( print_only_bp_pairs == 1 ){
+    return 0;
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////
   //
   // Step 2
