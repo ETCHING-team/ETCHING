@@ -1,0 +1,306 @@
+#!/bin/bash
+
+#--------------------------------------------------------------------
+# Copyright 2020. Bioinformatic and Genomics Lab.
+# Hanyang University, Seoul, Korea
+# Coded by Jang-il Sohn (sohnjangil@gmail.com)
+#-------------------------------------------------------------------- 
+
+ETCHING_FILTER="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
+ETCHING_FILTER_INPUT_OPTIONS="$@"
+ETCHING_PATH=$(dirname $(which $0) 2> /dev/null)
+
+source ${ETCHING_PATH}/etching_parameters.sh
+source ${ETCHING_PATH}/etching_function.sh
+
+#####################################
+
+if [[ $# -lt 1 ]]
+then
+    FILTER_USAGE
+    exit 1
+fi
+
+while [[ "$1" != "" ]]; do
+    case $1 in
+	-1 | --first ) shift
+	    FIRST=$1
+	    ;;
+	-2 | --second ) shift
+	    SECOND=$1
+	    ;;
+
+
+	-g | --reference-genome ) shift
+	    GENOME=$1
+	    ;;
+
+	--bwa-T ) shift
+		  BWA_T=$1
+		  ;;
+
+        -o | --output | -p | --prefix ) shift
+	    INPUT_PREFIX=$1
+            ;;
+        -t | --threads ) shift
+	    THREADS=$1
+	    ;;
+        -l | --k-mer-size ) shift
+	    KMER_SIZE=$1
+	    ;;
+
+        -K | --k-mer-freq-cutoff ) shift
+	    KMER_CUTOFF=$1
+            ;;
+        --max-kmer ) shift
+	    MAXK=$1
+            ;;
+
+
+	--kmer-table ) shift
+	    CUSTOM_KMER_TABLE=$1
+	    ;;
+
+	-1c | --first-control ) shift
+	    FIRST_CONT=$1
+	    ;;
+	-2c | --second-control ) shift
+	    SECOND_CONT=$1
+	    ;;
+
+
+	-f | --k-mer-filter ) shift
+	    FILTER=$1
+	    ;;
+
+	--no-prep )
+	    PREPROCESSING=0;
+	    ;;
+
+        -h | --help ) FILTER_USAGE
+            exit 1
+            ;;
+
+	-S | --samtools ) shift
+	    SAMTOOLS=$1
+	    ;;
+	-B | --bwa ) shift
+	    BWA=$1
+	    ;;
+
+
+	* ) 
+	    echo "ERROR!!! $0 line ${LINENO}: Unavailable option: $1"
+	    echo "-------------------------------"
+	    FILTER_USAGE
+	    exit 1
+    esac
+    shift
+done
+
+PREFIX_NAME=$(echo ${INPUT_PREFIX} | sed "s/\//\n/g" | tail -n1)
+
+# Set environment to run etching
+SET_ENVIRONMENT
+
+# Check required ETCHING's modules, binaries, cripts, and files
+CHECK_REQUIRED
+
+#############################
+#
+# set input tumor data
+#
+if (( ${#FIRST} * ${#SECOND} == 0 ))
+then
+    echo "ERROR!!! No input file"
+    exit 1
+fi
+
+if (( ${#FIRST} != 0 ))
+then
+    if [[ ! -f ${FIRST} ]]
+    then
+	echo "ERROR!!! $0 line ${LINENO}: There is no ${FIRST}".
+	exit 1
+    fi
+fi
+
+if (( ${#SECOND} != 0 ))
+then
+    if [[ ! -f ${SECOND} ]]
+    then
+	echo "ERROR!!! $0 line ${LINENO}: There is no ${SECOND}".
+	exit 1
+    fi
+fi
+
+#############################
+#
+# set input normal data
+#
+
+if (( ${#FIRST_CONT} != 0 ))
+then
+    if [[ ! -f ${FIRST_CONT} ]]
+    then
+	echo "ERROR!!! $0 line ${LINENO}: There is no ${FIRST_CONT}".
+	exit 1
+    fi
+fi
+
+if (( ${#SECOND_CONT} != 0 ))
+then
+    if [[ ! -f ${SECOND_CONT} ]]
+    then
+	echo "ERROR!!! $0 line ${LINENO}: There is no ${SECOND_CONT}".
+	exit 1
+    fi
+fi
+
+
+
+#############################
+#
+# Check parameters
+#
+
+if (( KMER_CUTOFF < 1 ))
+then
+    eccho "ERROR!!! -K (or --k-mer-freq-cutoff) must be >0"
+    exit 1
+fi
+
+
+#############################
+#
+# set input genome
+#
+
+if [[ ${#GENOME} == 0 ]]
+then
+    echo "ERROR!!! $0 line ${LINENO}: -g (reference_genome) is required"
+    echo "------------------------------------------"
+    FILTER_USAGE
+    exit 1
+fi
+
+
+if [[ ! -f ${GENOME} ]]
+then
+    echo "ERROR!!! There is no reference genome: $GENOME"
+    echo "----------------------------------------------"
+    FILTER_USAGE
+    exit 1
+fi
+
+#############################
+#
+# Check if reference genome was indexed
+#
+
+for i in amb ann bwt pac sa
+do
+    CHECK_INDEX=${GENOME}.${i}
+    if [[ ! -f ${CHECK_INDEX} ]]
+    then
+	echo "ERROR!!! $0 line ${LINENO}: We cannot find ${CHECK_INDEX}."
+	echo "-----------------------------------------------------------------------"
+	FILTER_USAGE
+	exit 1
+    fi
+done
+
+#############################
+#
+# Make k-mer table
+#
+
+
+if [[ ${#CUSTOM_KMER_TABLE} != 0 ]]
+then
+    echo
+    echo "[Skip kmer_table_generator and use ${CUSTOM_KMER_TABLE}]"
+    KMER_TABLE=${CUSTOM_KMER_TABLE}
+else
+    echo
+    echo "[kmer_table_generator to make sample specific k-mer table]"
+    DATE
+    
+    #############################
+    #
+    # kmer_table_generator
+    #
+    
+    echo "[k-mer filtration]"
+
+    cmd="echo -e \"${FIRST}\\n${SECOND}\" > ${PREFIX_NAME}.sample.list"
+    COMMAND ${ETCHING_FILTER} ${LINENO} $cmd
+    cmd="echo -e \"${FIRST_CONT}\\n${SECOND_CONT}\" > ${PREFIX_NAME}.filter.list"
+    COMMAND ${ETCHING_FILTER} ${LINENO} $cmd
+    
+    cmd="kmer_table_generator -i ${PREFIX_NAME}.sample.list -c ${PREFIX_NAME}.filter.list -p ${PREFIX_NAME} -t ${THREADS} -l ${KMER_SIZE} -M $MAXK -K ${KMER_CUTOFF}"
+    if [[ ${#FILTER} != 0 ]]
+    then
+	cmd="${cmd} -a ${FILTER}"
+    fi
+    COMMAND ${ETCHING_FILTER} ${LINENO} $cmd
+
+    KMER_TABLE=${PREFIX_NAME}.kmer_table.txt
+fi
+
+
+#############################
+#
+# read_collector
+#
+echo
+echo "[Read_collector]"
+DATE
+
+cmd="read_collector -f ${KMER_TABLE} -1 ${FIRST} -2 ${SECOND} -p ${PREFIX_NAME} -t ${THREADS}"
+COMMAND ${ETCHING_FILTER} ${LINENO} $cmd 2> /dev/null
+
+
+if (( PREPROCESSING == 1 ))
+then
+    FASTP_THREADS=${THREADS}
+    if (( THREADS > 16 ))
+    then
+	FASTP_THREADS=16
+    fi
+    echo
+    echo "[Preprocessing for filtered reads]"
+    
+    BWA_INPUT_1=${PREFIX_NAME}_prep_1.fastq
+    BWA_INPUT_2=${PREFIX_NAME}_prep_2.fastq
+    cmd="fastp -l 50 -5 -3 -w ${FASTP_THREADS} -i ${PREFIX_NAME}_1.fastq -I ${PREFIX_NAME}_2.fastq -o ${PREFIX_NAME}_prep_1.fastq -O ${PREFIX_NAME}_prep_2.fastq 2>&1"
+    COMMAND ${ETCHING_FILTER} ${LINENO} $cmd
+    echo 
+else
+    BWA_INPUT_1=${PREFIX_NAME}_1.fastq
+    BWA_INPUT_2=${PREFIX_NAME}_2.fastq	
+fi
+
+
+echo
+echo "[Mapping]"
+DATE
+
+let HALF=(${THREADS}/2 + 1)
+
+cmd="${BWA} mem -T ${BWA_T} -t ${THREADS} ${GENOME} ${BWA_INPUT_1} ${BWA_INPUT_2} | ${SAMTOOLS} view -@ ${HALF} -Sbh - > ${PREFIX_NAME}.bam"
+COMMAND ${ETCHING_FILTER} ${LINENO} $cmd
+echo 
+
+
+COMMAND ${ETCHING_FILTER} ${LINENO} ${SAMTOOLS} sort -@ ${THREADS} ${PREFIX_NAME}.bam -o ${PREFIX_NAME}.sort.bam 2> /dev/null
+
+
+cmd="${SAMTOOLS} index ${PREFIX_NAME}.sort.bam"
+COMMAND ${ETCHING_FILTER} ${LINENO} $cmd
+
+echo
+echo "[END]"
+DATE
+
+exit 0
