@@ -11,7 +11,7 @@ You can also find codes, k-mer set, and DEMO files on our website.
 
 http://big.hanyang.ac.kr/ETCHING/download.html
 
-We recommend using the new version of the pan-genome k-mer set (PGK2, http://big.hanyang.ac.kr/ETCHING/download.html). 
+We recommend using the new version of the pan-genome k-mer set, PGK2. You can download it from our website.
 
 Using PGK2, ETCHING can detect somatic SVs from tumor sequencing data without matched-normal in comparable performance with other cutting-edge SV detection tools.
 
