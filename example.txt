@@ -1,48 +1,59 @@
-ETCHING examples for DEMO
+## ----------------------------------------------------------------------------------------------------------
+## ETCHING examples for DEMO
 
-$ wget http://big.hanyang.ac.kr/ETCHING/DEMO.tar.gz
-$ tar zxvf DEMO.tar.gz
-$ cd DEMO
-$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
-  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_1 -t 8
+## Note:
+## Even if you don't have normal sequencing data, ETCHING can predict somatic SVs with pretty high recall
+## and precision rates by using PGK2 (http://big.hanyang.ac.kr/ETCHING/). Its performance without normal data
+## is comparable with other state-of-art somatic SV callers requiring normal data. In the following example,
+## replace demo_PGK with PGK2 for real data. When you download PGK2, you will have PGK2.kmc_pre and
+## PGK2.kmc_suf. Then, type like "-f PGK2" (or"-f /path/to/PGK2").
 
-----------------------------------------------------------------------------------------------------------
+## Requirement for running ETCHING:
+## samtools (>=1.13) and bwa
 
-Bam input files
-$ etching -b tumor.sort.bam -bc normal.sort.bam \
-  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_1 -t 8
+## ----------------------------------------------------------------------------------------------------------
+## Get demo
 
-You can use a bam file for tumor sample
-$ etching -b tumor.sort.bam -1c normal_1.fq -2c normal_2.fq \
-  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_2 -t 8
+wget http://big.hanyang.ac.kr/ETCHING/DEMO.tar.gz
+tar zxvf DEMO.tar.gz
+cd DEMO
 
-You can use a bam file for normal sample
-$ etching -1 tumor_1.fq -2 tumor_2.fq -bc normal.sort.bam \
-  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_3 -t 8
+## or
 
-----------------------------------------------------------------------------------------------------------
+wget http://big.hanyang.ac.kr/ETCHING/tiny_DEMO.tar.gz
+tar zxvf tiny_DEMO.tar.gz
+cd tiny_DEMO
 
-If you have a bed file of target regions, use --target-filter
-$ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
-  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_1 -t 8\
-  --target-filter target_regions.bed
+## ----------------------------------------------------------------------------------------------------------
+## FASTQ input with matched normal
 
-----------------------------------------------------------------------------------------------------------
+etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq \
+-g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_1 -t 8
 
-If you want to use pre-made k-mer table (31-mer only), use --kmer-table
-$ etching -1 tumor_1.fq -2 tumor_2.fq \
-  -g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_4 -t 8\
-  --kmer-table tumor_specific_kmer_table.txt
+## ----------------------------------------------------------------------------------------------------------
+## Somatic SV prediction without matched normal sequencing data
 
-k-mer (31-mer) table must be like:
-AACCTAACCTAACCTAACCTAACCTAACCTG 14
-AACCTAACCTAACCTAACCTAACCTAACCAA 12
-AACCTAACCTAACCTAACCTAACCTAACCAC 6
+etching -1 tumor_1.fq -2 tumor_2.fq \
+-g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_2 -t 8
 
-----------------------------------------------------------------------------------------------------------
+## ----------------------------------------------------------------------------------------------------------
+## BAM input
 
+etching -b tumor.sort.bam -bc normal.sort.bam \
+-g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_3 -t 8
+
+## ----------------------------------------------------------------------------------------------------------
+## CRAM input
+
+etching -b tumor.sort.cram -bc normal.sort.cram \
+-g small_genome.fa -a small_genome.gtf -f demo_PGK -o example_4 -t 8
+
+## ----------------------------------------------------------------------------------------------------------
 [Contact]
-Please report bugs to
-  Jang-il Sohn (sohnjangil@gmail.com)
-  Jin-Wu Nam (jwnam@hanyang.ac.kr)
+	Jin-Wu Nam (jwnam@hanyang.ac.kr)
+
+	If he is unavailable, please contact one of
+	Jang-il Sohn (sohnjangil@gmail.com),
+	Min-Hak Choi (choiminhak1004@gmail.com),
+	or Dohun Yi (kutarballoon@gmail.com).
 

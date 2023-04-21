@@ -6,13 +6,9 @@
 #include <fstream>
 #include <iostream>
 
-void etching_merge_to_table_usage(){
-  std::cout << "Usage: etching_merge_to_table etching_merge.vcf output_table.txt cutoff\n";
-}
-
 int main ( int argc , char ** argv ){
   if ( argc != 4 ){
-    etching_merge_to_table_usage();
+    std::cout << "Usage: etching_merge_to_table etching_merge.vcf output_table.txt cutoff\n";
     return 1;
   }
 
@@ -24,7 +20,7 @@ int main ( int argc , char ** argv ){
 
   if ( ! fin ){
     std::cerr << "ERROR!!! There is no input file: " << infile << "\n";
-    etching_merge_to_table_usage();
+    std::cout << "Usage: etching_merge_to_table etching_merge.vcf output_table.txt cutoff\n";
     return 1;
   }
 

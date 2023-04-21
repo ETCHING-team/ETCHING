@@ -1,39 +1,33 @@
-default: ../lib/libetching_filter.so ../lib/gzstream/gzstream.o read_collector kmer_filter fastq_check sort_fastq_mem_eff match_pair find_local_min_kmer_depth make_pgk fastp
+default: read_collector kmer_table_generator make_pgk
 	chmod a+x etching_filter
+	if [ ! -f fastp ] ; then wget http://opengene.org/fastp/fastp ; chmod a+x fastp ; fi
 
 all: default
+
+INCLUDE=-I../lib/bamtools -I../lib/gzstream -I../lib/zlib -I../include/
+OBJECT=../lib/bamtools/api/*.o ../lib/gzstream/*.o ../lib/bamtools/api/internal/*/*.o ../lib/zlib/*.lo # source
+SHARE=-L../lib -letching
 
 make_pgk: make_pgk.cpp
 	g++ -Wall -std=c++11 make_pgk.cpp -o make_pgk
 
-kmer_filter: kmer_filter.cpp
-	g++ -Wall -std=c++11 kmer_filter.cpp -o kmer_filter
+kmer_table_generator: kmer_table_generator.cpp
+	g++ -Wall -std=c++11 ${INCLUDE} kmer_table_generator.cpp -o kmer_table_generator
 
-fastq_check: fastq_check.cpp ../lib/libetching_filter.so
-	g++ -Wall -std=c++11 -pthread -I../lib/gzstream -I../lib/zlib fastq_check.cpp ../lib/zlib/*.lo -L../lib -letching_filter -o fastq_check
+read_collector: read_collector.cpp
+	g++ -Wall -std=c++11 -c ${INCLUDE} read_collector.cpp -o read_collector.o ${SHARE} -pthread
+	g++ -Wall -std=c++11 -o read_collector read_collector.o ${SHARE} -pthread
 
-read_collector: read_collector.cpp ../lib/libetching_filter.so 
-	g++ -Wall -std=c++11 -fPIC -c read_collector.cpp -o read_collector.lo -L../lib -letching_filter -I../lib/gzstream -I../lib/zlib -pthread
-	g++ -Wall -std=c++11 ../lib/bamtools/api/internal/*/*.o ../lib/bamtools/api/*.o read_collector.lo ../lib/zlib/*.lo -L../lib -letching_filter -pthread -o read_collector
-sort_fastq_mem_eff: sort_fastq_mem_eff.cpp
-	g++ -Wall -std=c++11 sort_fastq_mem_eff.cpp -o sort_fastq_mem_eff
-match_pair: match_pair.cpp
-	g++ -Wall -std=c++11 match_pair.cpp -o match_pair
-
-find_local_min_kmer_depth: find_local_min_kmer_depth.cpp
-	g++ -Wall -g -std=c++11 find_local_min_kmer_depth.cpp -o find_local_min_kmer_depth
-
-fastp:
-	wget http://opengene.org/fastp/fastp ; chmod a+x ./fastp
-
-
-
+binary: library read_collector.cpp kmer_table_generator make_pgk # binary
+	g++ -Wall -std=c++11 -c -fPIC -pthread ${INCLUDE} read_collector.cpp -o read_collector.o # binary
+	g++ -Wall -std=c++11 -pthread ${INCLUDE} read_collector.o ../lib/*.lo ${OBJECT} -o read_collector # binary
+library: encode.cpp filter_functions.cpp # source
+	g++ -Wall -std=c++11 -c -fPIC ${INCLUDE} encode.cpp -o ../lib/encode.lo # source
+	g++ -Wall -std=c++11 -c -fPIC ${INCLUDE} filter_functions.cpp -o ../lib/filter_functions.lo -pthread # source
+remove_source: # source
+	rm -f encode.cpp filter_functions.cpp # source
 clean:
-	rm -f read_collector kmer_filter fastq_check sort_fastq_mem_eff match_pair find_local_min_kmer_depth make_pgk
+	rm -f read_collector kmer_table_generator make_pgk
 
-cleanlibrary: 
-	rm -f ../lib/libetching_filter.so
-
-cleanall: clean cleanlibrary
-	rm -f *.lo *.o
-	cd ../lib/gzstream && make cleanall
+cleanall: clean
+	rm -f *.o

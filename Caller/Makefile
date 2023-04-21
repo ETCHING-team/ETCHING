@@ -1,27 +1,38 @@
-default: ../lib/libetching_caller.so etching_caller etching_typer target_filter extract_BP_read
+default: etching_caller etching_typer target_filter
 all: default
 
-etching_caller: ../lib/libetching_caller.so etching_caller.cpp etching_caller.hpp ../lib/zlib/*.lo
-	g++ -Wall -g -std=c++11 -fopenmp etching_caller.cpp -o etching_caller ../lib/zlib/*.lo -L../lib -letching_caller -I../lib/bamtools
+INCLUDE=-I../lib/bamtools -I../lib/gzstream -I../lib/zlib -I../include/
+OBJECT=../lib/bamtools/api/*.o ../lib/gzstream/*.o ../lib/bamtools/api/internal/*/*.o ../lib/zlib/*.lo # source
+SHARE=-L../lib -letching -pthread
+
+etching_caller: etching_caller.cpp
+	g++ -Wall -g -std=c++11 -c ${INCLUDE} caller_usage.cpp -o caller_usage.o
+	g++ -Wall -g -std=c++11 -fopenmp ${INCLUDE} etching_caller.cpp -o etching_caller caller_usage.o ${SHARE}
 
 target_filter: target_filter.cpp
-	g++ -Wall -g -std=c++11 -c target_filter.cpp -o target_filter.o -I../lib/bamtools
-	g++ -Wall -g -std=c++11 -o target_filter target_filter.o ../lib/zlib/*.lo -L../lib -letching_caller -I../lib/bamtools
+	g++ -Wall -g -std=c++11 -c ${INCLUDE} target_filter.cpp -o target_filter.o
+	g++ -Wall -g -std=c++11 ${INCLUDE} -o target_filter target_filter.o ${SHARE}
 
-extract_BP_read: extract_BP_read.cpp
-	g++ -Wall -g -std=c++11 -c extract_BP_read.cpp -o extract_BP_read.o -I../lib/bamtools
-	g++ -Wall -g -std=c++11 -o extract_BP_read extract_BP_read.o ../lib/zlib/*.lo -L../lib -letching_caller -I../lib/bamtools
-
-etching_typer: ../lib/libetching_caller.so etching_typer.cpp ../lib/zlib/*.lo
-	g++ -Wall -g -std=c++11 etching_typer.cpp ../lib/zlib/*.lo -L../lib -letching_caller -o etching_typer -I../lib/bamtools
-	cd ../lib/bamtools ; make ; cd -
+etching_typer: etching_typer.cpp
+	g++ -Wall -g -std=c++11 -c ${INCLUDE} etching_typer.cpp -o etching_typer.o -pthread
+	g++ -Wall -g -std=c++11 etching_typer.o -o etching_typer ${SHARE}
+binary: library # binary
+	g++ -Wall -g -std=c++11 -c -fPIC ${INCLUDE} caller_usage.cpp -o caller_usage.o # binary
+	g++ -Wall -g -std=c++11 -c -fPIC ${INCLUDE} etching_typer.cpp -o etching_typer.o -pthread # binary
+	g++ -Wall -g -std=c++11 -c -fPIC ${INCLUDE} target_filter.cpp -o target_filter.o # binary
+	g++ -Wall -g -std=c++11 -fopenmp ${INCLUDE} etching_caller.cpp -o etching_caller caller_usage.o -lpthread ../lib/*lo ${OBJECT} # binary
+	g++ -Wall -g -std=c++11 ${INCLUDE} etching_typer.o -o etching_typer -lpthread ../lib/*lo ${OBJECT} # binary
+	g++ -Wall -g -std=c++11 ${INCLUDE} target_filter.o -o target_filter -lpthread ../lib/*lo ${OBJECT} # binary
+library: bp_to_vcf.cpp find_path.cpp caller_functions.cpp my_vcf.cpp # source
+	g++ -Wall -g -std=c++11 -c -fPIC ${INCLUDE} bp_to_vcf.cpp -o ../lib/bp_to_vcf.lo  # source
+	g++ -Wall -g -std=c++11 -c -fPIC ${INCLUDE} find_path.cpp -o ../lib/find_path.lo # source
+	g++ -Wall -g -std=c++11 -c -fPIC ${INCLUDE} caller_functions.cpp -o ../lib/caller_functions.lo  # source
+	g++ -Wall -g -std=c++11 -c -fPIC ${INCLUDE} my_vcf.cpp -o ../lib/my_vcf.lo # source
+remove_source: # source
+	rm -f bp_to_vcf.cpp find_path.cpp caller_functions.cpp my_vcf.cpp # source
 
 clean:
-	rm -f etching_add_feature etching_caller etching_merge etching_typer extract_BP_read target_filter
-
-cleanlibrary: 
-	rm -f ../lib/libetching_caller.so
+	rm -f etching_add_feature etching_caller etching_merge etching_typer target_filter
 
 cleanall: clean
-	rm -f *.lo *.o
-	rm -f ../lib/libetching_caller.so
+	rm -f *.o

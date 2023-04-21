@@ -9,20 +9,24 @@
 #include <random>
 #include <sstream>
 
-void usage(){
+void sorter_usage(int argc, char ** argv){
   std::cout
-    << "Usage:\tetching_sorter [options] -i input.vcf -o output_prefix [options]\n"
+    << "Program: " << get_program_name(argc, argv) << "\n"
+    << "Version: " << ETCHING_VERSION << " (" << RELEASE_DATE << ")\n"
+    << "ML model: " << MODEL_VERSION << "\n"
+    << "Usage: " << get_program_name(argc, argv) << " [options] -i input.vcf -o output_prefix [options]\n"
     << "\n"
     << "Required:\n"
-    << "\t" << "-i (string)\t" << "input vcf file\n"
-    << "\t" << "-p (string)\t" << "Prefix of machine learning model files\n"
+    << "\t" << "-i (string) \t" << "input vcf file\n"
+    << "\t" << "-p (string) \t" << "Prefix of machine learning model files with path-to\n"
+    << "\t" << "            \t" << "(-p /path/to/ETCHING_ML_model/prefix)"
     << "\n"
     << "Options:\n"
-    << "\t" << "-o (string)\t" << "Prefix of output vcf file\n"
-    << "\t" << "-c (double)\t" << "Cut-off parameter [0.4]\n"
-    << "\t" << "-t (int)   \t" << "Number of threads [8]\n"
-    << "\t" << "-R         \t" << "Random Forest [default]\n"
-    << "\t" << "-X         \t" << "XGBoost\n"
+    << "\t" << "-o (string) \t" << "Prefix of output vcf file\n"
+    << "\t" << "-c (double) \t" << "Cut-off parameter [0.4]\n"
+    << "\t" << "-t (int)    \t" << "Number of threads [8]\n"
+    << "\t" << "-R          \t" << "Random Forest [default]\n"
+    << "\t" << "-X          \t" << "XGBoost\n"
     << "\t" << "NOTE: Machine learning method must be matched with model files.\n"
     << "\n";
 }
@@ -32,7 +36,7 @@ int make_score_file ( std::string, std::string, std::string, std::string);
   
 int main ( int argc , char ** argv ){
   if ( argc == 1 ){
-    usage();
+    sorter_usage(argc,argv);
     return 1;
   }
 
@@ -62,13 +66,13 @@ int main ( int argc , char ** argv ){
     case 'R': method_R="RandomForest"; break;
     case 'X': method_X="XGBoost"; break;
     case 'L': method_L="LightGBM"; break;
-    case 'h': usage() ; return 1;
+    case 'h': sorter_usage(argc,argv) ; return 1;
     default:
       {
 	std::cout << "ERROR!!! Check options!!!\n\n";
 	std::cout << (char) opt << "\n\n";
-	usage();
-	return 2 ;
+	sorter_usage(argc,argv);
+	return 1 ;
       }
     }
   }
@@ -77,8 +81,8 @@ int main ( int argc , char ** argv ){
     std::cout << "ERROR!!! -i (input file) is required\n"; 
     std::cout << "------------------------------------\n";
     std::cout << "\n";
-    usage();
-    return 3;
+    sorter_usage(argc,argv);
+    return 1;
   }
 
   std::ifstream fin ( infile.c_str() );
@@ -87,8 +91,8 @@ int main ( int argc , char ** argv ){
     std::cout << "ERROR!!! There is no input file: " << infile << "\n";
     std::cout << "-------------------------------------------------\n";
     std::cout << "\n";
-    usage();
-    return 4;
+    sorter_usage(argc,argv);
+    return 1;
   }
 
   fin.close();
@@ -97,8 +101,8 @@ int main ( int argc , char ** argv ){
     std::cout << "ERROR!!! -m option is required (the prefix of machine learning model)\n";
     std::cout << "---------------------------------------------------------------------\n";
     std::cout << "\n";
-    usage();
-    return 4;
+    sorter_usage(argc,argv);
+    return 1;
   }
 
   if ( method_R.size() == 0 && method_X.size() == 0 && method_L.size() == 0 ){
@@ -117,8 +121,8 @@ int main ( int argc , char ** argv ){
     std::cout << "ERROR!!! Please use only one of -R (Random Forest), or -X (XGBoost).\n";
     std::cout << "-----------------------------------------------------------------------------\n";
     std::cout << "\n";
-    usage();
-    return 5;
+    sorter_usage(argc,argv);
+    return 1;
   }
 
 
@@ -201,13 +205,14 @@ int main ( int argc , char ** argv ){
   int status;
   status=make_score_file ( infile, score_file, prefix, method);
   if (status != 0 ){
-    return status;
+    return 1;
   }
 
 
   // TODO: error check
 
   std::cout << "Removing false positives\n";
+  prefix.pop_back();
   razor ( infile, score_file, prefix, cutoff, method);
 
   return 0;
@@ -257,7 +262,7 @@ int make_score_file ( std::string infile, std::string score_file, std::string pr
     std::size_t Size1=score_vec.size();
     if ( Size != Size1 ){
       std::cout << "ERROR!!! Number of SV is not matched with the number of score in etching_sorter." << "\n";
-      return 6;
+      return 1;
     }
     for ( std::size_t j = 0 ; j < Size ; j ++ ){
       score_sum_vec[j] += score_vec[j]/10;
