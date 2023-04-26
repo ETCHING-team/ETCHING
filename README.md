@@ -102,7 +102,7 @@ cd ETCHING
 make
 
 # Set your environment for ETCHING
-echo "export PATH=/path/to/ETCHING/bin" >> ~/.bashrc
+echo "export PATH=$PATH:/path/to/ETCHING/bin" >> ~/.bashrc
 exec $SHELL
 ```
 
