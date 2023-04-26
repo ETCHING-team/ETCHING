@@ -131,7 +131,7 @@ etching -1 tumor_1.fq -2 tumor_2.fq -1c normal_1.fq -2c normal_2.fq -g Chr22.fa 
 You can run with bam or cram.
 ```bash
 # or
-etching -b tumor.sort.cram -bc normal.sort.cram -g Chr22.fa -f demo_PGK -p cram_mode_output
+etching -b tumor.sorted.cram -bc normal.sorted.cram -g Chr22.fa -f demo_PGK -p cram_mode_output
 ```
 
 
